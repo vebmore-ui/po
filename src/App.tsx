@@ -12,8 +12,12 @@ function getScrollProgress() {
   return Math.min(Math.max(scrollTop / docHeight, 0), 1)
 }
 
+const QUESTION_REVEAL = 1200
+const COMPASS_ANIM = 1200
+
 function App() {
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [showCompass, setShowCompass] = useState(false)
   const [animationComplete, setAnimationComplete] = useState(false)
 
   useEffect(() => {
@@ -26,10 +30,18 @@ function App() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setAnimationComplete(true)
-    }, 1200)
+      setShowCompass(true)
+    }, QUESTION_REVEAL)
     return () => clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    if (!showCompass) return
+    const timer = setTimeout(() => {
+      setAnimationComplete(true)
+    }, COMPASS_ANIM)
+    return () => clearTimeout(timer)
+  }, [showCompass])
 
   const textProgress = Math.min(Math.max(scrollProgress / 0.35, 0), 1)
   const compassProgress = scrollProgress < 0.35 ? 0 : Math.min(Math.max((scrollProgress - 0.35) / 0.25, 0), 1)
@@ -39,7 +51,7 @@ function App() {
     <>
       <div className="scroll-spacer" style={{ height: `${TOTAL_SCROLL_HEIGHT}vh` }} />
       <div className="hero-container" style={{ position: 'fixed', inset: 0 }}>
-        <Compass compassProgress={compassProgress} />
+        {showCompass && <Compass compassProgress={compassProgress} />}
         <ScrollTextLines textProgress={textProgress} animationComplete={animationComplete} />
         <div
           className="white-bg"

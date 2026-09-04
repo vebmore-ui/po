@@ -8,6 +8,7 @@ const LINES = [
 ]
 
 const REPEAT_COUNT = 8
+const QUESTION_WORDS = ['NEED', 'DIRECTION', 'TO', 'GROW', 'YOUR', 'BUSINESS', 'ONLINE?']
 
 export default function ScrollTextLines({ textProgress = 0, animationComplete = false }: { textProgress?: number; animationComplete?: boolean }) {
   const [visibleLines, setVisibleLines] = useState<boolean[]>(Array(LINES.length).fill(false))
@@ -28,6 +29,8 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
     return () => timers.forEach(clearTimeout)
   }, [animationComplete])
 
+  const questionOpacity = Math.max(0, 1 - textProgress / 0.15)
+
   return (
     <>
       <style>{`
@@ -39,8 +42,15 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
           from { transform: translateX(-50%); }
           to { transform: translateX(0); }
         }
+        @keyframes fadeWord {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         .text-line {
           transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.1s, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+        }
+        .word {
+          animation: fadeWord 0.5s ease-out both;
         }
       `}</style>
       <div
@@ -50,9 +60,37 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
           minHeight: '100vh',
           background: '#000000',
           overflow: 'hidden',
-          padding: '10vh 0',
+          padding: '20vh 0',
         }}
       >
+        <div
+          style={{
+            position: 'absolute',
+            top: '6vh',
+            left: '0.5rem',
+            color: '#ffffff',
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: 'clamp(1.2rem, 4vw, 3rem)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            opacity: questionOpacity,
+            display: 'flex',
+            gap: '0.5rem',
+            pointerEvents: 'none',
+          }}
+        >
+          {QUESTION_WORDS.map((word, i) => (
+            <span
+              key={i}
+              className="word"
+              style={{
+                animationDelay: `${i * 0.15}s`,
+              }}
+            >
+              {word}
+            </span>
+          ))}
+        </div>
         {LINES.map((line, index) => {
           const items = []
           for (let set = 0; set < 2; set++) {
