@@ -1,5 +1,5 @@
 name = "vebmore"
-main = "src/worker.ts"
+main = "worker.ts"
 compatibility_date = "2026-09-04"
 
 [vars]
@@ -9,6 +9,3 @@ directory = "./dist"
 
 [build]
 command = "npm run build"
-
-[build.upload]
-format = "modules"
