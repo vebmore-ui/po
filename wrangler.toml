@@ -1,0 +1,14 @@
+name = "vebmore"
+main = "src/worker.ts"
+compatibility_date = "2026-09-04"
+
+[vars]
+
+[assets]
+directory = "./dist"
+
+[build]
+command = "npm run build"
+
+[build.upload]
+format = "modules"
