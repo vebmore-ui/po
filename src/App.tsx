@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Compass from './components/hero/Compass'
 import ScrollTextLines from './components/hero/ScrollTextLines'
+import VebmoreReveal from './components/hero/VebmoreReveal'
 import './App.css'
 
 const TOTAL_SCROLL_HEIGHT = 300
@@ -46,6 +47,7 @@ function App() {
   const textProgress = Math.min(Math.max(scrollProgress / 0.35, 0), 1)
   const compassProgress = scrollProgress < 0.35 ? 0 : Math.min(Math.max((scrollProgress - 0.35) / 0.25, 0), 1)
   const whiteProgress = scrollProgress < 0.6 ? 0 : Math.min(Math.max((scrollProgress - 0.6) / 0.4, 0), 1)
+  const revealComplete = whiteProgress >= 1
 
   return (
     <>
@@ -67,6 +69,7 @@ function App() {
             pointerEvents: 'none',
           }}
         />
+        {revealComplete && <VebmoreReveal />}
       </div>
     </>
   )
