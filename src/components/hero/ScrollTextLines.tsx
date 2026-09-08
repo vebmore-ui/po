@@ -96,8 +96,29 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
           animation-delay: 2.4s;
           will-change: transform;
         }
+
+        @media (max-width: 390px) {
+          .lines-container {
+            padding-top: 10vh !important;
+            padding-bottom: 10vh !important;
+            transform: translateY(-4vh) !important;
+          }
+          .text-line:not(.question-line) {
+            height: 14vh !important;
+          }
+          .question-line {
+            height: 6vh !important;
+          }
+          .text-line span[style*="paddingRight"] {
+            padding-right: 0.75rem !important;
+          }
+          .question-track {
+            font-size: clamp(0.6rem, 1.6vw, 1.2rem);
+          }
+        }
       `}</style>
       <div
+        className="lines-container"
         style={{
           position: 'relative',
           width: '100%',
@@ -144,7 +165,7 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
 
           return (
             <div
-              className="text-line"
+              className={`text-line ${isQuestion ? 'question-line' : ''}`}
               key={index}
               style={{
                 position: 'relative',

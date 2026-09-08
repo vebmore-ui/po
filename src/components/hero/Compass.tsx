@@ -4,13 +4,21 @@ import CompassNeedle from './CompassNeedle'
 import CompassGlass from './CompassGlass'
 
 export default function Compass({ compassProgress = 0 }: { compassProgress?: number }) {
-  const [size, setSize] = useState(() => Math.round(Math.min(Math.max(280, Math.min(window.innerWidth * 0.28, window.innerHeight * 0.40)), 420)))
+  const [size, setSize] = useState(() => {
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const minSize = vw < 480 ? 140 : 280
+    return Math.round(Math.min(Math.max(minSize, Math.min(vw * 0.28, vh * 0.40)), 420))
+  })
   const [cursorPos, setCursorPos] = useState({ x: 0.5, y: 0.5 })
   const [animationStage, setAnimationStage] = useState(0)
 
   useEffect(() => {
     const handleResize = () => {
-      setSize(Math.round(Math.min(Math.max(280, Math.min(window.innerWidth * 0.28, window.innerHeight * 0.40)), 420)))
+      const vw = window.innerWidth
+      const vh = window.innerHeight
+      const minSize = vw < 480 ? 140 : 280
+      setSize(Math.round(Math.min(Math.max(minSize, Math.min(vw * 0.28, vh * 0.40)), 420)))
     }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
