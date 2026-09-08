@@ -7,8 +7,15 @@ export default function Compass({ compassProgress = 0 }: { compassProgress?: num
   const [size, setSize] = useState(() => {
     const vw = window.innerWidth
     const vh = window.innerHeight
-    const minSize = vw < 480 ? 140 : 280
-    return Math.round(Math.min(Math.max(minSize, Math.min(vw * 0.28, vh * 0.40)), 420))
+    const base = Math.min(vw * 0.28, vh * 0.40)
+    const minSize = vw < 480 ? 140 : vw < 1024 ? 180 : 280
+    return Math.round(Math.min(Math.max(minSize, base), 420))
+  })
+  const [topPos, setTopPos] = useState(() => {
+    const vw = window.innerWidth
+    if (vw <= 480) return 62
+    if (vw >= 1024) return 78
+    return 78 - ((1024 - vw) / (1024 - 480)) * 13
   })
   const [cursorPos, setCursorPos] = useState({ x: 0.5, y: 0.5 })
   const [animationStage, setAnimationStage] = useState(0)
@@ -17,8 +24,12 @@ export default function Compass({ compassProgress = 0 }: { compassProgress?: num
     const handleResize = () => {
       const vw = window.innerWidth
       const vh = window.innerHeight
-      const minSize = vw < 480 ? 140 : 280
-      setSize(Math.round(Math.min(Math.max(minSize, Math.min(vw * 0.28, vh * 0.40)), 420)))
+      const base = Math.min(vw * 0.28, vh * 0.40)
+      const minSize = vw < 480 ? 140 : vw < 1024 ? 180 : 280
+      setSize(Math.round(Math.min(Math.max(minSize, base), 420)))
+      if (vw <= 480) setTopPos(62)
+      else if (vw >= 1024) setTopPos(78)
+      else setTopPos(78 - ((1024 - vw) / (1024 - 480)) * 13)
     }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
@@ -60,7 +71,7 @@ export default function Compass({ compassProgress = 0 }: { compassProgress?: num
       style={{
         position: 'absolute',
         left: '50%',
-        top: '78%',
+        top: `${topPos}%`,
         transform: 'translate(-50%, -50%)',
         width: size,
         height: size,

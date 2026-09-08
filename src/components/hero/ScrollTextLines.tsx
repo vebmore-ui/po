@@ -22,6 +22,36 @@ const DISAPPEAR_ORDER = [4, 3, 2, 1]
 export default function ScrollTextLines({ textProgress = 0, animationComplete = false }: { textProgress?: number; animationComplete?: boolean }) {
   const [visibleLines, setVisibleLines] = useState<boolean[]>(Array(LINES.length).fill(false))
   const [questionRevealed, setQuestionRevealed] = useState(false)
+  const [lineHeight, setLineHeight] = useState(() => {
+    const vw = window.innerWidth
+    if (vw <= 480) return 14
+    if (vw >= 1024) return 20
+    return 20 - ((1024 - vw) / (1024 - 480)) * 4
+  })
+  const [questionHeight, setQuestionHeight] = useState(() => {
+    const vw = window.innerWidth
+    if (vw <= 480) return 5
+    if (vw >= 1024) return 7
+    return 7 - ((1024 - vw) / (1024 - 480)) * 1
+  })
+
+  useEffect(() => {
+    const handleResize = () => {
+      const vw = window.innerWidth
+      if (vw <= 480) {
+        setLineHeight(14)
+        setQuestionHeight(5)
+      } else if (vw >= 1024) {
+        setLineHeight(20)
+        setQuestionHeight(7)
+      } else {
+        setLineHeight(20 - ((1024 - vw) / (1024 - 480)) * 4)
+        setQuestionHeight(7 - ((1024 - vw) / (1024 - 480)) * 1)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Line 0 reveals with a typewriter on mount — before the compass appears.
   useEffect(() => {
@@ -103,12 +133,6 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
             padding-bottom: 10vh !important;
             transform: translateY(-4vh) !important;
           }
-          .text-line:not(.question-line) {
-            height: 14vh !important;
-          }
-          .question-line {
-            height: 6vh !important;
-          }
           .text-line span[style*="paddingRight"] {
             padding-right: 0.75rem !important;
           }
@@ -125,7 +149,7 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
           minHeight: '100vh',
           background: '#000000',
           overflow: 'hidden',
-          padding: '20vh 0',
+          padding: 'clamp(10vh, 20vh, 20vh) 0',
           transform: 'translateY(-8vh)',
         }}
       >
@@ -170,7 +194,7 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
               style={{
                 position: 'relative',
                 width: '100%',
-                height: isQuestion ? '7vh' : '20vh',
+                height: isQuestion ? `${questionHeight}vh` : `${lineHeight}vh`,
                 display: 'flex',
                 alignItems: 'center',
                 overflow: 'hidden',
