@@ -1,0 +1,438 @@
+/* ------------------------------------------------------------------
+   VEBMORE — curtains transition + black motion-design world
+   The page stays black end to end. Nothing here introduces a light
+   background; the change between worlds comes from choreography.
+   ------------------------------------------------------------------ */
+
+/* Two colours only: white for type and structure, green for the accent marks.
+   Every graphic in the canvas draws from these, so nothing introduces a third
+   hue. */
+:root {
+  --mw-ink: #ffffff;
+  --mw-muted: rgba(255, 255, 255, 0.42);
+  --mw-faint: rgba(255, 255, 255, 0.16);
+  --mw-accent: #35d07f;
+  --mw-accent-2: #0f8f4b;
+}
+
+/* ---------- Stage B: Motion.dev curtains (mixed cover + iris) ---------- */
+
+.curtain-root {
+  position: fixed;
+  inset: 0;
+  /* Above the motion world, which mounts behind it: the curtain has to be the
+     thing that covers the canvas, and lifting it is what reveals the canvas. */
+  z-index: 900;
+  overflow: hidden;
+  pointer-events: none;
+  background: #020a06;
+}
+
+.curtain-cover-layer {
+  position: absolute;
+  /* One viewport tall, offset up by its own height, so each column can sit
+     entirely above the frame while it waits its turn. */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  /* Above the iris so the green cover is what carries the seam. */
+  z-index: 2;
+}
+
+.curtain-band,
+.curtain-arc {
+  z-index: 3;
+}
+
+.curtain-col {
+  position: absolute;
+  /* Sits fully above the frame at translateY(-100%) and fully covers it at 0,
+     so the whole travel is visible. These two values are the column's own
+     height, and the component's transform is written against them. */
+  top: 0;
+  height: 100%;
+  display: block;
+  /* A green in the brand's hue family, dark enough to own the seam. */
+  background: linear-gradient(180deg, #04140c 0%, #08301c 45%, #0a4326 100%);
+  will-change: transform;
+}
+
+.curtain-col:nth-child(even) {
+  background: linear-gradient(180deg, #030f09 0%, #06220f 50%, #0b4a2b 100%);
+}
+
+.curtain-band {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: linear-gradient(180deg, rgba(4, 20, 12, 0) 20%, rgba(10, 67, 38, 0.9) 60%, rgba(4, 20, 12, 0) 90%);
+  transform-origin: 50% 0%;
+  will-change: transform, opacity;
+}
+
+.curtain-arc-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(62vmin, 520px);
+  height: min(62vmin, 520px);
+  margin: calc(min(62vmin, 520px) / -2) 0 0 calc(min(62vmin, 520px) / -2);
+  will-change: transform, opacity;
+}
+
+.curtain-arc {
+  display: block;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.curtain-iris {
+  position: absolute;
+  /* The drawing space is square (so the aperture stays a true circle) and sized
+     to the longer viewport edge, then centred — that way the open circle always
+     covers the whole frame no matter how wide or tall the window is. */
+  top: 50%;
+  left: 50%;
+  width: max(100vw, 100vh);
+  height: max(100vw, 100vh);
+  transform: translate(-50%, -50%);
+  display: block;
+  z-index: 1;
+}
+
+/* ---------- Stage C: the black motion-design canvas ---------- */
+
+.mw-root {
+  position: relative;
+  width: 100%;
+  background: #000;
+  isolation: isolate;
+}
+
+.mw-frame {
+  /* The canvas is the camera: it holds the viewport while the section supplies
+     the scroll length. Sticky is the pin here — the section must stay in flow so
+     its 600vh is real scroll, which a fixed layer would not provide. */
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  z-index: 1;
+  isolation: isolate;
+}
+
+.mw-frame.is-ready {
+  opacity: 1;
+}
+
+/* Shared coordinate system: every object is centred, positioned with
+   percentages of the frame plus its own transform. No per-breakpoint hacks. */
+.mw-obj {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.mw-obj[data-stage='0'] {
+  width: min(140vmin, 1100px);
+}
+.mw-obj[data-stage='0'] .mw-svg {
+  transform: rotate(-8deg);
+}
+
+.mw-obj[data-stage='1'] {
+  left: auto;
+  top: auto;
+  transform: none;
+  right: 4vw;
+  bottom: 12vh;
+}
+
+.mw-obj[data-stage='2'] {
+  left: 18%;
+  top: 72%;
+  transform: translate(-50%, -50%) rotate(12deg);
+}
+
+.mw-obj[data-stage='3'] {
+  left: 30%;
+  top: 26%;
+  transform: translate(-50%, -50%) rotate(-9deg);
+}
+
+.mw-obj[data-stage='5'] {
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 6vw;
+}
+
+.mw-obj[data-stage='6'] {
+  left: auto;
+  right: 8vw;
+  top: 22%;
+  transform: translate(0, -50%);
+}
+
+.mw-route {
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 70vh;
+  transform: translateY(-50%);
+}
+
+.mw-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.mw-draw {
+  vector-effect: non-scaling-stroke;
+}
+
+/* Typography — the words are objects on the canvas, not a paragraph. */
+.mw-words {
+  /* Full-bleed and unclipped: the line travels through it, so it must not add
+     padding or centring of its own. */
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The four statements sit side by side in ONE track. The track is what scroll
+   translates leftwards, so the words travel through the viewport as a line
+   rather than each entering from its own side. */
+.mw-line-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(48px, 12vw, 200px);
+  transform: translateY(-50%);
+  will-change: transform;
+}
+
+.mw-line {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0;
+  width: max-content;
+  display: flex;
+  align-items: baseline;
+  /* Flex discards the whitespace node between the lead and the word, which
+     fused them into one word. The gap is expressed here instead. */
+  gap: 0.24em;
+  transform-origin: 50% 50%;
+  text-align: left;
+  white-space: nowrap;
+  font-family: 'Archivo', 'Anton', system-ui, sans-serif;
+  font-size: clamp(1.7rem, 6.4vw, 6.2rem);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+  color: var(--mw-ink);
+  will-change: transform, opacity;
+}
+
+/* The lead is the heavy upright voice; the word is the slanted expressive one.
+   Anton ships a single weight, so the contrast is carried by asking for a real
+   bold face on the lead and a genuine italic on the word — without these the
+   browser fakes the slant and both halves read as one uniform statement. */
+.mw-lead {
+  font-family: 'Archivo', 'Anton', system-ui, sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: -0.035em;
+}
+
+.mw-word {
+  font-family: 'Archivo', 'Anton', system-ui, sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--mw-ink);
+  /* Slightly tighter than the lead: italic letterforms lean into each other, so
+     an even tracking leaves the word looking loose next to the upright. */
+  letter-spacing: -0.045em;
+  padding-right: 0.1em;
+}
+
+.mw-line[data-index='0'] .mw-word {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.mw-line[data-index='1'] .mw-word,
+.mw-line[data-index='2'] .mw-word {
+  color: rgba(255, 255, 255, 0.94);
+}
+
+/* Supporting copy: sparse, quiet, never competing with the statement. */
+.mw-meta-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mw-meta {
+  position: absolute;
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  font-size: clamp(0.62rem, 1.5vw, 0.86rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--mw-muted);
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+.mw-meta-a {
+  left: clamp(16px, 5vw, 96px);
+  bottom: clamp(28px, 8vh, 88px);
+}
+
+.mw-meta-b {
+  right: clamp(16px, 5vw, 96px);
+  top: clamp(28px, 8vh, 88px);
+}
+
+.mw-meta-c {
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(20px, 5vh, 56px);
+  color: var(--mw-ink);
+}
+
+/* Narrow screens: the composition recomposes, positions stay relative. */
+@media (max-width: 768px) {
+  .mw-obj[data-stage='0'] {
+    width: min(190vmin, 900px);
+  }
+  .mw-obj[data-stage='1'] {
+    right: -6vw;
+    bottom: 8vh;
+  }
+  .mw-obj[data-stage='3'] {
+    left: 26%;
+    top: 22%;
+  }
+  .mw-obj[data-stage='5'] {
+    right: 2vw;
+  }
+  .mw-obj[data-stage='6'] {
+    right: -4vw;
+  }
+  .mw-meta-b {
+    top: auto;
+    bottom: calc(clamp(28px, 8vh, 88px) + 1.6em);
+  }
+  .mw-meta {
+    letter-spacing: 0.3em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mw-line {
+    will-change: auto;
+  }
+}
+/* ---------- Closing coda: the final black frame ---------- */
+
+.mw-coda {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+  padding: clamp(48px, 12vh, 140px) clamp(16px, 5vw, 96px);
+}
+
+.mw-coda-obj {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@keyframes mwCodaSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mw-coda-spin {
+  animation: mwCodaSpin 48s linear infinite;
+}
+
+.mw-coda-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2.4vh, 26px);
+  text-align: center;
+}
+
+.mw-coda-eyebrow,
+.mw-coda-rule,
+.mw-coda-meta {
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  text-transform: uppercase;
+  color: var(--mw-muted);
+  font-size: clamp(0.6rem, 1.4vw, 0.82rem);
+  letter-spacing: 0.4em;
+}
+
+.mw-coda-rule {
+  color: var(--mw-ink);
+  letter-spacing: 0.34em;
+}
+
+.mw-coda-mark {
+  margin: 0;
+  font-family: 'Anton', 'Bebas Neue', system-ui, sans-serif;
+  font-size: clamp(2.6rem, 13vw, 11rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  color: var(--mw-ink);
+}
+
+.mw-coda-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(12px, 4vw, 40px);
+  color: var(--mw-faint);
+  color: rgba(255, 255, 255, 0.34);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mw-coda-spin {
+    animation: none;
+  }
+}
