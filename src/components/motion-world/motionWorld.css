@@ -107,26 +107,32 @@
 /* ---------- Stage C: the black motion-design canvas ---------- */
 
 .mw-root {
-  position: relative;
-  width: 100%;
-  background: #000;
-  isolation: isolate;
-}
-
-.mw-frame {
-  /* The canvas is the camera: it holds the viewport while the section supplies
-     the scroll length. Sticky is the pin here — the section must stay in flow so
-     its 600vh is real scroll, which a fixed layer would not provide. */
-  position: sticky;
-  top: 0;
+  /* The world is a BACKGROUND, not a section: it is fixed behind the curtain so
+     lifting the curtain reveals it directly. It contributes no height to the
+     page, so there is no scroll to travel through before it appears. */
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100vh;
   height: 100dvh;
+  background: #000;
+  /* Below the curtain (900) and below the hero/reveal layers (100-200), so it
+     is genuinely behind everything that is meant to be in front of it. */
+  z-index: 1;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.mw-frame {
+  /* The canvas fills the fixed layer: the layer is the camera now, so the frame
+     only has to hold the objects and clip them to the viewport. */
+  position: relative;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background: #000;
   opacity: 0;
   transition: opacity 0.22s ease;
-  z-index: 1;
   isolation: isolate;
 }
 

@@ -110,7 +110,18 @@ export default function CurtainsTransition({ progress, scrollSpan, onComplete }:
           own travel and flattened the stagger into uniform slabs. */}
       <div className="curtain-cover-layer">
         {Array.from({ length: COLUMNS }, (_, i) => {
-          const down = Math.min(Math.max((coverIn - i * 0.11) / 0.62, 0), 1)
+          // The stagger must FIT INSIDE coverIn's 0..1 range, or the later columns
+          // never finish their fall. The original numbers did not: column 6 needed
+          // coverIn 1.28 to land, but coverIn is capped at 1, so the last three
+          // columns stalled at 45%, 27% and 10% short and the right of the frame
+          // was never covered — which is why the VEBMORE mark could not be held
+          // until the curtain fell on it.
+          //
+          // Total stagger (last column's delay) plus one column's travel is 1.0,
+          // so every column reaches the bottom exactly as coverIn completes.
+          const STAGGER = 0.06
+          const FALL = 1 - STAGGER * (COLUMNS - 1)
+          const down = Math.min(Math.max((coverIn - i * STAGGER) / FALL, 0), 1)
           const up = Math.min(Math.max((exit - (COLUMNS - 1 - i) * 0.06) / 0.68, 0), 1)
           return (
             <span

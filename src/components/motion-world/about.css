@@ -1,0 +1,271 @@
+/* ------------------------------------------------------------------
+   VEBMORE — the black-to-white seam and the About section
+   The page has been black end to end until this point. Everything
+   here is the arrival in a different material: paper.
+   ------------------------------------------------------------------ */
+
+/* ---------- Stage D: the pixelize transition ---------- */
+
+.px-root {
+  position: fixed;
+  inset: 0;
+  /* Above the motion world (1) and above the hero/reveal layers (100-200), and
+     above the curtain (900) so it owns the frame while it plays. It is below the
+     About section, whose own reveal is what the seam resolves into. */
+  z-index: 950;
+  pointer-events: none;
+  background: transparent;
+}
+
+.px-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Stage E: the About section (white) ---------- */
+
+.ab-root {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  /* Paper. The first non-black surface on the page. */
+  background: #ffffff;
+  color: #000;
+  /* Comfortable editorial margins that scale with the viewport. */
+  padding: clamp(56px, 11vh, 132px) clamp(20px, 6vw, 104px);
+  /* Above the pixelize canvas, which resolves INTO this section. */
+  z-index: 960;
+}
+
+.ab-grid {
+  width: 100%;
+  display: grid;
+  /* Two columns on desktop: the composition and the plate. The left column is
+     wider because the title needs room to breathe. */
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(32px, 6vw, 88px);
+  align-items: center;
+}
+
+.ab-left {
+  min-width: 0;
+}
+
+/* ---------- The ABOUT label and its green quotation marks ---------- */
+
+.ab-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0 0 clamp(20px, 3.4vh, 34px);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  /* The label text stays black; only the marks below take the accent. */
+  color: #000;
+}
+
+.ab-quotes {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: 0;
+  /* The restrained brand green, matching the motion world's accent. */
+  color: #0f8f4b;
+  /* Sits tight to ABOUT so the two read as one small label unit. */
+  margin-left: -0.24em;
+}
+
+/* ---------- The title ---------- */
+
+.ab-title {
+  margin: 0 0 clamp(24px, 4vh, 40px);
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  font-weight: 400;
+  /* Large and dominant: this is the section's single loudest element. */
+  font-size: clamp(3.1rem, 8.6vw, 8.4rem);
+  line-height: 0.86;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.ab-title-line {
+  display: block;
+  /* Two lines, each its own flow row. */
+  white-space: nowrap;
+}
+
+/* Each word is masked so it can rise out of nothing rather than fade: the
+   wrapper clips, and the inner span is what actually moves. */
+.ab-word-mask {
+  display: inline-block;
+  overflow: hidden;
+  /* A hair of vertical room so descenders and the mask edge do not clip the
+     glyphs at the top of the travel. */
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+  vertical-align: bottom;
+  /* Space between words on the first line. */
+  margin-right: 0.22em;
+}
+
+.ab-word-mask:last-child {
+  margin-right: 0;
+}
+
+.ab-word {
+  display: inline-block;
+  /* The pre-reveal state: pushed fully below its mask and transparent. */
+  transform: translateY(105%);
+  opacity: 0;
+  transition:
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease-out;
+  will-change: transform, opacity;
+}
+
+.ab-word.is-in {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* The mark is the sentence's subject, so it is set apart from the lead words. */
+.ab-word-mark {
+  /* A touch of the brand green in the otherwise black title, so the mark reads as
+     the company's name rather than a fourth word. */
+  color: #000;
+  letter-spacing: -0.005em;
+}
+
+/* ---------- The paragraph ---------- */
+
+.ab-copy {
+  max-width: 46ch;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1vw, 0.8rem);
+  font-weight: 400;
+  line-height: 1.85;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.ab-copy p {
+  margin: 0;
+}
+
+.ab-lede {
+  /* The one-line summary sits slightly apart from the body copy. */
+  margin-bottom: 1.35em !important;
+  color: rgba(0, 0, 0, 0.62);
+}
+
+/* ---------- The birds plate ---------- */
+
+.ab-right {
+  margin: 0;
+  min-width: 0;
+}
+
+.ab-plate {
+  position: relative;
+  width: 100%;
+  /* A tall plate, so the flock has vertical room to move. */
+  aspect-ratio: 4 / 3;
+  /* BLACK OUTLINE, not a filled box: the birds need the inside. */
+  border: 1px solid #000;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* Vanta injects a canvas into this element; it must fill the plate exactly. */
+.ab-birds,
+.ab-birds canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.ab-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9em;
+  margin-top: 14px;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.6rem, 0.86vw, 0.7rem);
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.ab-caption-index {
+  color: #0f8f4b;
+  font-weight: 700;
+}
+
+/* ---------- Shared reveal utility ---------- */
+
+.ab-rise {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ab-rise.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .ab-grid {
+    /* One column: the composition stacks above its plate. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(40px, 7vh, 64px);
+  }
+
+  .ab-title-line {
+    /* The mask wrappers would otherwise hold the line open past the viewport. */
+    white-space: normal;
+  }
+
+  .ab-title {
+    font-size: clamp(2.9rem, 13vw, 5.2rem);
+  }
+
+  .ab-copy {
+    max-width: none;
+  }
+
+  .ab-plate {
+    aspect-ratio: 5 / 4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab-word,
+  .ab-rise {
+    transition: none;
+  }
+
+  .ab-word {
+    transform: none;
+    opacity: 1;
+  }
+
+  .ab-rise {
+    transform: none;
+    opacity: 1;
+  }
+}

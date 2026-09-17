@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { MotionConfig, motion, useReducedMotion } from 'motion/react'
 import {
   CompassRings,
@@ -11,8 +10,6 @@ import {
   ScaleMarks,
   SweepArc,
 } from './motion-world/motionObjects'
-
-gsap.registerPlugin(ScrollTrigger)
 
 const LINES = [
   { lead: 'You', word: 'Dream,' },
@@ -31,29 +28,35 @@ const LINES = [
  * is finite and fully reversible. Supporting SVG objects are driven by Motion
  * springs, which own only their own transforms — GSAP never touches them.
  */
-export default function MotionWorld() {
+type Props = {
+  /**
+   * 0..1 progress of Stage C's own journey. Supplied by App from the page's
+   * scroll *past the end of Act I*, so the world scrubs while it is already the
+   * thing on screen — it never needs scroll length of its own.
+   */
+  progress: number
+}
+
+export default function MotionWorld({ progress }: Props) {
   const root = useRef<HTMLDivElement>(null)
   const frame = useRef<HTMLDivElement>(null)
+  // The journey's timeline, kept across renders so the progress effect can seek
+  // it. GSAP owns the tween; this is only a handle to it.
+  const tlRef = useRef<gsap.core.Timeline | null>(null)
   const reduced = useReducedMotion()
   const [ready, setReady] = useState(false)
 
-  // The section's height is a viewport expression, not a measurement: resizing
-  // the section from inside it moves the ground under the scroller and freezes
-  // the page. `--mw-scroll` is how many screens of scroll the journey takes, and
-  // covers the line's travel with a screen at each end.
-  // The section's height sets how much scroll the journey has, so it is derived
-  // from the travel the line actually needs: one viewport of horizontal travel
-  // per viewport of scroll, plus a viewport to open and close on. A fixed
-  // viewport count either starved the later words of scroll or left a long
-  // stretch of dead scroll after the last one had settled.
-  // Screens of scroll for the journey: the line's travel plus a screen at each
-  // end to open and close on. Kept as a viewport expression rather than a
-  // measurement — deriving it from the layout inside the section moves the
-  // ground under the scroller and freezes the page.
-  const worldHeight = '520vh'
+  // The world is a FIXED layer, not a section in the flow. It sits behind the
+  // curtain from the moment the curtain's zone begins, so the curtain simply
+  // uncovers it — there is nothing below to scroll down into. Its scroll budget
+  // is Act I's own spacer, which is why this component contributes no height to
+  // the page at all.
+  //
+  // The journey is therefore driven by the `progress` prop rather than a
+  // ScrollTrigger: App already owns the one place that converts scroll into
+  // progress, and reusing that keeps the two acts on a single clock.
 
-  // Stage C must not become visible until the curtains are fully finished: the
-  // world mounts behind them and only reveals itself once the iris has opened.
+  // A short fade so the canvas is not revealed mid-frame, independent of scroll.
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 40)
     return () => clearTimeout(t)
@@ -63,82 +66,28 @@ export default function MotionWorld() {
     const el = root.current
     const stage = frame.current
     if (!el || !stage) return
-
     const ctx = gsap.context(() => {
       const words = gsap.utils.toArray<HTMLElement>('.mw-line')
       const stageEls = gsap.utils.toArray<HTMLElement>('[data-stage]')
       const metaEls = gsap.utils.toArray<HTMLElement>('.mw-meta')
 
-      // The section mounts BEHIND the curtain, so its own top has already
-      // scrolled past by the time the curtain lifts. Anchoring the range to the
-      // top of the document would strand the timeline at progress 0 and the line
-      // would never move; anchoring it to where the section actually starts
-      // makes the first frame the moment it is uncovered.
-      // The scrub range is deliberately SHORTER than the section: the section is
-      // sized generously so there is always enough scroll, and the timeline uses
-      // as much of it as the line actually needs to cross. Scrubbing across the
-      // whole section instead stretched four words over several thousand pixels
-      // and the page ran out of scroll before the last one reached the centre.
-      const range = () => {
-        const vh = window.innerHeight
-        // The journey starts when the canvas is actually on screen, not when the
-        // section mounts: the section's sticky frame holds the canvas behind the
-        // curtain while the hero's own track finishes scrolling past. Starting
-        // the range at the section's top left that whole stretch scrolling with
-        // the line frozen.
-        const start = Math.max(el.offsetTop, 0)
-        // One viewport of scroll for every viewport of horizontal travel, plus a
-        // screen at each end to hold the opening and closing frames. Scaled by
-        // the same ratio the line itself travels, so the timeline ends exactly
-        // when the last word has crossed the centre.
-        const travelPx = travel()
-        // One viewport of scroll per viewport of travel, plus a screen to hold
-        // the opening frame. Deliberately not more: the section is sized
-        // generously so there is always scroll available, and stretching the
-        // timeline across all of it left a long stretch of dead scroll after the
-        // last word had already reached the centre.
-        const end = Math.min(
-          start + travelPx * (vh / window.innerWidth) + vh,
-          Math.max(document.documentElement.scrollHeight - vh, start + 1),
-        )
-        return { start, end }
-      }
-
       if (reduced) {
-        // Reduced motion: no travel through the line, just the words legible and
-        // a gentle hand-off between them as the section is scrolled.
-        gsap.set(words, { opacity: 0.14, yPercent: 0 })
-        gsap.set(words[0], { opacity: 1 })
-        ScrollTrigger.create({
-          trigger: el,
-          start: () => range().start,
-          end: () => range().end,
-          onUpdate: (self) => {
-            const active = Math.min(Math.round(self.progress * (words.length - 1)), words.length - 1)
-            words.forEach((w, i) => gsap.set(w, { opacity: i === active ? 1 : 0.14 }))
-          },
-        })
+        // Reduced motion: no travel through the line and no canvas choreography.
+        // Every statement is shown at rest and legible, so the world is still
+        // readable — it simply does not move.
+        gsap.set(words, { opacity: 1, yPercent: 0 })
+        gsap.set(metaEls, { opacity: 1, y: 0 })
+        stageEls.forEach((s) => s.setAttribute('data-ready', 'true'))
+        const track = el.querySelector<HTMLElement>('.mw-line-track')
+        if (track) gsap.set(track, { x: window.innerWidth / 2 - (words[0]?.offsetWidth ?? 0) / 2 })
         return
       }
 
-      const tl = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          // Absolute scroll positions, not `top+=N` offsets. Those are measured
-          // from the trigger element's own top, so adding the element's document
-          // offset to them counted that offset twice and pushed the whole range
-          // far past the end of the page — leaving the scrub stuck at its start.
-          trigger: el,
-          start: () => range().start,
-          end: () => range().end,
-          scrub: 0.9,
-          // Re-derives every function-based value above (travel, centres) each
-          // time the trigger refreshes, so the font loading in after first paint
-          // does not leave the line animating to stale positions.
-          invalidateOnRefresh: true,
-          onRefresh: (self) => self.animation?.invalidate(),
-        },
-      })
+      // A paused timeline, not a ScrollTrigger: App supplies `progress` and the
+      // effect below seeks this timeline to it. The timeline is the single
+      // source of the journey's shape; scroll only says where in it we are.
+      const tl = gsap.timeline({ defaults: { ease: 'none' }, paused: true })
+      tlRef.current = tl
 
       // ONE LINE, MOVING LEFT. The four statements are laid out side by side as
       // a single horizontal track; scroll translates that track leftwards so each
@@ -205,23 +154,18 @@ export default function MotionWorld() {
         return fraction * (SPAN - beat * 1.6)
       }
       const beat = SPAN / LINES.length
-      // Word 0 — "You Dream," settles down from a slight rise and swells.
-      tl.fromTo(words[0],
-        { yPercent: 14, scale: 1.1, opacity: 0.2 },
-        { yPercent: 0, scale: 1, opacity: 1, duration: beat * 1.4, ease: 'power2.out' }, centreBeat(0))
-      // Word 1 — "We Design," tips in from a rotation and lifts through.
-      tl.fromTo(words[1],
-        { rotate: 12, yPercent: 22, scale: 0.86, opacity: 0.15 },
-        { rotate: 0, yPercent: 0, scale: 1, opacity: 1, duration: beat * 1.4, ease: 'power3.out' }, centreBeat(1))
-      // Word 2 — "We Develop," rises to full scale from small.
-      tl.fromTo(words[2],
-        { scale: 0.72, yPercent: 30, opacity: 0.15 },
-        { scale: 1, yPercent: 0, opacity: 1, duration: beat * 1.4, ease: 'power3.out' }, centreBeat(2))
-      // Word 3 — "We Deliver." arrives with a slight counter-rotation and a
-      // letter-spacing settle, then holds as the closing statement.
-      tl.fromTo(words[3],
-        { rotate: -8, yPercent: 26, scale: 1.18, opacity: 0.15, letterSpacing: '0.06em' },
-        { rotate: 0, yPercent: 0, scale: 1, opacity: 1, letterSpacing: '0em', duration: beat * 1.5, ease: 'power3.out' }, centreBeat(3))
+      // EVERY word gets the SAME beat: a plain rise-and-settle as it crosses the
+      // centre. No rotation, no scale, no entry from the side — the only motion
+      // is the shared leftward travel of the track plus this one settle, so the
+      // four statements read as one consistent line rather than four separate
+      // directional effects. The per-word tweens are therefore derived from one
+      // shape, applied to each word at the moment it actually reaches centre.
+      words.forEach((word, i) => {
+        tl.fromTo(word,
+          { yPercent: 18, opacity: 0 },
+          { yPercent: 0, opacity: 1, duration: beat * 1.4, ease: 'power2.out' },
+          centreBeat(i))
+      })
 
       // ---------------------------------------------------------------------
       // OBJECTS. The brief asks for motion that is physical and spatial: things
@@ -295,35 +239,49 @@ export default function MotionWorld() {
       gsap.set(metaEls, { opacity: 0, y: 16 })
       // stage elements fade from their authored CSS opacity; nothing else to do.
       stageEls.forEach((s) => s.setAttribute('data-ready', 'true'))
+
+      // The line must be measured with the real fonts, so the first seek happens
+      // after they land; until then the track sits at its resting offset.
+      tl.invalidate()
     }, el)
 
-    // The section's own height is added to the page when it mounts, so every
-    // range measured before that is stale: the trigger would be built against a
-    // page that did not yet contain this section, pinning the scrub to the wrong
-    // stretch of scroll and leaving the line frozen for thousands of pixels.
-    // Two refreshes — one on the next frame, one after fonts/layout settle —
-    // give the ranges their real values.
-    const id1 = requestAnimationFrame(() => ScrollTrigger.refresh())
-    const id2 = window.setTimeout(() => ScrollTrigger.refresh(), 400)
+    // Fonts arrive after first paint and change the line's width, so the
+    // timeline's measured positions are re-derived once they are ready. Without
+    // this the words would animate at the moments the fallback font implied.
+    const invalidate = () => {
+      const tl = tlRef.current
+      if (tl) tl.invalidate()
+    }
+    const fonts = (document as Document & { fonts?: FontFaceSet }).fonts
+    fonts?.ready.then(invalidate).catch(() => {})
+    const t = window.setTimeout(invalidate, 400)
 
     return () => {
-      cancelAnimationFrame(id1)
-      window.clearTimeout(id2)
+      window.clearTimeout(t)
+      tlRef.current = null
       ctx.revert()
     }
   }, [reduced])
 
-  // The line must cross the whole viewport, so the section is sized for that
-  // travel rather than for a count of screens: this height IS the scroll range
-  // the timeline scrubs through, and the sticky frame holds the canvas while it
-  // passes. Too little and the later words never reach the centre.
+  // Scroll only drives the timeline: the world is a fixed layer, so its progress
+  // is handed in rather than measured here. A scrub-smoothed follow keeps the
+  // motion fluid without adding a second source of truth for the position.
+  useEffect(() => {
+    const tl = tlRef.current
+    if (!tl) return
+    if (reduced) return
+    gsap.to(tl, { time: tl.duration() * Math.min(Math.max(progress, 0), 1), duration: 0.35, ease: 'power1.out', overwrite: true })
+  }, [progress, reduced])
+
+  // A FIXED full-viewport layer sitting behind the curtain. It adds no height to
+  // the page, so nothing has to be scrolled past to reach it: the world is
+  // already there, and the curtain lifting is the only thing that reveals it.
   return (
-    <section
+    <div
       ref={root}
       id="motion-world"
       className="mw-root"
       aria-label="You Dream, We Design, We Develop, We Deliver."
-      style={{ height: worldHeight, background: '#000' }}
     >
       <div ref={frame} className={`mw-frame${ready ? ' is-ready' : ''}`}>
         <MotionConfig reducedMotion="user">
@@ -379,6 +337,6 @@ export default function MotionWorld() {
 
         </MotionConfig>
       </div>
-    </section>
+    </div>
   )
 }

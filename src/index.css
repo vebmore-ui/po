@@ -10,16 +10,23 @@ html, body, #root {
   min-height: 100%;
 }
 
+/* These two elements exist ONLY to give the page its scroll length — the acts
+   themselves are fixed layers, so nothing about them is drawn here. They must
+   therefore stay TRANSPARENT. Painting them black made a tall black block part of
+   the document flow: once the pixelize had resolved to white, the next stretch of
+   scrolling walked onto that block and the screen turned black again before the
+   About section arrived. With no background of their own, the only thing that can
+   ever paint the frame is the act that is meant to be on screen. */
 .scroll-spacer {
   width: 100%;
   pointer-events: none;
-  background: #000;
+  background: transparent;
 }
 
 .mw-tail {
   width: 100%;
   pointer-events: none;
-  background: #000;
+  background: transparent;
 }
 
 .hero-container {

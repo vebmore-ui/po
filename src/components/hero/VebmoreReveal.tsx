@@ -10,17 +10,34 @@ const LETTERS = 'VEBMORE'.split('')
 // `onComplete` is the only addition to the original reveal: it reports that the
 // composition has fully settled, so whatever comes next can wait for it instead
 // of guessing at a delay. Nothing about the reveal itself is changed.
-export default function VebmoreReveal({ onComplete }: { onComplete?: () => void }) {
+export default function VebmoreReveal({
+  onStart,
+  onComplete,
+}: {
+  /** Fires once, when this reveal actually begins playing. */
+  onStart?: () => void
+  /** Fires once, when the mark's final beat has settled. */
+  onComplete?: () => void
+}) {
   const [ready, setReady] = useState(false)
   const [phase, setPhase] = useState(0)
   const complete = useRef(false)
   const notify = useRef(onComplete)
+  const announce = useRef(onStart)
 
   useEffect(() => {
     notify.current = onComplete
   }, [onComplete])
 
   useEffect(() => {
+    announce.current = onStart
+  }, [onStart])
+
+  useEffect(() => {
+    // The reveal is mounted exactly when it is reached, so mounting IS the start.
+    // Reporting it here keeps the parent's lock and the animation on one event
+    // rather than on two thresholds that can drift apart.
+    announce.current?.()
     const t = setTimeout(() => setReady(true), 0)
     return () => clearTimeout(t)
   }, [])
