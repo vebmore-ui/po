@@ -113,7 +113,7 @@ export default function AboutSection({ active }: { active: boolean }) {
           </div>
           <figcaption className="ab-caption">
             <span className="ab-caption-index">01</span>
-            <span>Motion study &mdash; flock field</span>
+            <span>Motion study &mdash; Cursor closer to birds.</span>
           </figcaption>
         </figure>
       </div>
