@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Compass from './components/hero/Compass'
 import ScrollTextLines from './components/hero/ScrollTextLines'
-import AboutSection from './components/AboutSection'
+import AboutCapabilitiesStage from './components/AboutCapabilitiesStage'
 import './App.css'
 import './components/motion-world/about.css'
 
@@ -107,8 +107,8 @@ function App() {
         <ScrollTextLines textProgress={textProgress} animationComplete={animationComplete} />
       </div>
 
-      {/* About section: flows naturally after the hero spacer */}
-      <AboutSection active={aboutActive} />
+      {/* About + Capabilities: pinned horizontal stage */}
+      <AboutCapabilitiesStage aboutActive={aboutActive} />
     </>
   )
 }

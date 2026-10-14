@@ -1,0 +1,591 @@
+/* ------------------------------------------------------------------
+   VEBMORE — 02 Capabilities section
+   Continuation of the white paper canvas. Editorial bearing list.
+   All classes prefixed `cap-`.
+   ------------------------------------------------------------------ */
+
+/* ---------- Section root ---------- */
+
+.cap-root {
+  position: relative;
+  width: 100%;
+  background: #ffffff;
+  color: #000;
+  padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
+  z-index: 960;
+  box-sizing: border-box;
+}
+
+/* When inside the stage panel, fill the viewport exactly */
+.stg-panel .cap-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(28px, 5vh, 72px) clamp(20px, 6vw, 104px);
+}
+
+/* ---------- Header grid ---------- */
+
+.cap-header {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: clamp(32px, 6vw, 88px);
+  align-items: end;
+  margin-bottom: clamp(40px, 6vh, 80px);
+}
+
+/* ---------- Label ---------- */
+
+.cap-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0 0 clamp(20px, 3.4vh, 34px);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.cap-quotes {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #0f8f4b;
+  margin-left: -0.24em;
+}
+
+/* ---------- Title ---------- */
+
+.cap-title {
+  margin: 0;
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(3.1rem, 8.6vw, 8.4rem);
+  line-height: 0.86;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+/* Panel-mode compaction */
+.stg-panel .cap-title {
+  font-size: clamp(2.6rem, 6vw, 6rem);
+}
+
+.stg-panel .cap-header {
+  margin-bottom: clamp(20px, 3vh, 40px);
+}
+
+.stg-panel .cap-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.stg-panel .cap-row {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+  transition: flex-grow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* An open row takes a larger share of the list so its description has room to
+   sit inside the tile rather than spilling past the row's own bounds. */
+.stg-panel .cap-row.is-open {
+  flex-grow: 2.4;
+}
+
+/* Inside the pinned stage the four tiles share one viewport, so the row titles
+   have to fit their tile: a long name wrapping to two lines at the base size
+   would overflow the row and bleed over its neighbours. */
+.stg-panel .cap-name {
+  font-size: clamp(1.4rem, 3.1vw, 2.9rem);
+  line-height: 0.98;
+}
+
+.stg-panel .cap-name-wrap {
+  max-height: clamp(1.5rem, 3.2vw, 3rem);
+}
+
+/* In the pinned stage the description must sit INSIDE the tile: it is a normal
+   flow child of the row, so opening it grows the row's own content rather than
+   floating over the row below. */
+.stg-panel .cap-desc-wrap {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  z-index: 3;
+}
+
+.cap-title-line {
+  display: block;
+  white-space: nowrap;
+}
+
+/* Word mask-slide (same system as About) */
+
+.cap-word-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+  vertical-align: bottom;
+  margin-right: 0.22em;
+}
+
+.cap-word-mask:last-child {
+  margin-right: 0;
+}
+
+.cap-word {
+  display: inline-block;
+  transform: translateY(105%);
+  opacity: 0;
+  transition:
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease-out;
+  will-change: transform, opacity;
+}
+
+.cap-word.is-in {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ---------- Lede (right column) ---------- */
+
+.cap-lede {
+  max-width: 42ch;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1vw, 0.8rem);
+  font-weight: 400;
+  line-height: 1.85;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.62);
+  margin: 0;
+}
+
+/* ---------- Shared rise utility ---------- */
+
+.cap-rise {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cap-rise.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Capabilities list ---------- */
+
+.cap-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* ---------- Row ---------- */
+
+.cap-row {
+  position: relative;
+}
+
+/* Hairline above each row */
+.cap-row::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cap-row.is-in::before {
+  transform: scaleX(1);
+}
+
+/* Bottom hairline on the last row */
+.cap-row:last-child::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
+}
+
+.cap-row:last-child.is-in::after {
+  transform: scaleX(1);
+}
+
+/* ---------- Row button ---------- */
+
+.cap-btn {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: clamp(16px, 3vw, 40px);
+  width: 100%;
+  padding: clamp(18px, 2.8vh, 32px) 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  position: relative;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cap-btn:focus-visible {
+  outline: 2px solid #0f8f4b;
+  outline-offset: 4px;
+}
+
+/* Row content starts hidden for reveal */
+.cap-btn-inner {
+  display: contents;
+  opacity: 0;
+  transition: opacity 0.5s ease-out 0.15s;
+}
+
+.cap-row.is-in .cap-btn-inner {
+  opacity: 1;
+}
+
+/* ---------- Row cells ---------- */
+
+.cap-bearing {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #0f8f4b;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+.cap-name {
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 6vw, 6rem);
+  line-height: 0.92;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.cap-tags {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.6rem, 0.86vw, 0.7rem);
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+/* ---------- Hover / open wipe panel ---------- */
+
+.cap-wipe {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Desktop hover or open state */
+.cap-row.is-open .cap-wipe {
+  clip-path: inset(0 0 0 0);
+}
+
+@media (hover: hover) {
+  .cap-row:hover .cap-wipe {
+    clip-path: inset(0 0 0 0);
+  }
+
+  .cap-row:hover .cap-bearing {
+    color: #13ff00;
+  }
+
+  .cap-row:hover .cap-name,
+  .cap-row:hover .cap-tags {
+    color: #ffffff;
+  }
+
+  /* The toggle must stay legible once the row wipes to black. */
+  .cap-row:hover .cap-toggle {
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .cap-row:hover .cap-toggle:not(.is-on) .cap-toggle-knob {
+    background: #ffffff;
+  }
+}
+
+.cap-row.is-open .cap-bearing {
+  color: #13ff00;
+}
+
+.cap-row.is-open .cap-name,
+.cap-row.is-open .cap-tags {
+  color: #ffffff;
+}
+
+/* Open row: the wipe is black behind the toggle, so lighten its track. */
+.cap-row.is-open .cap-toggle {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cap-row.is-open .cap-toggle:not(.is-on) .cap-toggle-knob {
+  background: #ffffff;
+}
+
+/* ---------- Toggle switch (right edge of each row) ---------- */
+
+.cap-toggle-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.cap-toggle {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: clamp(44px, 4.6vw, 56px);
+  height: clamp(24px, 2.5vw, 30px);
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.06);
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.cap-toggle-knob {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: calc(clamp(24px, 2.5vw, 30px) - 8px);
+  height: calc(clamp(24px, 2.5vw, 30px) - 8px);
+  border-radius: 50%;
+  background: #000;
+  transform: translateY(-50%);
+  transition:
+    left 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.3s ease;
+}
+
+.cap-toggle.is-on {
+  background: #13ff00;
+  border-color: #13ff00;
+}
+
+.cap-toggle.is-on .cap-toggle-knob {
+  left: calc(100% - clamp(24px, 2.5vw, 30px) + 4px);
+  background: #000;
+}
+
+/* ---------- Title roll-up on open ---------- */
+
+/* The title and the tags are masked so they can roll up and disappear while
+   the row is open; only the toggle stays in place as the row's control. */
+.cap-name-wrap {
+  display: block;
+  overflow: hidden;
+  transition:
+    max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease-out,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Room for the row title at its largest: the title is clamp(2.4rem, 6vw, 6rem)
+     at line-height 0.92, so the mask must clear the glyphs without clipping. */
+  max-height: clamp(2.4rem, 5.8vw, 5.8rem);
+}
+
+.cap-name {
+  display: block;
+}
+
+.cap-row.is-open .cap-name-wrap {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-40%);
+}
+
+.cap-tags {
+  transition:
+    color 0.3s ease,
+    opacity 0.35s ease-out,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cap-row.is-open .cap-tags {
+  opacity: 0;
+  transform: translateY(-40%);
+}
+
+/* ---------- Description panel ---------- */
+
+.cap-desc-wrap {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cap-row.is-open .cap-desc-wrap {
+  grid-template-rows: 1fr;
+}
+
+.cap-desc-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.cap-desc {
+  padding: 0 0 clamp(14px, 2vh, 22px) 0;
+  padding-left: calc(clamp(0.68rem, 1.1vw, 0.82rem) * 6 + clamp(16px, 3vw, 40px));
+  max-width: 56ch;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.62rem, 0.9vw, 0.74rem);
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .cap-header {
+    grid-template-columns: 1fr;
+    gap: clamp(24px, 4vh, 40px);
+  }
+
+  .cap-title-line {
+    white-space: normal;
+  }
+
+  .cap-title {
+    font-size: clamp(2.9rem, 13vw, 5.2rem);
+  }
+
+  .cap-btn {
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+
+  .cap-bearing {
+    grid-column: 1;
+  }
+
+  .cap-toggle-cell {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .cap-name {
+    grid-column: 1 / -1;
+    font-size: clamp(2rem, 10vw, 3.4rem);
+  }
+
+  .cap-name-wrap {
+    max-height: clamp(2.2rem, 10.5vw, 3.6rem);
+  }
+
+  .cap-tags {
+    grid-column: 1 / -1;
+    white-space: normal;
+    line-height: 1.6;
+  }
+
+  .cap-desc {
+    padding-left: 0;
+  }
+
+  .cap-lede {
+    max-width: none;
+  }
+}
+
+/* ---------- Touch devices: simple bg swap instead of clip-path ---------- */
+
+@media (hover: none) {
+  .cap-wipe {
+    transition: none;
+    clip-path: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .cap-row.is-open .cap-wipe {
+    clip-path: none;
+    opacity: 1;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cap-word,
+  .cap-rise {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  .cap-row::before,
+  .cap-row:last-child::after {
+    transition: none;
+    transform: scaleX(1);
+  }
+
+  .cap-btn-inner {
+    transition: none;
+    opacity: 1;
+  }
+
+  .cap-wipe {
+    transition: none;
+  }
+
+  .cap-desc-wrap {
+    transition: none;
+  }
+
+  .cap-name-wrap,
+  .cap-tags {
+    transition: none;
+  }
+}
