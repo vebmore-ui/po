@@ -312,7 +312,7 @@
 .cap-wipe {
   position: absolute;
   inset: 0;
-  background: #000;
+  background: #0f8f4b;
   clip-path: inset(100% 0 0 0);
   transition: clip-path 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 1;
@@ -338,7 +338,7 @@
     color: #ffffff;
   }
 
-  /* The toggle must stay legible once the row wipes to black. */
+  /* The toggle must stay legible once the row wipes to green. */
   .cap-row:hover .cap-toggle {
     border-color: rgba(255, 255, 255, 0.6);
     background: rgba(255, 255, 255, 0.12);

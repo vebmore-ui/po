@@ -5,15 +5,36 @@ export default function CompassNeedle({ size = 400, visible = true }: { size: nu
   const targetAngle = useRef(0)
   const currentAngle = useRef(0)
 
+  // A very slight, continuous pendulum sway layered on top of the spring.
+  // It is additive and purely cosmetic: the needle keeps tracking the cursor
+  // while always drifting a fraction of a degree either side of it.
+  const prefersReducedMotion = useRef(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    prefersReducedMotion.current = mq.matches
+    const check = () => {
+      prefersReducedMotion.current = mq.matches
+    }
+    mq.addEventListener('change', check)
+    return () => mq.removeEventListener('change', check)
+  }, [])
+
   useEffect(() => {
     let raf: number
-    const animate = () => {
+    let start = performance.now()
+    const animate = (now: number) => {
       if (!needleRef.current) return
       let diff = targetAngle.current - currentAngle.current
       while (diff > Math.PI) diff -= Math.PI * 2
       while (diff < -Math.PI) diff += Math.PI * 2
       currentAngle.current += diff * 0.06
-      const deg = currentAngle.current * (180 / Math.PI)
+
+      // Pendulum: ±0.6° at a slow ~0.35Hz, disabled for reduced motion.
+      const sway = prefersReducedMotion.current
+        ? 0
+        : Math.sin(((now - start) / 1000) * Math.PI * 2 * 0.35) * (0.6 * Math.PI / 180)
+
+      const deg = (currentAngle.current + sway) * (180 / Math.PI)
       needleRef.current.setAttribute('transform', `translate(${size / 2}, ${size / 2}) rotate(${deg})`)
       raf = requestAnimationFrame(animate)
     }

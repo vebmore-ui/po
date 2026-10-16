@@ -1,0 +1,582 @@
+/* ==========================================================================
+   WORKS SECTION (Black Monolith)
+   Tokens, Typography & Interactions for Section 4
+   Prefix: wk-
+   ========================================================================== */
+
+.wk-root {
+  position: relative;
+  background-color: #000000;
+  color: #ffffff;
+  z-index: 2;
+  min-height: 100vh;
+  padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ---------- Header ---------- */
+
+.wk-header {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: clamp(24px, 4vw, 64px);
+  align-items: end;
+  margin-bottom: clamp(40px, 6.5vh, 80px);
+}
+
+.wk-label {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 clamp(16px, 2.5vh, 28px);
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+}
+
+.wk-label-num {
+  color: #13ff00;
+}
+
+.wk-title {
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(3.1rem, 8.6vw, 8.4rem);
+  line-height: 0.86;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.wk-title-line {
+  display: block;
+  white-space: nowrap;
+}
+
+/* Word mask-slide reveal */
+.wk-word-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+  vertical-align: bottom;
+  margin-right: 0.22em;
+}
+
+.wk-word-mask:last-child {
+  margin-right: 0;
+}
+
+.wk-word {
+  display: inline-block;
+  transform: translateY(105%);
+  opacity: 0;
+  transition:
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease-out;
+  will-change: transform, opacity;
+}
+
+.wk-word.is-in {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Header right column */
+.wk-header-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.wk-count-badge {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1vw, 0.8rem);
+  letter-spacing: 0.2em;
+  color: #13ff00;
+  text-transform: uppercase;
+}
+
+.wk-lede {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1vw, 0.8rem);
+  font-weight: 400;
+  line-height: 1.85;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+  margin: 0;
+  max-width: 44ch;
+}
+
+/* Shared rise animation */
+.wk-rise {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wk-rise.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Projects List ---------- */
+
+.wk-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.wk-row {
+  position: relative;
+  transition: opacity 0.3s ease-out;
+}
+
+/* Hairline above each row */
+.wk-row::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wk-row.is-in::before {
+  transform: scaleX(1);
+}
+
+/* Bottom hairline after last row */
+.wk-row:last-child::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
+}
+
+.wk-row:last-child.is-in::after {
+  transform: scaleX(1);
+}
+
+/* Row interactive link */
+.wk-row-link {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: clamp(16px, 3.5vw, 48px);
+  width: 100%;
+  padding: clamp(22px, 3.2vh, 44px) 0;
+  background: none;
+  border: none;
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.wk-row-link:focus-visible {
+  outline: 2px solid #13ff00;
+  outline-offset: 4px;
+}
+
+/* Row content mask-slide reveal */
+.wk-row-content {
+  display: contents;
+}
+
+.wk-row-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wk-row.is-in .wk-row-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Index cell */
+.wk-index {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.72rem, 1.1vw, 0.9rem);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  color: #13ff00;
+  white-space: nowrap;
+}
+
+/* Name cell */
+.wk-name-wrap {
+  overflow: hidden;
+}
+
+.wk-name {
+  display: inline-block;
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(3rem, 9vw, 9rem);
+  line-height: 0.9;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: #ffffff;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.3s ease;
+  will-change: transform;
+}
+
+/* Meta cell */
+.wk-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.64rem, 0.9vw, 0.76rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+.wk-meta-item strong {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Arrow cell */
+.wk-arrow-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(2rem, 3.5vw, 3.8rem);
+}
+
+.wk-arrow {
+  display: inline-block;
+  font-size: clamp(1.6rem, 3vw, 3.2rem);
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.6);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.3s ease;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* ---------- Desktop Hover & Focus states ---------- */
+
+@media (hover: hover) and (pointer: fine) {
+  /* Dim other rows when list is hovered */
+  .wk-list:has(.wk-row:hover) .wk-row:not(:hover) {
+    opacity: 0.3;
+  }
+
+  .wk-row:hover .wk-name {
+    transform: translateX(1.5vw);
+    color: #ffffff;
+  }
+
+  .wk-row:hover .wk-arrow {
+    transform: rotate(45deg);
+    color: #13ff00;
+  }
+}
+
+/* Keyboard focus parity */
+.wk-list:has(.wk-row:focus-within) .wk-row:not(:focus-within) {
+  opacity: 0.3;
+}
+
+.wk-row:focus-within .wk-name {
+  transform: translateX(1.5vw);
+  color: #ffffff;
+}
+
+.wk-row:focus-within .wk-arrow {
+  transform: rotate(45deg);
+  color: #13ff00;
+}
+
+/* ---------- Cursor-following floating plate (Desktop) ---------- */
+
+.wk-preview-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 320px;
+  height: 220px;
+  pointer-events: none;
+  z-index: 60;
+  will-change: transform;
+  display: none;
+}
+
+@media (pointer: fine) {
+  .wk-preview-wrap {
+    display: block;
+  }
+}
+
+.wk-preview-card {
+  width: 320px;
+  height: 220px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.9),
+    0 0 20px rgba(19, 255, 0, 0.1);
+  overflow: hidden;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.wk-preview-card.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.wk-preview-overlay {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 18px;
+  box-sizing: border-box;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.1) 40%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+}
+
+.wk-preview-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wk-preview-mono-badge {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #13ff00;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 3px 8px;
+  border: 1px solid rgba(19, 255, 0, 0.3);
+}
+
+.wk-preview-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wk-preview-name {
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 2.2rem;
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.wk-preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wk-preview-tag {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ---------- Mobile inline expansion plate ---------- */
+
+.wk-inline-plate-wrap {
+  display: none;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+
+.wk-inline-plate-wrap.is-open {
+  grid-template-rows: 1fr;
+}
+
+.wk-inline-plate-inner {
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: 24px;
+}
+
+.wk-inline-card {
+  width: 100%;
+  height: 200px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
+}
+
+/* ---------- Footer Strip ---------- */
+
+.wk-footer {
+  position: relative;
+  margin-top: clamp(48px, 8vh, 96px);
+  padding-top: clamp(20px, 3.2vh, 36px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wk-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wk-footer.is-in::before {
+  transform: scaleX(1);
+}
+
+.wk-footer-text {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* ---------- Responsive Breakpoint (<= 900px or Touch) ---------- */
+
+@media (max-width: 900px) {
+  .wk-header {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .wk-title-line {
+    white-space: normal;
+  }
+
+  .wk-row-link {
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+    row-gap: 8px;
+    column-gap: 16px;
+    padding: 24px 0;
+  }
+
+  .wk-index {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .wk-name-wrap {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .wk-arrow-wrap {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+
+  .wk-meta {
+    grid-column: 2;
+    grid-row: 2;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .wk-inline-plate-wrap {
+    display: grid;
+  }
+}
+
+@media (pointer: coarse) {
+  .wk-inline-plate-wrap {
+    display: grid;
+  }
+}
+
+/* ---------- Prefers-reduced-motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-rise,
+  .wk-word,
+  .wk-row-item {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  .wk-row::before,
+  .wk-row:last-child::after,
+  .wk-footer::before {
+    transition: none;
+    transform: scaleX(1);
+  }
+
+  .wk-preview-wrap {
+    display: none !important;
+  }
+
+  .wk-name,
+  .wk-arrow {
+    transition: none;
+    transform: none !important;
+  }
+
+  .wk-row:hover,
+  .wk-row:focus-within {
+    opacity: 1 !important;
+  }
+
+  .wk-inline-plate-wrap {
+    transition: none;
+  }
+}
+

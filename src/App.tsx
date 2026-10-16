@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Compass from './components/hero/Compass'
 import ScrollTextLines from './components/hero/ScrollTextLines'
 import AboutCapabilitiesStage from './components/AboutCapabilitiesStage'
+import WorksSection from './components/WorksSection'
 import './App.css'
 import './components/motion-world/about.css'
 
@@ -107,8 +108,11 @@ function App() {
         <ScrollTextLines textProgress={textProgress} animationComplete={animationComplete} />
       </div>
 
-      {/* About + Capabilities: pinned horizontal stage */}
+      {/* About + Capabilities + Tech Stack: pinned horizontal stage */}
       <AboutCapabilitiesStage aboutActive={aboutActive} />
+
+      {/* Section 4: Works (Black Monolith) */}
+      <WorksSection />
     </>
   )
 }

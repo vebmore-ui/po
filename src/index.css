@@ -59,3 +59,67 @@ html, body, #root {
     opacity: 1;
   }
 }
+
+/* ------------------------------------------------------------------
+   Compass notice — small opaque-black rectangle, top-right of the dial.
+   Green mono typewriter message, same voice as the About section notes.
+   ------------------------------------------------------------------ */
+
+.compass-notice {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(28%, -18%);
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 6px 12px;
+  max-width: 22ch;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.compass-notice-text {
+  display: inline-block;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.52rem, 0.72vw, 0.62rem);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: #13ff00;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.compass-notice-caret {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 0.18em;
+  vertical-align: -0.12em;
+  background: #13ff00;
+  animation: compassCaret 1s steps(2, start) infinite;
+}
+
+@keyframes compassCaret {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .compass-notice {
+    transform: translate(14%, -22%);
+    padding: 5px 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compass-notice-caret {
+    animation: none;
+    opacity: 0;
+  }
+}

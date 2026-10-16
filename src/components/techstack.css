@@ -1,0 +1,237 @@
+/* ------------------------------------------------------------------
+   VEBMORE — Tech stack panel (stage panel 3)
+   A solid brand-green plate that arrives blank while the track slides,
+   then reveals a 5×3 grid of black technology tiles.
+   All classes prefixed `ts-`.
+   ------------------------------------------------------------------ */
+
+/* ---------- Panel root ---------- */
+
+.ts-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #0f8f4b;
+  /* Hairline seam on the left edge, matching the stage's divider style. */
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.ts-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
+  box-sizing: border-box;
+}
+
+/* ---------- Labels ---------- */
+
+.ts-label {
+  margin: 0 0 clamp(20px, 3.4vh, 34px);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.ts-caption {
+  margin: clamp(20px, 3.4vh, 34px) 0 0;
+  align-self: flex-end;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.6rem, 0.86vw, 0.7rem);
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+/* Labels fade in only after the tiles have started popping — the green
+   plate reads completely blank while it slides into place. */
+.ts-fade {
+  opacity: 0;
+  transition: opacity 0.6s ease-out 0.3s;
+}
+
+.ts-fade.is-in {
+  opacity: 1;
+}
+
+/* ---------- Tile grid ---------- */
+
+.ts-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: clamp(10px, 1.4vw, 22px);
+  align-content: center;
+  align-items: stretch;
+}
+
+/* ---------- Tile ---------- */
+
+.ts-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.2vh, 14px);
+  aspect-ratio: 4 / 3;
+  min-height: 0;
+  border-radius: clamp(14px, 1.6vw, 26px);
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+  color: #ffffff;
+
+  /* Pop-in: hidden until `is-in`, then scale/translate overshoot to rest. */
+  opacity: 0;
+  transform: scale(0.55) translateY(14px);
+  transition:
+    transform 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) var(--ts-tile-delay, 0ms),
+    opacity 0.52s ease-out var(--ts-tile-delay, 0ms),
+    background-color 0.22s ease-out 0ms,
+    color 0.22s ease-out 0ms;
+  will-change: transform, opacity;
+}
+
+.ts-tile.is-in {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Hover is only armed after the tile's own pop has completed. */
+.ts-tile.ts-tile-idle {
+  pointer-events: none;
+}
+
+/* ---------- Tile contents ---------- */
+
+.ts-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40%;
+  color: currentColor;
+  transition: transform 0.22s ease-out;
+}
+
+.ts-logo svg {
+  width: 100%;
+  height: 100%;
+  max-width: clamp(34px, 4vw, 64px);
+  max-height: 100%;
+  display: block;
+}
+
+.ts-monogram {
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  font-size: clamp(1.2rem, 2vw, 2.2rem);
+  line-height: 1;
+  letter-spacing: 0.05em;
+}
+
+.ts-name {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.6rem, 0.86vw, 0.7rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ---------- Hover (desktop, pointer: fine only) ---------- */
+
+@media (hover: hover) {
+  .ts-tile:not(.ts-tile-idle) {
+    transition:
+      transform 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) var(--ts-tile-delay, 0ms),
+      opacity 0.52s ease-out var(--ts-tile-delay, 0ms),
+      background-color 0.22s ease-out 0ms,
+      color 0.22s ease-out 0ms;
+  }
+
+  .ts-tile:not(.ts-tile-idle):hover {
+    background-color: #ffffff;
+    color: #000000;
+    transform: scale(1.06) rotate(-1.5deg);
+  }
+
+  /* Tiles on the right half of the grid tilt the other way. */
+  .ts-tile:nth-child(5n + 4):not(.ts-tile-idle):hover,
+  .ts-tile:nth-child(5n + 5):not(.ts-tile-idle):hover {
+    transform: scale(1.06) rotate(1.5deg);
+  }
+
+  .ts-tile:not(.ts-tile-idle):hover .ts-logo {
+    transform: scale(1.15);
+  }
+}
+
+/* ---------- Responsive: normal-flow section under the stage ---------- */
+
+@media (max-width: 900px) {
+  .ts-root {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    border-left: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .ts-inner {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .ts-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: none;
+    gap: clamp(10px, 2vw, 18px);
+  }
+
+  .ts-tile {
+    aspect-ratio: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .ts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- Reduced motion: everything simply visible ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-tile {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .ts-fade {
+    opacity: 1;
+    transition: none;
+  }
+
+  .ts-logo {
+    transition: none;
+  }
+
+  .ts-tile.ts-tile-idle {
+    pointer-events: auto;
+  }
+}

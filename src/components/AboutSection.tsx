@@ -18,7 +18,7 @@ import VantaBirds from './about/VantaBirds'
 const WORDS = ['FLY', 'MORE', 'WITH']
 const MARK = 'VEBMORE'
 
-export default function AboutSection({ active, birdsActive = true }: { active: boolean; birdsActive?: boolean }) {
+export default function AboutSection({ active }: { active: boolean }) {
   // One flag per beat, so each element can be given its own stagger without a
   // library. The order below IS the reveal order.
   const [beat, setBeat] = useState(0)
@@ -109,10 +109,10 @@ export default function AboutSection({ active, birdsActive = true }: { active: b
         {/* ---------------- RIGHT: the birds plate ---------------- */}
         <figure className={`ab-right ab-rise${shown(5) ? ' is-in' : ''}`}>
           <div className="ab-plate">
-            <VantaBirds active={shown(6) && birdsActive} className="ab-birds" />
+            <VantaBirds active={shown(6)} className="ab-birds" />
           </div>
           <figcaption className="ab-caption">
-            <span className="ab-caption-index">01</span>
+            <span className="ab-caption-index">02</span>
             <span>Motion study &mdash; Cursor closer to birds.</span>
           </figcaption>
         </figure>

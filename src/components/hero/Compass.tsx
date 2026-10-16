@@ -3,6 +3,52 @@ import CompassFace from './CompassFace'
 import CompassNeedle from './CompassNeedle'
 import CompassGlass from './CompassGlass'
 
+/**
+ * Small opaque-black notification rectangle pinned to the top-right of the
+ * compass. The message types itself in on a short delay, green mono, in the
+ * same voice as the About section's editorial notes.
+ */
+const NOTICE_TEXT = '01 "NEEDLE DIRECTION — SET BY YOUR CURSOR"'
+const NOTICE_START = 1500
+const NOTICE_SPEED = 42 // ms per character
+
+function CompassNotice() {
+  const [typed, setTyped] = useState(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    return mq.matches ? NOTICE_TEXT.length : 0
+  })
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (mq.matches) return
+    let interval: number | undefined
+    const start = window.setTimeout(() => {
+      interval = window.setInterval(() => {
+        setTyped((n) => {
+          if (n >= NOTICE_TEXT.length) {
+            if (interval) window.clearInterval(interval)
+            return n
+          }
+          return n + 1
+        })
+      }, NOTICE_SPEED)
+    }, NOTICE_START)
+    return () => {
+      window.clearTimeout(start)
+      if (interval) window.clearInterval(interval)
+    }
+  }, [])
+
+  return (
+    <div className="compass-notice">
+      <span className="compass-notice-text">
+        {NOTICE_TEXT.slice(0, typed)}
+        <span className="compass-notice-caret" aria-hidden="true" />
+      </span>
+    </div>
+  )
+}
+
 export default function Compass({ compassProgress = 0 }: { compassProgress?: number }) {
   const [size, setSize] = useState(() => {
     const vw = window.innerWidth
@@ -84,6 +130,7 @@ export default function Compass({ compassProgress = 0 }: { compassProgress?: num
         <CompassFace size={size} animationStage={animationStage} cursorPos={cursorPos} />
         <CompassNeedle size={size} visible={animationStage >= 6} />
         <CompassGlass />
+        {animationStage >= 6 && <CompassNotice />}
       </div>
     </div>
   )

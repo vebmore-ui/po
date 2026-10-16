@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import AboutSection from './AboutSection'
 import CapabilitiesSection from './CapabilitiesSection'
+import TechStackPanel from './TechStackPanel'
 import './stage.css'
 
 /**
@@ -11,11 +12,16 @@ import './stage.css'
  * via rAF — no React state per frame.
  *
  * Timeline:
- *   p 0.00–0.12  Hold. About visible, birds live.
- *   p 0.12–0.28  Birds plate fades out (opacity + scale).
- *   p 0.28–0.78  Track slides from 0 to -100vw.
- *   p 0.52       Capabilities entry beats fire (once).
- *   p 0.78–1.00  Hold. Capabilities interactive. Pin releases.
+ *   p 0.00–0.16  Hold. About visible, birds live.
+ *   p 0.16–0.42  Track slides from 0 to -100vw (ease-in-out).
+ *   p 0.42       Capabilities entry beats fire (once).
+ *   p 0.42–0.62  Capabilities dwell — rows stay interactive.
+ *   p 0.62–0.82  Track slides from -100vw to -200vw (same ease-in-out).
+ *   p 0.82–0.855 Blank green hold, then tiles pop (~70ms apart).
+ *   p 0.87–1.00  Final hold, all tiles hoverable. Pin releases.
+ *
+ * The birds deliberately stay live for the whole stage: they no longer fade as
+ * the track departs, so the flock keeps animating into the Capabilities slide.
  */
 
 /* Ease-in-out curve: maps a linear 0–1 to a smoothed 0–1 */
@@ -34,17 +40,17 @@ interface Props {
 export default function AboutCapabilitiesStage({ aboutActive }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
-  const birdsPlateRef = useRef<HTMLDivElement>(null)
   const capParallaxRef = useRef<HTMLDivElement>(null)
 
   // Reactive state (low-frequency, not per-frame)
-  const [birdsActive, setBirdsActive] = useState(true)
   const [capTrigger, setCapTrigger] = useState(false)
+  const [techTrigger, setTechTrigger] = useState(false)
 
   // Refs for rAF loop
   const pRef = useRef(0)
   const rafRef = useRef(0)
   const capFired = useRef(false)
+  const techFired = useRef(false)
 
   // Detect mobile / reduced-motion to skip the rAF loop entirely
   const isDisabled = useRef(false)
@@ -83,43 +89,47 @@ export default function AboutCapabilitiesStage({ aboutActive }: Props) {
     const rawP = scrollRange > 0 ? clamp(-rect.top / scrollRange, 0, 1) : 0
     pRef.current = rawP
 
-    // ── Birds fade: p 0.12–0.28 ──
-    const birdsT = clamp((rawP - 0.12) / 0.16, 0, 1)
-    if (birdsPlateRef.current) {
-      const opacity = 1 - birdsT
-      const scale = 1 - birdsT * 0.04
-      birdsPlateRef.current.style.opacity = String(opacity)
-      birdsPlateRef.current.style.transform = `scale(${scale})`
-    }
+    // ── Birds stay live for the whole stage (no fade, no teardown) ──
 
-    // Birds WebGL lifecycle (hysteresis: destroy at 0.28, re-create at 0.24)
-    if (rawP > 0.28 && birdsActive) {
-      setBirdsActive(false)
-    } else if (rawP < 0.24 && !birdsActive) {
-      setBirdsActive(true)
-    }
+    // ── Track slide 1: p 0.16–0.42, 0vw → -100vw ──
+    const slide1T = clamp((rawP - 0.16) / 0.26, 0, 1)
+    const eased1 = easeInOut(slide1T)
 
-    // ── Track slide: p 0.28–0.78 ──
-    const slideT = clamp((rawP - 0.28) / 0.5, 0, 1)
-    const eased = easeInOut(slideT)
-    const trackX = -eased * 100
+    // ── Track slide 2: p 0.62–0.82, -100vw → -200vw ──
+    const slide2T = clamp((rawP - 0.62) / 0.2, 0, 1)
+    const eased2 = easeInOut(slide2T)
+
+    const trackX = -eased1 * 100 - eased2 * 100
     track.style.transform = `translateX(${trackX}vw)`
 
-    // Capabilities parallax lag: 6vw extra offset that resolves to 0
+    // Capabilities parallax lag: 6vw extra offset that resolves to 0 by the
+    // end of slide 1 (the tech panel gets no parallax — it must read as a
+    // flat plate sliding in).
     if (capParallaxRef.current) {
-      const parallax = (1 - eased) * 6
+      const parallax = (1 - eased1) * 6
       capParallaxRef.current.style.transform = `translateX(${parallax}vw)`
     }
 
-    // ── Capabilities entry at p ≥ 0.52 (once) ──
-    if (rawP >= 0.52 && !capFired.current) {
+    // ── Capabilities entry at p ≥ 0.42 (once) ──
+    if (rawP >= 0.42 && !capFired.current) {
       capFired.current = true
       setCapTrigger(true)
     }
 
+    // ── Tech tile sequence, with hysteresis ──
+    // Fire once p crosses 0.855 (the green plate is settled); reset only when
+    // p falls back below 0.80, so sitting near the boundary neither re-fires
+    // nor rewinds. The reset lets tiles pop again on re-entry.
+    if (rawP >= 0.855 && !techFired.current) {
+      techFired.current = true
+      setTechTrigger(true)
+    } else if (rawP < 0.8 && techFired.current) {
+      techFired.current = false
+      setTechTrigger(false)
+    }
+
     rafRef.current = requestAnimationFrame(tick)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [birdsActive])
+  }, [])
 
   useEffect(() => {
     rafRef.current = requestAnimationFrame(tick)
@@ -132,9 +142,7 @@ export default function AboutCapabilitiesStage({ aboutActive }: Props) {
         <div ref={trackRef} className="stg-track">
           {/* ── Panel 1: About ── */}
           <div className="stg-panel">
-            <div ref={birdsPlateRef} style={{ display: 'contents' }}>
-              <AboutSection active={aboutActive} birdsActive={birdsActive} />
-            </div>
+            <AboutSection active={aboutActive} />
           </div>
 
           {/* ── Panel 2: Capabilities ── */}
@@ -142,6 +150,11 @@ export default function AboutCapabilitiesStage({ aboutActive }: Props) {
             <div ref={capParallaxRef} style={{ width: '100%', height: '100%' }}>
               <CapabilitiesSection triggerEntry={capTrigger} />
             </div>
+          </div>
+
+          {/* ── Panel 3: Tech stack ── */}
+          <div className="stg-panel">
+            <TechStackPanel triggerPop={techTrigger} />
           </div>
         </div>
       </div>

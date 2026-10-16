@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------
-   VEBMORE — About → Capabilities pinned horizontal stage
-   Two panels (About, Capabilities) in a sticky-pinned horizontal track.
-   Scroll drives translateX from 0 to -100vw.
+   VEBMORE — About → Capabilities → Tech stack pinned horizontal stage
+   Three panels (About, Capabilities, Tech stack) in a sticky-pinned
+   horizontal track. Scroll drives translateX from 0 to -200vw.
    All classes prefixed `stg-`.
    ------------------------------------------------------------------ */
 
@@ -9,11 +9,11 @@
 
 .stg-track-wrap {
   position: relative;
-  /* 260vh of scroll budget. The sticky pin holds for this entire distance.
-     Kept deliberately short: past the birds the journey to the Capabilities
-     slide was long enough to feel like dead scrolling. */
-  height: 260vh;
-  height: 260svh;
+  /* 400vh of scroll budget: the original About → Capabilities slide keeps
+     its feel, then a generous Capabilities dwell, a second slide into the
+     green Tech panel, a short blank hold, the tile pops and a final hold. */
+  height: 400vh;
+  height: 400svh;
   background: #ffffff;
   z-index: 960;
 }
@@ -33,7 +33,7 @@
 
 .stg-track {
   display: flex;
-  width: 200vw;
+  width: 300vw;
   height: 100%;
   will-change: transform;
 }
@@ -90,6 +90,11 @@
     height: auto;
     display: block;
   }
+
+  .stg-panel .ts-root {
+    height: auto;
+    min-height: 0;
+  }
 }
 
 /* ---------- Reduced motion: disable pin ---------- */
@@ -125,5 +130,10 @@
   .stg-panel .cap-root {
     height: auto;
     display: block;
+  }
+
+  .stg-panel .ts-root {
+    height: auto;
+    min-height: 0;
   }
 }
