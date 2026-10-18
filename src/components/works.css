@@ -1,94 +1,90 @@
 /* ==========================================================================
-   WORKS SECTION (Black Monolith) — pinned project roller
-   A plain black plate with ONE static green glow. The heading takes About's
-   title typography; project names take the heading's old size.
+   WORKS SECTION — Diagonal Orbit Carousel & Project Detail Stage
+   Two-column editorial layout inside pinned stage:
+   Left: Title + Diagonal Orbit Carousel
+   Right: Detail Stage + "More Designs & Work" Navigation Button
    Prefix: wk-
    ========================================================================== */
 
 .wk-root {
   position: relative;
-  background-color: #000;
-  color: #ffffff;
-  z-index: 2;
+  width: 100%;
   height: 100%;
   min-height: 100vh;
   min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: #000000;
+  color: #ffffff;
+  padding: var(--panel-pad-top) clamp(20px, 6vw, 104px) clamp(30px, 5vh, 60px);
   box-sizing: border-box;
   overflow: hidden;
 }
 
-/* A single static radial glow in brand green, under 10% opacity, so the black
-   plate is not dead flat. No canvas, no WebGL, no animation — just a paint. */
-.wk-glow {
+/* Faint static dot-grid */
+.wk-grid-bg {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
   pointer-events: none;
-  background: radial-gradient(
-    60vmax 60vmax at 85% 15%,
-    rgba(15, 143, 75, 0.09) 0%,
-    rgba(15, 143, 75, 0.04) 35%,
-    rgba(0, 0, 0, 0) 70%
-  );
+  z-index: 0;
 }
 
-.wk-inner {
+/* Two-column layout */
+.wk-layout {
   position: relative;
   z-index: 1;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: clamp(24px, 4vw, 64px);
+  min-height: 0;
+}
+
+/* ── LEFT COLUMN ── */
+.wk-left-col {
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 100vh;
-  min-height: 100svh;
-  padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
-  box-sizing: border-box;
-}
-
-/* ---------- Header ---------- */
-
-.wk-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.5fr);
-  gap: clamp(24px, 4vw, 64px);
-  align-items: end;
-  margin-bottom: clamp(24px, 4vh, 56px);
-}
-
-.wk-header-left {
+  min-height: 0;
   min-width: 0;
 }
 
+.wk-head {
+  flex-shrink: 0;
+  margin-bottom: clamp(12px, 2vh, 24px);
+}
+
 .wk-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0 0 clamp(10px, 1.8vh, 18px);
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: clamp(0.68rem, 1.1vw, 0.82rem);
   font-weight: 500;
   letter-spacing: 0.34em;
   text-transform: uppercase;
   color: #ffffff;
-  margin: 0 0 clamp(16px, 2.5vh, 28px);
-  display: flex;
-  align-items: baseline;
-  gap: 0.6em;
 }
 
 .wk-quotes {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 1.05em;
+  color: #13ff00;
   font-weight: 700;
-  letter-spacing: 0;
-  color: #0f8f4b;
-  margin-left: -0.24em;
 }
 
-/* Heading: About's exact title typography. */
+/* Title matching About section styling */
 .wk-title {
-  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
-  font-weight: 400;
-  font-size: clamp(3.1rem, 8.6vw, 8.4rem);
-  line-height: 0.86;
-  letter-spacing: 0.005em;
-  text-transform: uppercase;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.8rem, 6.2vw, 6.4rem);
+  line-height: 0.88;
+  letter-spacing: 0.02em;
   margin: 0;
+  text-transform: uppercase;
+  font-weight: 400;
 }
 
 .wk-title-line {
@@ -96,76 +92,33 @@
   white-space: nowrap;
 }
 
-/* Word mask-slide reveal (same system as About). */
 .wk-word-mask {
   display: inline-block;
   overflow: hidden;
-  padding-bottom: 0.06em;
-  margin-bottom: -0.06em;
-  vertical-align: bottom;
-  margin-right: 0.22em;
-}
-
-.wk-word-mask:last-child {
-  margin-right: 0;
+  vertical-align: top;
+  margin-right: 0.28em;
 }
 
 .wk-word {
   display: inline-block;
-  transform: translateY(105%);
-  opacity: 0;
-  transition:
-    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.5s ease-out;
-  will-change: transform, opacity;
+  transform: translateY(115%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .wk-word.is-in {
   transform: translateY(0);
-  opacity: 1;
 }
 
 .wk-word-mark {
-  color: #ffffff;
-  letter-spacing: -0.005em;
-}
-
-/* Header right column */
-.wk-header-right {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 16px;
-  min-width: 0;
-}
-
-.wk-count-badge {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(0.68rem, 1vw, 0.8rem);
-  letter-spacing: 0.2em;
   color: #13ff00;
-  text-transform: uppercase;
 }
 
-.wk-lede {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(0.68rem, 1vw, 0.8rem);
-  font-weight: 400;
-  line-height: 1.85;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.62);
-  margin: 0;
-  max-width: 44ch;
-}
-
-/* Shared rise animation */
+/* Rise animation for label */
 .wk-rise {
   opacity: 0;
-  transform: translateY(14px);
-  transition:
-    opacity 0.7s ease-out,
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wk-rise.is-in {
@@ -173,672 +126,470 @@
   transform: translateY(0);
 }
 
-/* ---------- Roller ---------- */
+.wk-fade {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
 
-/* The roller is a column: the rows area takes the remaining height, and the
-   "more" button row sits under it with its space reserved, so the button can
-   never overlap a row. */
-.wk-roller {
+.wk-fade.is-in {
+  opacity: 1;
+}
+
+/* Carousel Region */
+.wk-carousel-wrap {
   position: relative;
   flex: 1;
   min-height: 0;
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  touch-action: pan-y;
 }
 
-/* The rows area: everything the roller needs vertically, with the soft fade. */
-.wk-roll-viewport {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  -webkit-mask-image: linear-gradient(
-    transparent 0%,
-    #000 18%,
-    #000 82%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    transparent 0%,
-    #000 18%,
-    #000 82%,
-    transparent 100%
-  );
+.wk-carousel-wrap:focus-visible {
+  outline: 1px dashed rgba(19, 255, 0, 0.5);
+  outline-offset: 4px;
 }
 
-/* Two hairlines framing the active row, drawn in from the left. */
-.wk-hairline {
+/* Faint orbit track ellipse */
+.wk-orbit-track {
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  z-index: 2;
+  width: 72%;
+  height: 52%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transform: rotate(-30deg);
   pointer-events: none;
 }
 
-.wk-hairline-top {
-  top: 50%;
-  /* Half the active row above the centre; set from the measured row height by
-     the roller loop, with a sane fallback before the first measurement. */
-  margin-top: calc(-0.5 * var(--wk-row-h, 70px));
-}
-
-.wk-hairline-bottom {
-  top: 50%;
-  margin-top: calc(0.5 * var(--wk-row-h, 70px));
-  transition-delay: 0.08s;
-}
-
-.wk-roller.is-in .wk-hairline {
-  transform: scaleX(1);
-}
-
-.wk-roll-list {
-  position: absolute;
-  inset: 0;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* Each item is absolutely positioned; its `transform` (translate3d only) is
-   written by the stage's rAF loop. The vertical stack is computed from measured
-   heights, so rows can never overlap. */
-.wk-roll-item {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  will-change: transform, opacity;
-  transition: none;
-}
-
-/* Before entry the rows are hidden; the rAF loop takes over once shown. */
-.wk-roll-list:not(.is-in) .wk-roll-item {
-  opacity: 0 !important;
-  visibility: hidden !important;
-}
-
-.wk-roll-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(16px, 3.5vw, 48px);
+/* Orbit Cards Container */
+.wk-cards-orbit {
+  position: relative;
   width: 100%;
-  background: none;
-  border: none;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Individual Orbit Card */
+.wk-card {
+  position: absolute;
+  width: clamp(112px, 11vw, 168px);
+  aspect-ratio: 3 / 4;
+  border-radius: clamp(14px, 1.6vw, 26px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-sizing: border-box;
   text-decoration: none;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
-}
-
-.wk-roll-link:focus-visible {
-  outline: 2px solid #13ff00;
-  outline-offset: 6px;
-}
-
-/* ---------- LEFT block (index + name) — the only part that scales ---------- */
-
-.wk-roll-left {
-  display: flex;
-  align-items: center;
-  gap: clamp(16px, 3.5vw, 48px);
-  min-width: 0;
-  /* Scaling from the left edge is what keeps every name on one left rail. */
-  transform-origin: left center;
-  will-change: transform;
-}
-
-/* Index cell */
-.wk-index {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(0.72rem, 1.1vw, 0.9rem);
-  font-weight: 500;
-  letter-spacing: 0.28em;
-  color: #13ff00;
-  white-space: nowrap;
-}
-
-/* Name cell — the heading's OLD size, kept in a custom property so the two
-   sizes can never drift apart. */
-.wk-name-wrap {
-  overflow: hidden;
-  min-width: 0;
-}
-
-.wk-name {
-  display: inline-block;
-  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
-  font-weight: 400;
-  font-size: var(--wk-name-size, clamp(2.4rem, 6vw, 5.6rem));
-  line-height: 0.9;
-  letter-spacing: 0.005em;
-  text-transform: uppercase;
-  color: #ffffff;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-
-/* ---------- RIGHT block (meta + arrow) — never scales, never shifts ---------- */
-
-.wk-roll-right {
-  display: flex;
-  align-items: center;
-  gap: clamp(16px, 2.4vw, 36px);
-  flex-shrink: 0;
-  transition: opacity 0.2s ease-out;
-}
-
-/* Only the active row shows meta and arrow at full strength: at neighbour size
-   the meta is unreadable, so it is faded out entirely. */
-.wk-roll-item.is-neighbour .wk-roll-right {
-  opacity: 0;
-}
-
-/* Meta cell */
-.wk-meta {
+  padding: clamp(10px, 1.2vw, 16px);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
+  will-change: transform, opacity;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  cursor: pointer;
+}
+
+.wk-card:hover,
+.wk-card.is-active {
+  border-color: #13ff00;
+  box-shadow: 0 0 20px rgba(19, 255, 0, 0.2);
+}
+
+.wk-card-index {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(0.64rem, 0.9vw, 0.76rem);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
-  white-space: nowrap;
-  text-align: right;
-}
-
-.wk-meta-item strong {
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-/* Arrow cell */
-.wk-arrow-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: clamp(2rem, 3.5vw, 3.8rem);
-}
-
-.wk-arrow {
-  display: inline-block;
-  font-size: clamp(1.6rem, 3vw, 3.2rem);
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.6);
-  transition:
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.3s ease;
-  transform-origin: center;
-  will-change: transform;
-}
-
-/* ---------- Hover / focus on the active row ---------- */
-
-/* The hover shift applies ONLY on hover/focus — never as a resting state, so
-   every name keeps the same left edge. */
-@media (hover: hover) and (pointer: fine) {
-  .wk-roll-item.is-active .wk-roll-link:hover .wk-name {
-    transform: translateX(1.5vw);
-  }
-
-  .wk-roll-item.is-active .wk-roll-link:hover .wk-arrow {
-    transform: rotate(45deg);
-    color: #13ff00;
-  }
-}
-
-.wk-roll-link:focus-visible .wk-name {
-  transform: translateX(1.5vw);
-}
-
-.wk-roll-link:focus-visible .wk-arrow {
-  transform: rotate(45deg);
+  font-size: clamp(0.64rem, 0.9vw, 0.78rem);
+  font-weight: 700;
   color: #13ff00;
 }
 
-/* ---------- "All work" link ---------- */
-
-/* Sits in normal flow UNDER the rows (its own flex row inside the roller),
-   centred � the same slot the old "more" button held. */
-.wk-all-link {
-  position: relative;
-  flex-shrink: 0;
-  align-self: center;
-  margin-top: clamp(10px, 1.6vh, 20px);
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 16px 6px 6px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.04);
+.wk-card-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.4rem, 2.2vw, 2.2rem);
   color: #ffffff;
-  text-decoration: none;
-  transition:
-    background-color 0.22s ease-out,
-    border-color 0.22s ease-out;
-}
-
-.wk-all-circle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background: transparent;
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-.wk-all-label {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(0.6rem, 0.86vw, 0.7rem);
-  font-weight: 500;
-  letter-spacing: 0.24em;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-@media (hover: hover) {
-  .wk-all-link:hover {
-    background: #0f8f4b;
-    border-color: #0f8f4b;
-  }
+/* Arrow controls */
+.wk-arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 50;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.wk-all-link:focus-visible {
+.wk-arrow-prev {
+  left: 4px;
+}
+
+.wk-arrow-next {
+  right: 4px;
+}
+
+.wk-arrow-btn:hover {
+  background-color: #ffffff;
+  color: #000000;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.wk-arrow-btn:focus-visible {
   outline: 2px solid #13ff00;
   outline-offset: 3px;
 }
 
-/* ---------- Counter strip ---------- */
-
-.wk-counter-strip {
+/* ── RIGHT COLUMN: Detail Stage ── */
+.wk-right-col {
   display: flex;
-  justify-content: flex-end;
-  padding-top: clamp(12px, 2vh, 24px);
-  opacity: 0;
-  transition: opacity 0.6s ease-out;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  padding-bottom: 8px;
 }
 
-.wk-counter-strip.is-in {
-  opacity: 1;
+.wk-detail-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.wk-counter-text {
+/* Idle State */
+.wk-detail-idle {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.5vh, 28px);
+}
+
+.wk-idle-plate-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: 42svh;
+  border-radius: clamp(14px, 1.6vw, 26px);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  box-sizing: border-box;
+}
+
+.wk-idle-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wk-idle-count {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(0.68rem, 1vw, 0.82rem);
-  font-weight: 500;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #13ff00;
+  letter-spacing: 0.1em;
 }
 
-/* ---------- Cursor-following floating plate (Desktop) ---------- */
-
-.wk-preview-wrap {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 320px;
-  height: 220px;
-  pointer-events: none;
-  z-index: 20;
-  will-change: transform;
-  display: none;
+.wk-idle-lede {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.72rem, 1vw, 0.85rem);
+  line-height: 1.6;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
 }
 
-@media (pointer: fine) {
-  .wk-preview-wrap {
-    display: block;
+.wk-idle-prompt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.wk-prompt-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #13ff00;
+  animation: promptPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes promptPulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
   }
 }
 
-.wk-preview-card {
-  width: 320px;
-  height: 220px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.9),
-    0 0 20px rgba(19, 255, 0, 0.1);
-  overflow: hidden;
-  box-sizing: border-box;
-  opacity: 0;
-  transform: scale(0.85);
-  transition:
-    opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform, opacity;
-}
-
-.wk-preview-card.is-visible {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.wk-preview-overlay {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 100%;
-  height: 100%;
-  padding: 18px;
-  box-sizing: border-box;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.4) 0%,
-    rgba(0, 0, 0, 0.1) 40%,
-    rgba(0, 0, 0, 0.8) 100%
-  );
-}
-
-.wk-preview-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.wk-preview-mono-badge {
+.wk-prompt-text {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.64rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #13ff00;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 3px 8px;
-  border: 1px solid rgba(19, 255, 0, 0.3);
+  font-size: clamp(0.64rem, 0.85vw, 0.74rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.55);
 }
 
-.wk-preview-bottom {
+/* Active State */
+.wk-detail-active {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: clamp(12px, 2vh, 22px);
+  animation: detailFadeIn 0.3s ease;
 }
 
-.wk-preview-name {
-  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
-  font-weight: 400;
-  font-size: 2.2rem;
+@keyframes detailFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Big Plate with Wipe Reveal */
+.wk-plate {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: 42svh;
+  border-radius: clamp(14px, 1.6vw, 26px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-sizing: border-box;
+  padding: clamp(14px, 1.8vw, 24px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  animation: plateWipe 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: clip-path, transform;
+}
+
+@keyframes plateWipe {
+  0% {
+    clip-path: inset(100% 0 0 0);
+    transform: scale(1.04);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: scale(1);
+  }
+}
+
+.wk-plate-index {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.72rem, 1vw, 0.85rem);
+  font-weight: 700;
+  color: #13ff00;
+  letter-spacing: 0.12em;
+}
+
+/* Detail Meta Information */
+.wk-detail-meta-block {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 14px);
+}
+
+.wk-detail-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wk-detail-index {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #13ff00;
+  letter-spacing: 0.1em;
+}
+
+.wk-detail-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.4rem, 4vw, 4.4rem);
   line-height: 0.9;
-  letter-spacing: 0.01em;
-  color: #ffffff;
+  letter-spacing: 0.02em;
   margin: 0;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  text-transform: uppercase;
 }
 
-.wk-preview-tags {
+.wk-detail-meta {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.62rem, 0.85vw, 0.72rem);
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.wk-detail-desc {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.65rem, 0.88vw, 0.75rem);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: 0.08em;
+}
+
+.wk-detail-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.wk-preview-tag {
+.wk-tag-chip {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.58rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* ---------- Mobile inline expansion plate ---------- */
-
-.wk-inline-plate-wrap {
-  display: none;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  overflow: hidden;
-}
-
-.wk-inline-plate-wrap.is-open {
-  grid-template-rows: 1fr;
-}
-
-.wk-inline-plate-inner {
-  min-height: 0;
-  overflow: hidden;
-  padding-bottom: 24px;
-}
-
-.wk-inline-card {
-  width: 100%;
-  height: 200px;
+  padding: 3px 8px;
+  border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-sizing: border-box;
+  color: rgba(255, 255, 255, 0.75);
 }
 
-/* ==========================================================================
-   Responsive / fallback: <= 900px or reduced motion.
-   No pin, no roller — a normal stacked list of the visible projects.
-   ========================================================================== */
+.wk-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
 
-@media (max-width: 900px), (prefers-reduced-motion: reduce) {
+.wk-detail-hint {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
+.wk-visit-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #13ff00;
+  color: #13ff00;
+  background: transparent;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.wk-visit-btn:hover {
+  background-color: #13ff00;
+  color: #000000;
+}
+
+/* ── More Work Button ── */
+.wk-more-wrap {
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.wk-more-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 0.95vw, 0.8rem);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
+}
+
+.wk-more-btn:hover {
+  background-color: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.wk-more-btn:focus-visible {
+  outline: 2px solid #13ff00;
+  outline-offset: 3px;
+}
+
+/* ── MOBILE / REDUCED MOTION (<= 900px) ── */
+@media (max-width: 900px) {
   .wk-root {
     height: auto;
-    min-height: 0;
+    min-height: auto;
+    overflow: visible;
+    padding: clamp(60px, 8vh, 90px) 20px;
   }
 
-  .wk-inner {
-    height: auto;
-    min-height: 0;
-    padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
-  }
-
-  .wk-header {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .wk-title-line {
-    white-space: normal;
-  }
-
-  .wk-roller {
-    flex: none;
-    display: block;
-  }
-
-  .wk-roll-viewport {
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-
-  .wk-hairline {
-    display: none;
-  }
-
-  .wk-roll-list {
-    position: static;
-    inset: auto;
-  }
-
-  .wk-roll-item {
-    position: static;
-    top: auto;
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: none !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .wk-roll-item:last-child {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .wk-roll-link {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 8px;
-    column-gap: 16px;
-    padding: 24px 0;
-    align-items: center;
-  }
-
-  .wk-roll-left {
-    grid-column: 1;
-    grid-row: 1;
-    transform: none !important;
-  }
-
-  .wk-name {
-    font-size: clamp(2.2rem, 11vw, 4rem);
-  }
-
-  .wk-roll-right {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-    opacity: 1 !important;
-  }
-
-  .wk-meta {
-    flex-direction: row;
-    gap: 12px;
-  }
-
-  .wk-inline-plate-wrap {
-    display: grid;
-  }
-
-  .wk-all-link {
-    position: static;
-    left: auto;
-    bottom: auto;
-    margin: 20px auto 0;
+  .wk-layout {
     display: flex;
+    flex-direction: column;
+    gap: 32px;
   }
 
-  .wk-counter-strip {
-    opacity: 1;
+  .wk-carousel-wrap {
+    min-height: 280px;
+    height: 320px;
+  }
+
+  .wk-card {
+    width: 130px;
+  }
+
+  .wk-right-col {
+    height: auto;
+  }
+
+  .wk-detail-idle .wk-prompt-text {
+    font-size: 0.7rem;
   }
 }
-
-@media (pointer: coarse) {
-  .wk-inline-plate-wrap {
-    display: grid;
-  }
-}
-
-/* ---------- Prefers-reduced-motion: everything simply visible ---------- */
 
 @media (prefers-reduced-motion: reduce) {
+  .wk-word,
   .wk-rise,
-  .wk-word {
-    transition: none;
-    transform: none;
-    opacity: 1;
+  .wk-plate,
+  .wk-arrow-btn,
+  .wk-more-btn,
+  .wk-visit-btn {
+    transition: none !important;
+    animation: none !important;
   }
 
-  .wk-hairline {
-    transition: none;
-    transform: scaleX(1);
+  .wk-prompt-pulse {
+    animation: none !important;
   }
 
-  .wk-preview-wrap {
-    display: none !important;
-  }
-
-  .wk-name,
-  .wk-arrow {
-    transition: none;
+  .wk-plate {
+    clip-path: none !important;
     transform: none !important;
   }
-
-
-
-  .wk-inline-plate-wrap {
-    transition: none;
-  }
 }
 
-
-/* ==========================================================================
-   /works PAGE VARIANT — the full archive in normal flow
-   The stage's panel styles are untouched; this block only re-flows the list
-   when the same component is rendered as a standalone page (`wk-variant-page`).
-   ========================================================================== */
-
-.wk-variant-page .wk-inner {
-  padding-top: var(--panel-pad-top);
-  padding-bottom: clamp(40px, 8vh, 96px);
-}
-
-.wk-variant-page .wk-roller {
-  display: block;
-}
-
-.wk-variant-page .wk-roll-viewport {
-  -webkit-mask-image: none;
-  mask-image: none;
-}
-
-.wk-variant-page .wk-hairline {
-  display: none;
-}
-
-.wk-variant-page .wk-roll-list {
-  position: static;
-  inset: auto;
-}
-
-.wk-variant-page .wk-roll-item {
-  position: static;
-  opacity: 1 !important;
-  visibility: visible !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.wk-variant-page .wk-roll-item:last-child {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.wk-variant-page .wk-roll-link {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  row-gap: 8px;
-  column-gap: 24px;
-  padding: clamp(20px, 3.2vh, 36px) 0;
-}
-
-.wk-variant-page .wk-roll-left {
-  transform: none !important;
-  min-width: 0;
-}
-
-.wk-variant-page .wk-roll-right {
-  opacity: 1 !important;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.wk-variant-page .wk-meta {
-  text-align: right;
-}
-
-.wk-variant-page .wk-preview-wrap {
-  display: none !important;
-}
-
-/* On the /works page the project blurb sits under the name. */
-.wk-blurb {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(0.62rem, 0.9vw, 0.74rem);
-  line-height: 1.7;
-  letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.5);
-  max-width: 52ch;
-  margin-top: 8px;
-}

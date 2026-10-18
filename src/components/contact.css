@@ -15,12 +15,85 @@
   align-items: center;
   background: #000;
   color: #fff;
-  padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
+  padding: var(--panel-pad-top) clamp(20px, 6vw, 104px) clamp(40px, 6vh, 80px);
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Faint dot-grid with radial mask fading toward centre */
+.ct-dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse at center, transparent 20%, black 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, transparent 20%, black 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Static green radial glow in bottom-right corner */
+.ct-glow-corner {
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 50vw;
+  height: 50vw;
+  max-width: 600px;
+  max-height: 600px;
+  background: radial-gradient(circle, rgba(19, 255, 0, 0.09) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Faint SVG compass ring behind left column */
+.ct-compass-bg {
+  position: absolute;
+  bottom: -15vmin;
+  left: -15vmin;
+  width: 60vmin;
+  height: 60vmin;
+  pointer-events: none;
+  opacity: 0.06;
+  color: #ffffff;
+  z-index: 0;
+}
+
+.ct-compass-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ct-tick-group {
+  transform-origin: 200px 200px;
+  animation: compassSlowRotate 120s linear infinite;
+}
+
+.ct-root:not(.is-visible) .ct-tick-group {
+  animation-play-state: paused;
+}
+
+@keyframes compassSlowRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ct-cardinal-text {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 16px;
+  font-weight: 700;
+  fill: currentColor;
+  stroke: none;
 }
 
 /* Parallax target: the stage nudges this from -6vw to 0 during the slide. */
 .ct-grid {
+  position: relative;
+  z-index: 1;
   width: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
@@ -130,6 +203,35 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
+/* ---------- Local Clock ---------- */
+
+.ct-clock {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: clamp(14px, 2.2vh, 24px);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.7rem, 0.95vw, 0.82rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ct-clock-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.ct-clock-time {
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.ct-clock-zone {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
 .ct-copyright {
   margin: clamp(32px, 6vh, 64px) 0 0;
   padding-top: clamp(16px, 2.4vh, 24px);
@@ -195,30 +297,6 @@
 }
 
 /* ---------- Email ---------- */
-
-.ct-email {
-  margin: 0 0 clamp(12px, 2vh, 18px);
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(0.72rem, 1.05vw, 0.86rem);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.ct-email-link {
-  color: #fff;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  transition:
-    border-color 0.22s ease-out,
-    color 0.22s ease-out;
-}
-
-@media (hover: hover) {
-  .ct-email-link:hover {
-    color: #13ff00;
-    border-color: #13ff00;
-  }
-}
 
 /* ---------- Button row ---------- */
 

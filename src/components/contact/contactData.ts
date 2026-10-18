@@ -7,6 +7,12 @@
  * hard-coded in a component.
  */
 
+/** Studio local timezone for the live clock. */
+export const STUDIO_TIMEZONE = 'Asia/Kolkata' // REPLACE
+
+/** Studio timezone abbreviation display label. */
+export const STUDIO_TIMEZONE_LABEL = 'IST' // REPLACE
+
 /** The address shown in the UI and used to build the compose URLs. */
 export const CONTACT_EMAIL = 'hello@vebmore.com' // REPLACE
 

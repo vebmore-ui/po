@@ -1,0 +1,183 @@
+/* ==========================================================================
+   CUSTOM CURSOR — editorial compass cursor
+   Enabled only for (hover: hover) and (pointer: fine), and disabled under
+   prefers-reduced-motion.
+   Dot: 6px solid white, 1px black outline.
+   Ring: 30px, 1px white with 1px black outline, 4 cardinal ticks (N/E/S/W).
+   Lerps 0.18/frame, stops after 1s stillness.
+   Prefix: cur-
+   ========================================================================== */
+
+.cur-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cur-root {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cur-root {
+    display: none !important;
+  }
+}
+
+/* 6px solid white circle with 1px black outer edge */
+.cur-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #000000;
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+}
+
+/* 30px ring, 1px solid white with 1px black outer edge */
+.cur-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  box-shadow: 0 0 0 1px #000000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  transition:
+    width 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    margin 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+/* Cardinal tick marks container */
+.cur-ticks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cur-tick {
+  position: absolute;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+/* North */
+.cur-tick-n {
+  top: -4px;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  height: 4px;
+}
+
+/* South */
+.cur-tick-s {
+  bottom: -4px;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  height: 4px;
+}
+
+/* East */
+.cur-tick-e {
+  right: -4px;
+  top: calc(50% - 0.5px);
+  width: 4px;
+  height: 1px;
+}
+
+/* West */
+.cur-tick-w {
+  left: -4px;
+  top: calc(50% - 0.5px);
+  width: 4px;
+  height: 1px;
+}
+
+/* Label for data-cursor="view" */
+.cur-view-label {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #13ff00;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Interactive hover state: ring 48px, ticks rotate 45deg, dot shrinks */
+.cur-root.is-interactive .cur-ring {
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+.cur-root.is-interactive .cur-ticks {
+  transform: rotate(45deg);
+}
+
+.cur-root.is-interactive .cur-dot {
+  transform: scale(0.5);
+}
+
+/* View hover state: ring 64px, view label visible, dot hidden */
+.cur-root.is-view .cur-ring {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-color: #13ff00;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8);
+}
+
+.cur-root.is-view .cur-ticks {
+  transform: rotate(45deg);
+  opacity: 0.4;
+}
+
+.cur-root.is-view .cur-dot {
+  opacity: 0;
+}
+
+.cur-root.is-view .cur-view-label {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Pressed state: scales down slightly */
+.cur-root.is-pressed .cur-ring {
+  transform: scale(0.85);
+}
+
+.cur-root.is-pressed .cur-dot {
+  transform: scale(0.7);
+}
+
+/* Hidden when inactive or left the window */
+.cur-root:not(.is-live) {
+  opacity: 0;
+}
+

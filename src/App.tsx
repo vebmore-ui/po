@@ -1,120 +1,134 @@
-import { useState, useEffect } from 'react'
-import Compass from './components/hero/Compass'
-import ScrollTextLines from './components/hero/ScrollTextLines'
-import AboutCapabilitiesStage from './components/AboutCapabilitiesStage'
-import WorksContactStage from './components/WorksContactStage'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import SiteNav, { type NavItem } from './components/nav/SiteNav'
+import SiteCursor from './components/cursor/SiteCursor'
+import HomePage from './pages/HomePage'
+import WorksPage from './pages/WorksPage'
+import { usePath, navigate } from './router'
+import {
+  SECTION_IDS,
+  SECTION_LABELS,
+  type SectionId,
+  getActiveSection,
+  getAnchors,
+  sectionIdFromHash,
+  type AnchorContext,
+} from './sectionMap'
 import './App.css'
-import './components/motion-world/about.css'
 
-function getScrollTop() {
-  const root = document.getElementById('root')
-  const rootTop = root ? root.scrollTop : 0
-  return rootTop > 0 ? rootTop : document.documentElement.scrollTop || window.scrollY
+const NAV_ITEMS: NavItem[] = SECTION_IDS.map((id) => ({
+  id,
+  label: SECTION_LABELS[id],
+}))
+
+function getAnchorContext(): AnchorContext {
+  return {
+    aboutStage: document.querySelector('.stg-track-wrap'),
+    worksStage: document.querySelector('.wc-wrap'),
+    aboutPanel: document.querySelector('.ab-root'),
+    capabilitiesPanel: document.querySelector('.cap-root'),
+    techPanel: document.querySelector('.ts-root'),
+    worksPanel: document.querySelector('.wk-root'),
+    contactPanel: document.querySelector('.ct-root'),
+  }
 }
 
-// Timing for compass initial entrance & text animations
-const QUESTION_REVEAL = 1200
-const COMPASS_ANIM = 1200
+export default function App() {
+  const path = usePath()
+  const isWorksPage = path === '/works'
+  const [activeSection, setActiveSection] = useState<SectionId>('home')
+  const rafScrollRef = useRef(0)
 
-// How many viewports of scroll travel for the compass exit
-const HERO_SCROLL_VIEWPORTS = 1.6
+  // ── Scroll to a specific section anchor ──
+  const scrollToSection = useCallback((id: SectionId) => {
+    const ctx = getAnchorContext()
+    const anchors = getAnchors(ctx)
+    const targetY = anchors[id] ?? 0
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-function App() {
-  const [showCompass, setShowCompass] = useState(false)
-  const [animationComplete, setAnimationComplete] = useState(false)
-  const [, setScrollTick] = useState(0)
+    window.scrollTo({
+      top: targetY,
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    })
+  }, [])
 
-  const [viewport, setViewport] = useState(() => {
-    const h = window.innerHeight || 800
-    return {
-      h,
-      heroTrack: Math.max(h * HERO_SCROLL_VIEWPORTS, 200),
-    }
-  })
+  // ── Nav selection handler ──
+  const handleNavSelect = useCallback(
+    (id: string) => {
+      const sectionId = id as SectionId
+      if (isWorksPage) {
+        if (sectionId === 'home') {
+          navigate('/')
+        } else {
+          navigate(`/#${sectionId}`)
+        }
+      } else {
+        scrollToSection(sectionId)
+      }
+    },
+    [isWorksPage, scrollToSection],
+  )
 
+  // ── Active section detection for homepage ──
   useEffect(() => {
-    const measure = () => {
-      const h = window.innerHeight || 800
-      const heroTrack = Math.max(h * HERO_SCROLL_VIEWPORTS, 200)
-      setViewport({ h, heroTrack })
+    if (isWorksPage) return
+
+    let ticking = false
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true
+        rafScrollRef.current = requestAnimationFrame(() => {
+          ticking = false
+          const ctx = getAnchorContext()
+          const currentId = getActiveSection(ctx)
+          setActiveSection((prev) => (prev !== currentId ? currentId : prev))
+        })
+      }
     }
-    const id = requestAnimationFrame(measure)
-    window.addEventListener('resize', measure)
+
+    // Run once on mount
+    onScroll()
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll, { passive: true })
+
     return () => {
-      cancelAnimationFrame(id)
-      window.removeEventListener('resize', measure)
+      if (rafScrollRef.current) cancelAnimationFrame(rafScrollRef.current)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
     }
-  }, [])
+  }, [isWorksPage])
 
+  // ── Handle incoming hash when mounting on homepage ──
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollTick((t) => t + 1)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    const root = document.getElementById('root')
-    root?.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      root?.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
+    if (isWorksPage) return
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowCompass(true)
-    }, QUESTION_REVEAL)
-    return () => clearTimeout(timer)
-  }, [])
+    const hash = window.location.hash
+    if (!hash) return
 
-  useEffect(() => {
-    if (!showCompass) return
-    const timer = setTimeout(() => {
-      setAnimationComplete(true)
-    }, COMPASS_ANIM)
-    return () => clearTimeout(timer)
-  }, [showCompass])
+    const targetSection = sectionIdFromHash(hash)
+    if (!targetSection) return
 
-  const scrollTop = getScrollTop()
-  const heroProgress = Math.min(Math.max(scrollTop / viewport.heroTrack, 0), 1)
-
-  // Compass section stages:
-  // 1. Text lines exit sequentially (0.0 to 0.45)
-  // 2. Compass fades out (0.35 to 0.70)
-  const textProgress = Math.min(Math.max(heroProgress / 0.45, 0), 1)
-  const compassProgress = heroProgress < 0.35 ? 0 : Math.min(Math.max((heroProgress - 0.35) / 0.35, 0), 1)
-
-  // Once hero is fully scrolled past, hide the fixed container
-  const heroDone = heroProgress >= 1
-
-  // AboutSection activates as it arrives into view
-  const aboutActive = heroProgress >= 0.85
+    // Allow layout and DOM to settle before calculating anchors
+    const id = requestAnimationFrame(() => {
+      scrollToSection(targetSection)
+    })
+    return () => cancelAnimationFrame(id)
+  }, [isWorksPage, scrollToSection])
 
   return (
     <>
-      {/* Spacer providing scroll distance for the hero section exit */}
-      <div className="scroll-spacer" style={{ height: Math.round(viewport.heroTrack) }} />
+      {/* Editorial Custom Cursor (persists across pages) */}
+      <SiteCursor />
 
-      {/* Compass hero: fixed pinned layer that reacts to scroll until scrolled past */}
-      <div
-        className="hero-container"
-        style={{
-          position: 'fixed',
-          inset: 0,
-          visibility: heroDone ? 'hidden' : 'visible',
-          zIndex: 1,
-        }}
-      >
-        {showCompass && <Compass compassProgress={compassProgress} />}
-        <ScrollTextLines textProgress={textProgress} animationComplete={animationComplete} />
-      </div>
+      {/* Primary Site Navigation (persists across pages) */}
+      <SiteNav
+        items={NAV_ITEMS}
+        activeId={isWorksPage ? 'work' : activeSection}
+        onSelect={handleNavSelect}
+      />
 
-      {/* About + Capabilities + Tech Stack: pinned horizontal stage */}
-      <AboutCapabilitiesStage aboutActive={aboutActive} />
-
-      {/* Section 4 + 5: Works → Contact pinned horizontal stage */}
-      <WorksContactStage />
+      {/* Pages: unmounts / mounts per path */}
+      {isWorksPage ? <WorksPage /> : <HomePage />}
     </>
   )
 }
-
-export default App

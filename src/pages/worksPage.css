@@ -1,0 +1,363 @@
+/* ==========================================================================
+   WORKS PAGE (/works) — The Full Archive
+   Normal document-flow page with black background, filter bar, and 3/2/1 grid.
+   Prefix: wp-
+   ========================================================================== */
+
+.wp-root {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: #000000;
+  color: #ffffff;
+  padding: var(--panel-pad-top) clamp(20px, 6vw, 104px) clamp(60px, 10vh, 120px);
+  box-sizing: border-box;
+}
+
+.wp-grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wp-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 5vh, 64px);
+}
+
+/* Header */
+.wp-head {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: clamp(24px, 4vh, 48px);
+}
+
+.wp-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #ffffff;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wp-root.is-entered .wp-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wp-quote {
+  color: #13ff00;
+  font-weight: 700;
+}
+
+.wp-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.wp-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 7vw, 7.5rem);
+  line-height: 0.88;
+  letter-spacing: 0.02em;
+  margin: 0;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.wp-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  margin-right: 0.28em;
+}
+
+.wp-word {
+  display: inline-block;
+  transform: translateY(115%);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wp-root.is-entered .wp-word {
+  transform: translateY(0);
+}
+
+.wp-count {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(1rem, 1.8vw, 2rem);
+  font-weight: 700;
+  color: #13ff00;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.wp-head-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.wp-lede {
+  max-width: 680px;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.72rem, 1vw, 0.85rem);
+  line-height: 1.6;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+.wp-back {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #13ff00;
+  text-decoration: none;
+  padding: 8px 16px;
+  border: 1px solid rgba(19, 255, 0, 0.3);
+  border-radius: 999px;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.wp-back:hover {
+  background-color: #13ff00;
+  color: #000000;
+}
+
+/* Filter Chips */
+.wp-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wp-chip {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 8px 18px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.wp-chip:hover {
+  border-color: rgba(255, 255, 255, 0.8);
+  color: #ffffff;
+}
+
+.wp-chip.is-active {
+  border-color: #13ff00;
+  background-color: rgba(19, 255, 0, 0.1);
+  color: #13ff00;
+}
+
+.wp-chip:focus-visible {
+  outline: 2px solid #13ff00;
+  outline-offset: 3px;
+}
+
+/* 3 / 2 / 1 Grid */
+.wp-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 40px);
+}
+
+.wp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-decoration: none;
+  color: #ffffff;
+  border-radius: clamp(14px, 1.6vw, 24px);
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+  opacity: 0;
+  transform: translateY(24px) scale(0.97);
+  animation: cardPopIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardPopIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wp-card:hover {
+    transform: translateY(-4px) scale(1.03);
+    border-color: #13ff00;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  }
+}
+
+.wp-card-plate {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: clamp(10px, 1.2vw, 18px);
+  padding: clamp(14px, 1.8vw, 20px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.wp-card-index {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #13ff00;
+}
+
+.wp-card-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 3.2vw, 3rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.wp-card-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 4px 4px;
+}
+
+.wp-card-meta {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wp-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wp-card-tag {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wp-card-arrow {
+  align-self: flex-end;
+  font-size: 1rem;
+  color: #13ff00;
+}
+
+/* Footer strip */
+.wp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: clamp(32px, 6vh, 64px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  flex-wrap: wrap;
+}
+
+.wp-footer-text {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.72rem, 1.1vw, 0.88rem);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wp-footer-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  background: transparent;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-decoration: none;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.wp-footer-btn:hover {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Responsive Grid Breakpoints */
+@media (max-width: 1100px) {
+  .wp-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .wp-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wp-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-label,
+  .wp-word,
+  .wp-card,
+  .wp-back,
+  .wp-chip,
+  .wp-footer-btn {
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+

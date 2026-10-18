@@ -1,77 +1,65 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, type KeyboardEvent, type TouchEvent } from 'react'
 import { featuredProjects, type Project } from './works/worksData'
-import WorkPreview from './works/WorkPreview'
+import { navigate } from '../router'
 import './works.css'
-
-/**
- * WORKS — the pinned project carousel.
- *
- * The homepage carousel shows the first FEATURED_COUNT projects in a fixed
- * 5-item roller. The full archive lives on /works, where this same component
- * renders in `page` variant: the full list is visible at once (no roller
- * transform math), with a link back to the homepage.
- *
- * The homepage roller itself owns no scroll math: `WorksContactStage` measures
- * scroll in absolute distance and pushes the dwell-eased float index `f` in
- * through a ref (never state, so the roller never re-renders per frame).
- *
- * Everything the roller needs — the per-item transform/opacity, the counter —
- * is written to DOM refs inside the rAF loop. React state is reserved for
- * things that change at human speed: the entry beats, the hovered project and
- * the open mobile row.
- */
 
 const TITLE_WORDS = ['GROW', 'MORE', 'WITH']
 const MARK = 'VEBMORE'
-
-function clamp(v: number, lo: number, hi: number): number {
-  return v < lo ? lo : v > hi ? hi : v
-}
+const AXIS_TILT_DEG = -30
+const AXIS_TILT_RAD = (AXIS_TILT_DEG * Math.PI) / 180
+const COS_TILT = Math.cos(AXIS_TILT_RAD)
+const SIN_TILT = Math.sin(AXIS_TILT_RAD)
+const DEG_PER_SLOT = 360 / 5 // 72 deg
+const BASE_VELOCITY = 360 / 28 // ~12.857 deg per second
 
 interface Props {
-  /** The dwell-eased active index, written by the stage's rAF loop. */
-  rollRef?: React.RefObject<number>
-  /** Stage-controlled entry trigger. `undefined` → use the observer. */
   triggerEntry?: boolean
-  /** Reports the visible project count up so the stage can size its wrapper. */
-  onVisibleCountChange?: (count: number) => void
-  /** Lets the stage scroll the page to a project (click / keyboard on a row). */
-  onRequestScrollToProject?: (index: number) => void
-  /**
-   * `panel` (default): homepage roller inside the pinned stage.
-   * `page`: standalone /works page — full list in normal flow, no roller math.
-   */
-  variant?: 'panel' | 'page'
+  slideProgressRef?: React.RefObject<number>
 }
 
-export default function WorksSection({
-  rollRef,
-  triggerEntry,
-  onVisibleCountChange,
-  onRequestScrollToProject,
-  variant = 'panel',
-}: Props) {
+export default function WorksSection({ triggerEntry, slideProgressRef }: Props) {
   const rootRef = useRef<HTMLElement>(null)
-  const timers = useRef<number[]>([])
+  const carouselRegionRef = useRef<HTMLDivElement>(null)
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([])
+
   const [beat, setBeat] = useState(0)
+  const entryFired = useRef(false)
+  const timers = useRef<number[]>([])
 
-  // Desktop hover preview state
-  const [hoveredProject, setHoveredProject] = useState<Project | null>(null)
-  const [previewVisible, setPreviewVisible] = useState(false)
+  // Hovered / active project for detail panel
+  const [activeProject, setActiveProject] = useState<Project | null>(null)
 
-  // Mobile tap accordion state (one open at a time)
-  const [openMobileId, setOpenMobileId] = useState<string | null>(null)
+  const hoverLeaveTimer = useRef<number | null>(null)
+  const touchDeselectTimer = useRef<number | null>(null)
 
-  const list = featuredProjects
+  // Carousel physics & animation refs
+  const thetaRef = useRef(0)
+  const targetThetaRef = useRef(0)
+  const isTweeningRef = useRef(false)
+  const tweenStartTimeRef = useRef(0)
+  const tweenStartThetaRef = useRef(0)
+  const tweenEndThetaRef = useRef(0)
+
+  const isHoveredRef = useRef(false)
+  const isDetailHoveredRef = useRef(false)
+  const pauseUntilRef = useRef(0)
+  const currentVelocityRef = useRef(BASE_VELOCITY)
+
+  const isVisibleRef = useRef(false)
+  const isReducedMotionRef = useRef(false)
+  const rafRef = useRef(0)
+  const lastTimeRef = useRef(0)
+
+  // Cached dimensions
+  const dimsRef = useRef({ w: 400, h: 400, rx: 140, ry: 90 })
 
   // ── Entry animation schedule ──
-  const entryFired = useRef(false)
   const fireEntry = useCallback(() => {
     if (entryFired.current) return
     entryFired.current = true
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setBeat(6)
+      timers.current.push(window.setTimeout(() => setBeat(4), 0))
       return
     }
 
@@ -79,9 +67,7 @@ export default function WorksSection({
       [100, 1], // label rises
       [280, 2], // heading words mask-slide up
       [560, 3], // VEBMORE mark
-      [500, 4], // lede fades up
-      [650, 5], // roller hairlines draw
-      [820, 6], // roller rows & counter
+      [700, 4], // content fade in
     ]
 
     schedule.forEach(([ms, n]) => {
@@ -91,12 +77,10 @@ export default function WorksSection({
     })
   }, [])
 
-  // ── Stage-driven entry ──
   useEffect(() => {
     if (triggerEntry) fireEntry()
   }, [triggerEntry, fireEntry])
 
-  // ── Fallback: IntersectionObserver when not inside the stage ──
   useEffect(() => {
     if (triggerEntry !== undefined) return
     const el = rootRef.current
@@ -119,211 +103,249 @@ export default function WorksSection({
     }
   }, [triggerEntry, fireEntry])
 
-  // ── Report the visible count up to the stage (wrapper height) ──
-  useEffect(() => {
-    onVisibleCountChange?.(list.length)
-  }, [list.length, onVisibleCountChange])
-
   const shown = (n: number) => beat >= n
 
-  // ── Measure the row height once, and again only on resize ──
-  // The stacking maths needs the active row's natural height; measuring it per
-  // frame would force a layout on every tick, so it is cached here instead.
+  // ── Reduced motion check ──
   useEffect(() => {
-    if (variant !== 'panel') return
-    const listEl = rootRef.current?.querySelector('.wk-roll-list') as HTMLElement | null
-    const roller = rootRef.current?.querySelector('.wk-roller') as HTMLElement | null
-    if (!listEl) return
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    isReducedMotionRef.current = mq.matches
+    const update = (e: MediaQueryListEvent) => {
+      isReducedMotionRef.current = e.matches
+    }
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+
+  // ── Measure carousel region ──
+  useEffect(() => {
+    const region = carouselRegionRef.current
+    if (!region) return
 
     const measure = () => {
-      const first = listEl.querySelector('.wk-roll-item') as HTMLElement | null
-      if (first) {
-        const h = first.offsetHeight
-        listEl.style.setProperty('--wk-row-h', `${h}px`)
-        if (roller) roller.style.setProperty('--wk-row-h', `${h}px`)
-      }
+      const w = region.clientWidth || 400
+      const h = region.clientHeight || 400
+      // Cards are approx 140px wide x 186px high
+      const cardW = Math.min(Math.max(w * 0.28, 112), 168)
+      const cardH = cardW * (4 / 3)
+      const rx = Math.max((w - cardW) * 0.44, 40)
+      const ry = Math.max((h - cardH) * 0.42, 30)
+      dimsRef.current = { w, h, rx, ry }
     }
 
     measure()
     const ro = new ResizeObserver(measure)
-    ro.observe(listEl)
-    if (roller) ro.observe(roller)
+    ro.observe(region)
     return () => ro.disconnect()
-  }, [variant])
+  }, [])
 
-  // ── Roller driver: one rAF loop, refs only ──
-  // The stage writes `rollRef.current`; this loop turns it into the per-item
-  // transform/opacity, the counter text and the "more" button's state.
-  //
-  // Overlap is impossible BY CONSTRUCTION: each item's height is its own scale
-  // applied to the measured row height, and the items are stacked with a fixed
-  // gap between their edges. Only the LEFT block is scaled, so the meta/arrow
-  // column never shrinks into the middle of the row.
+  // ── Render transforms for cards ──
+  const applyCardTransforms = useCallback((thetaDeg: number) => {
+    const { rx, ry } = dimsRef.current
+    const count = featuredProjects.length
+
+    for (let i = 0; i < count; i++) {
+      const el = cardRefs.current[i]
+      if (!el) continue
+
+      const phiDeg = thetaDeg + i * (360 / count)
+      const phiRad = (phiDeg * Math.PI) / 180
+
+      // Before tilt: x = Rx * sin φ, y = -Ry * cos φ
+      const x0 = rx * Math.sin(phiRad)
+      const y0 = -ry * Math.cos(phiRad)
+      const w = Math.cos(phiRad) // depth: +1 front, -1 back
+
+      // Tilt around Z axis by AXIS_TILT_DEG
+      const x = x0 * COS_TILT - y0 * SIN_TILT
+      const y = x0 * SIN_TILT + y0 * COS_TILT
+
+      const normDepth = (w + 1) / 2 // 0 (back) to 1 (front)
+      const scale = 0.58 + 0.42 * normDepth
+      const opacity = 0.28 + 0.72 * normDepth
+      const zIndex = Math.round(normDepth * 30) + 1
+      const rotY = Math.sin(phiRad) * 12
+
+      el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(3)}) rotateY(${rotY.toFixed(1)}deg)`
+      el.style.opacity = opacity.toFixed(3)
+      el.style.zIndex = String(zIndex)
+    }
+  }, [])
+
+  // ── Orbit rAF Loop ──
   useEffect(() => {
-    if (variant !== 'panel' || !rollRef) return
-    let raf = 0
-    let lastRounded = -1
+    const el = rootRef.current
+    if (!el) return
 
-    const GAP = () => clamp(window.innerHeight * 0.014, 8, 18)
-    const easeOutCubic = (t: number) => 1 - (1 - t) ** 3
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting
+      },
+      { threshold: 0.05 },
+    )
+    observer.observe(el)
 
-    /** Scale for an item `d` steps from the active one: 1 at 0, ~0.55 at |1|. */
-    const scaleFor = (d: number) => {
-      const ad = Math.min(Math.abs(d), 1)
-      return 1 - ad * 0.45
-    }
+    const loop = (timestamp: number) => {
+      if (!lastTimeRef.current) lastTimeRef.current = timestamp
+      const dt = Math.min((timestamp - lastTimeRef.current) / 1000, 0.1)
+      lastTimeRef.current = timestamp
 
-    const opacityFor = (d: number) => {
-      const ad = Math.min(Math.abs(d), 1)
-      return 1 - ad * 0.72
-    }
+      const slideQ = slideProgressRef?.current ?? 0
+      const isPanelActive = isVisibleRef.current && slideQ < 0.98
 
-    const loop = () => {
-      const f = rollRef.current ?? 0
-      const listEl = rootRef.current?.querySelector('.wk-roll-list') as HTMLElement | null
-      const roller = rootRef.current?.querySelector('.wk-roller') as HTMLElement | null
-      const H =
-        parseFloat(
-          (roller ?? listEl)?.style.getPropertyValue('--wk-row-h') || '',
-        ) || 0
-      const rollerH = roller?.clientHeight ?? 0
+      if (isPanelActive && !isReducedMotionRef.current) {
+        // Tweening from arrow click
+        if (isTweeningRef.current) {
+          const elapsed = timestamp - tweenStartTimeRef.current
+          const progress = Math.min(elapsed / 700, 1)
+          // cubic ease-in-out
+          const eased =
+            progress < 0.5
+              ? 4 * progress * progress * progress
+              : 1 - Math.pow(-2 * progress + 2, 3) / 2
 
-      if (listEl && H > 0 && rollerH > 0) {
-        const items = listEl.children
-        const n = items.length
-        const gap = GAP()
+          thetaRef.current =
+            tweenStartThetaRef.current +
+            (tweenEndThetaRef.current - tweenStartThetaRef.current) * eased
 
-        // ── 1. Visible height of each item, from its own scale ──
-        // The item's LAYOUT box stays `H` tall (only its inner left block is
-        // scaled), so the box must be placed by `H` while the stacking is
-        // computed from these visible heights. That is what keeps the visible
-        // text centred on the same point the box is centred on.
-        const heights: number[] = []
-        for (let i = 0; i < n; i++) {
-          heights.push(H * scaleFor(i - f))
-        }
-
-        // ── 2. Stack the visible content top to bottom (edges + gap) ──
-        const centres: number[] = []
-        let cursor = 0
-        for (let i = 0; i < n; i++) {
-          const c = cursor + heights[i] / 2
-          centres.push(c)
-          cursor = c + heights[i] / 2 + gap
-        }
-
-        // ── 3. The interpolated centre that must sit at the roller's middle ──
-        const lo = clamp(Math.floor(f), 0, n - 1)
-        const hi = clamp(Math.ceil(f), 0, n - 1)
-        const t = easeOutCubic(clamp(f - Math.floor(f), 0, 1))
-        const focusCentre = centres[lo] + (centres[hi] - centres[lo]) * t
-        const offset = rollerH / 2 - focusCentre
-
-        // ── 4. Write transform + opacity only ──
-        for (let i = 0; i < n; i++) {
-          const el = items[i] as HTMLElement
-          const d = i - f
-          const ad = Math.abs(d)
-          const scale = scaleFor(d)
-          const opacity = opacityFor(d)
-          const active = ad < 0.5
-
-          el.classList.toggle('is-active', active)
-          el.classList.toggle('is-neighbour', !active && ad < 1.25)
-
-          const link = el.querySelector('a')
-          if (link) {
-            if (active) link.setAttribute('aria-current', 'true')
-            else link.removeAttribute('aria-current')
+          if (progress >= 1) {
+            isTweeningRef.current = false
+            thetaRef.current = tweenEndThetaRef.current % 360
+            targetThetaRef.current = thetaRef.current
           }
+        } else {
+          // Normal auto-rotation with hover damping
+          const isPaused =
+            isHoveredRef.current ||
+            isDetailHoveredRef.current ||
+            timestamp < pauseUntilRef.current
 
-          if (ad > 1.25) {
-            el.style.opacity = '0'
-            el.style.visibility = 'hidden'
-            el.style.pointerEvents = 'none'
-            continue
-          }
+          const targetVelocity = isPaused ? 0 : BASE_VELOCITY
+          const rate = isPaused ? 0.35 : 0.6
+          currentVelocityRef.current +=
+            (targetVelocity - currentVelocityRef.current) * Math.min(dt / rate, 1)
 
-          // Place the BOX by its true layout height (H), so the box and its
-          // centred visible content share one centre. The box is H tall, so its
-          // top is the centre minus H/2.
-          const y = centres[i] + offset - H / 2
-          el.style.visibility = 'visible'
-          el.style.pointerEvents = active ? 'auto' : 'none'
-          el.style.opacity = `${opacity}`
-          el.style.transform = `translate3d(0, ${y}px, 0)`
-          // The left block carries the scale (origin left-centre); the right
-          // block is never scaled, so it stays pinned at the far right.
-          const left = el.querySelector('.wk-roll-left') as HTMLElement | null
-          if (left) left.style.transform = `scale(${scale})`
+          thetaRef.current = (thetaRef.current + currentVelocityRef.current * dt) % 360
+          targetThetaRef.current = thetaRef.current
         }
+
+        applyCardTransforms(thetaRef.current)
+      } else if (isReducedMotionRef.current) {
+        // Static staggered arrangement
+        applyCardTransforms(0)
       }
 
-      // Counter — only touch the DOM when the rounded index changes.
-      const rounded = Math.round(f)
-      const counter = rootRef.current?.querySelector('.wk-counter-text')
-      if (rounded !== lastRounded && counter) {
-        lastRounded = rounded
-        const total = String(list.length).padStart(2, '0')
-        const now = String(Math.min(rounded + 1, list.length)).padStart(2, '0')
-        counter.textContent = `[${now}/${total}]`
+      rafRef.current = requestAnimationFrame(loop)
+    }
+
+    rafRef.current = requestAnimationFrame(loop)
+
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(rafRef.current)
+    }
+  }, [applyCardTransforms, slideProgressRef])
+
+  // ── Step Carousel (Arrows / Keys / Swipe) ──
+  const stepSlot = useCallback(
+    (direction: 1 | -1) => {
+      const now = performance.now()
+      pauseUntilRef.current = now + 3000 // pause 3s after arrow
+
+      if (isReducedMotionRef.current) {
+        thetaRef.current = (thetaRef.current + direction * DEG_PER_SLOT) % 360
+        targetThetaRef.current = thetaRef.current
+        applyCardTransforms(thetaRef.current)
+        return
       }
 
-      raf = requestAnimationFrame(loop)
+      tweenStartTimeRef.current = now
+      tweenStartThetaRef.current = thetaRef.current
+      tweenEndThetaRef.current = thetaRef.current + direction * DEG_PER_SLOT
+      isTweeningRef.current = true
+    },
+    [applyCardTransforms],
+  )
+
+  // ── Hover Intent Handlers ──
+  const handleCardMouseEnter = (project: Project) => {
+    if (hoverLeaveTimer.current) {
+      window.clearTimeout(hoverLeaveTimer.current)
+      hoverLeaveTimer.current = null
     }
-
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [variant, rollRef, list.length])
-
-  const handleRowMouseEnter = (project: Project) => {
-    setHoveredProject(project)
-    setPreviewVisible(true)
+    isHoveredRef.current = true
+    setActiveProject(project)
   }
 
-  const handleListMouseLeave = () => {
-    setPreviewVisible(false)
+  const handleCardMouseLeave = () => {
+    isHoveredRef.current = false
+    hoverLeaveTimer.current = window.setTimeout(() => {
+      if (!isDetailHoveredRef.current) {
+        setActiveProject(null)
+      }
+    }, 300)
   }
 
-  const handleRowClick = (
-    e: React.MouseEvent,
-    project: Project,
-    index: number,
-  ) => {
-    // Only toggle mobile accordion on coarse pointer or <= 900px
-    const isMobile =
-      window.matchMedia('(max-width: 900px)').matches ||
-      window.matchMedia('(pointer: coarse)').matches
-
-    if (isMobile) {
-      e.preventDefault()
-      setOpenMobileId((prev) => (prev === project.id ? null : project.id))
-      return
+  const handleDetailMouseEnter = () => {
+    if (hoverLeaveTimer.current) {
+      window.clearTimeout(hoverLeaveTimer.current)
+      hoverLeaveTimer.current = null
     }
-    // Desktop: a non-active row scrolls the page to that project's position.
-    if (
-      variant === 'panel' &&
-      onRequestScrollToProject &&
-      index !== Math.round(rollRef?.current ?? 0)
-    ) {
+    isDetailHoveredRef.current = true
+  }
+
+  const handleDetailMouseLeave = () => {
+    isDetailHoveredRef.current = false
+    hoverLeaveTimer.current = window.setTimeout(() => {
+      if (!isHoveredRef.current) {
+        setActiveProject(null)
+      }
+    }, 300)
+  }
+
+  // ── Touch Tap Handler ──
+  const handleCardTouch = (project: Project) => {
+    setActiveProject(project)
+    isHoveredRef.current = true
+    if (touchDeselectTimer.current) window.clearTimeout(touchDeselectTimer.current)
+    touchDeselectTimer.current = window.setTimeout(() => {
+      setActiveProject(null)
+      isHoveredRef.current = false
+    }, 8000)
+  }
+
+  // Touch Swipe
+  const touchStartXRef = useRef<number | null>(null)
+  const onTouchStart = (e: TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX
+  }
+  const onTouchEnd = (e: TouchEvent) => {
+    if (touchStartXRef.current === null) return
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current
+    if (Math.abs(deltaX) > 40) {
+      stepSlot(deltaX < 0 ? 1 : -1)
+    }
+    touchStartXRef.current = null
+  }
+
+  // Keyboard navigation
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
       e.preventDefault()
-      onRequestScrollToProject(index)
+      stepSlot(-1)
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      stepSlot(1)
     }
   }
 
   return (
-    <section
-      ref={rootRef}
-      className={`wk-root wk-variant-${variant}`}
-      aria-labelledby="wk-heading"
-    >
-      {/* Static green glow — a flat plate with no canvas, WebGL or animation. */}
-      <span className="wk-glow" aria-hidden="true" />
+    <section ref={rootRef} className="wk-root" aria-labelledby="wk-heading">
+      <div className="wk-grid-bg" aria-hidden="true" />
 
-      <div className="wk-inner">
-        {/* ── Header ── */}
-        <header className="wk-header">
-          <div className="wk-header-left">
+      <div className="wk-layout">
+        {/* ── LEFT COLUMN: Header & Carousel ── */}
+        <div className="wk-left-col">
+          <div className="wk-head">
             <p className={`wk-label wk-rise${shown(1) ? ' is-in' : ''}`}>
               <span>WORKS</span>
               <span className="wk-quotes" aria-hidden="true">
@@ -333,13 +355,13 @@ export default function WorksSection({
 
             <h2 id="wk-heading" className="wk-title">
               <span className="wk-title-line">
-                {TITLE_WORDS.map((word, i) => (
-                  <span className="wk-word-mask" key={word}>
+                {TITLE_WORDS.map((w, i) => (
+                  <span className="wk-word-mask" key={w}>
                     <span
                       className={`wk-word${shown(2) ? ' is-in' : ''}`}
                       style={{ transitionDelay: `${i * 90}ms` }}
                     >
-                      {word}
+                      {w}
                     </span>
                   </span>
                 ))}
@@ -357,140 +379,154 @@ export default function WorksSection({
             </h2>
           </div>
 
-          <div className="wk-header-right">
-            <span className={`wk-count-badge wk-rise${shown(4) ? ' is-in' : ''}`}>
-              [{String(projects.length).padStart(2, '0')}]
-            </span>
-            <p className={`wk-lede wk-rise${shown(4) ? ' is-in' : ''}`}>
-              Artifacts of precision. Digital systems engineered for longevity,
-              clarity of purpose, and expressive kinetic rhythm.
-            </p>
-          </div>
-        </header>
-
-        {/* ── Roller ── */}
-        <div className={`wk-roller${shown(5) ? ' is-in' : ''}`}>
-          <div className="wk-roll-viewport">
-            <span className="wk-hairline wk-hairline-top" aria-hidden="true" />
-            <span className="wk-hairline wk-hairline-bottom" aria-hidden="true" />
-
-            <ul
-              ref={rollerRef}
-              className={`wk-roll-list${shown(6) ? ' is-in' : ''}`}
-              role="list"
-              onMouseLeave={handleListMouseLeave}
-            >
-              {list.map((project, idx) => {
-              const indexNum = String(idx + 1).padStart(2, '0')
-              return (
-                <li key={project.id} className="wk-roll-item">
-                  <a
-                      href={`/works#${project.id}`}
-                      className="wk-roll-link"
-                    onClick={(e) => handleRowClick(e, project, idx)}
-                    onMouseEnter={() => handleRowMouseEnter(project)}
-                    onFocus={() => handleRowMouseEnter(project)}
-                  >
-                    {/* LEFT block: the only part that scales. transform-origin
-                        is left-centre, so every name shares one left edge. */}
-                    <span className="wk-roll-left">
-                      <span className="wk-index">{indexNum}</span>
-                      <span className="wk-name-wrap">
-                        <span className="wk-name">{project.name}</span>
-                      </span>
-                    </span>
-
-                    {/* RIGHT block: never scales, stays pinned at the far right
-                        and simply fades with the row. */}
-                    <span className="wk-roll-right">
-                      <span className="wk-meta">
-                        <span className="wk-meta-item">
-                          <strong>YEAR:</strong> {project.year}
-                        </span>
-                        <span className="wk-meta-item">
-                          <strong>ROLE:</strong> {project.role}
-                        </span>
-                      </span>
-                      <span className="wk-arrow-wrap">
-                        <span className="wk-arrow" aria-hidden="true">
-                          &#x2197;
-                        </span>
-                      </span>
-                    </span>
-                  </a>
-
-                  {/* Mobile / touch inline preview accordion plate */}
-                  <div
-                    className={`wk-inline-plate-wrap${
-                      openMobileId === project.id ? ' is-open' : ''
-                    }`}
-                    aria-hidden={openMobileId !== project.id}
-                  >
-                    <div className="wk-inline-plate-inner">
-                      <div
-                        className="wk-preview-card wk-inline-card is-visible"
-                        style={{ background: project.gradient }}
-                      >
-                        <div className="wk-preview-overlay">
-                          <div className="wk-preview-top">
-                            <span className="wk-preview-mono-badge">
-                              {project.year}
-                            </span>
-                            <span className="wk-preview-mono-badge">
-                              {project.role}
-                            </span>
-                          </div>
-                          <div className="wk-preview-bottom">
-                            <h4 className="wk-preview-name">{project.name}</h4>
-                            <div className="wk-preview-tags">
-                              {project.tags.map((tag) => (
-                                <span key={tag} className="wk-preview-tag">
-                                  [{tag}]
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-          </div>
-
-          {/* ── All-work link: the full archive lives on /works ── */}
-          <a
-            href="/works"
-            className={`wk-all-link wk-rise${shown(6) ? ' is-in' : ''}`}
-            onClick={(e) => {
-              if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-              e.preventDefault()
-              window.location.assign('/works')
-            }}
+          {/* Diagonal Orbit Carousel Region */}
+          <div
+            ref={carouselRegionRef}
+            className={`wk-carousel-wrap wk-fade${shown(4) ? ' is-in' : ''}`}
+            tabIndex={0}
+            role="region"
+            aria-label="Featured projects carousel"
+            onKeyDown={onKeyDown}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
           >
-            <span className="wk-all-circle" aria-hidden="true">
-              &#x2192;
-            </span>
-            <span className="wk-all-label">ALL WORK</span>
-          </a>
+            {/* Tilted orbit track ring */}
+            <div className="wk-orbit-track" aria-hidden="true" />
+
+            {/* Orbiting Cards */}
+            <div className="wk-cards-orbit">
+              {featuredProjects.map((p, idx) => (
+                <a
+                  key={p.id}
+                  ref={(el) => {
+                    cardRefs.current[idx] = el
+                  }}
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`wk-card${activeProject?.id === p.id ? ' is-active' : ''}`}
+                  data-cursor="view"
+                  style={{ background: p.gradient }}
+                  onMouseEnter={() => handleCardMouseEnter(p)}
+                  onMouseLeave={handleCardMouseLeave}
+                  onFocus={() => handleCardMouseEnter(p)}
+                  onBlur={handleCardMouseLeave}
+                  onTouchStart={() => handleCardTouch(p)}
+                  aria-label={`${p.name} — ${p.role}`}
+                >
+                  <span className="wk-card-index">0{idx + 1}</span>
+                  <span className="wk-card-name">{p.name}</span>
+                </a>
+              ))}
+            </div>
+
+            {/* Carousel Arrow Controls */}
+            <button
+              type="button"
+              className="wk-arrow-btn wk-arrow-prev"
+              onClick={() => stepSlot(-1)}
+              aria-label="Previous project"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              className="wk-arrow-btn wk-arrow-next"
+              onClick={() => stepSlot(1)}
+              aria-label="Next project"
+            >
+              ›
+            </button>
+          </div>
         </div>
 
-        {/* ── Counter strip ── */}
-        <footer className={`wk-counter-strip${shown(6) ? ' is-in' : ''}`}>
-          <span className="wk-counter-text">
-            [01/{String(list.length).padStart(2, '0')}]
-          </span>
-        </footer>
-      </div>
+        {/* ── RIGHT COLUMN: Detail Stage & More Works Button ── */}
+        <div
+          className={`wk-right-col wk-fade${shown(4) ? ' is-in' : ''}`}
+          onMouseEnter={handleDetailMouseEnter}
+          onMouseLeave={handleDetailMouseLeave}
+        >
+          <div className="wk-detail-container">
+            {activeProject ? (
+              /* Active State: Large View Reveal */
+              <div className="wk-detail-active" key={activeProject.id}>
+                <div
+                  className="wk-plate"
+                  style={{ background: activeProject.gradient }}
+                >
+                  <span className="wk-plate-index">
+                    0{featuredProjects.indexOf(activeProject) + 1} / 05
+                  </span>
+                </div>
 
-      {/* ── Desktop Cursor-following Preview Plate ── */}
-      <WorkPreview
-        project={hoveredProject}
-        visible={previewVisible}
-        containerRef={rootRef}
-      />
+                <div className="wk-detail-meta-block">
+                  <div className="wk-detail-head">
+                    <span className="wk-detail-index">
+                      0{featuredProjects.indexOf(activeProject) + 1} / 05
+                    </span>
+                    <h3 className="wk-detail-name">{activeProject.name}</h3>
+                    <p className="wk-detail-meta">
+                      YEAR: {activeProject.year} · ROLE: {activeProject.role}
+                    </p>
+                  </div>
+
+                  <p className="wk-detail-desc">{activeProject.description}</p>
+
+                  <div className="wk-detail-tags">
+                    {activeProject.tags.map((t) => (
+                      <span key={t} className="wk-tag-chip">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="wk-detail-actions">
+                    <p className="wk-detail-hint">
+                      CLICK THE ROTATING PROJECT TO VISIT IT ↗
+                    </p>
+                    <a
+                      href={activeProject.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="wk-visit-btn"
+                    >
+                      VISIT PROJECT ↗
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Idle State */
+              <div className="wk-detail-idle">
+                <div className="wk-idle-plate-placeholder" aria-hidden="true" />
+                <div className="wk-idle-content">
+                  <span className="wk-idle-count">[05]</span>
+                  <p className="wk-idle-lede">
+                    SELECTED WORKS FROM OUR INTERACTION AND WEB ARCHIVE.
+                  </p>
+                  <div className="wk-idle-prompt">
+                    <span className="wk-prompt-pulse" aria-hidden="true" />
+                    <span className="wk-prompt-text">
+                      HOVER OVER OR CLICK A PROJECT TO SEE ITS DETAILS
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* MORE DESIGNS & WORK ↗ Pill Button */}
+          <div className="wk-more-wrap">
+            <button
+              type="button"
+              className="wk-more-btn"
+              onClick={() => navigate('/works')}
+            >
+              MORE DESIGNS & WORK ↗
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }

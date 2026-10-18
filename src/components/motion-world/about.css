@@ -36,7 +36,7 @@
   background: #ffffff;
   color: #000;
   /* Comfortable editorial margins that scale with the viewport. */
-  padding: clamp(56px, 11vh, 132px) clamp(20px, 6vw, 104px);
+  padding: var(--panel-pad-top) clamp(20px, 6vw, 104px) clamp(40px, 6vh, 80px);
   /* Above the pixelize canvas, which resolves INTO this section. */
   z-index: 960;
 }

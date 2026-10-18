@@ -1,107 +1,99 @@
 /* ==========================================================================
    SITE NAVIGATION — fixed pill
-   A fixed band across the top: an empty logo slot on the left (the mark is
-   reserved, not drawn yet) and a compact pill on the right. The ACTIVE item is
-   slightly larger, full white, and carries a small lime triangle beneath it —
-   and it is always moved to the LEFTMOST position of the pill via CSS `order`,
-   so the DOM/tab order never changes while the visual order does.
-   Prefix: nav-
+   Top header band with logo slot on the left and compact nav pill on the right.
+   Active item is scaled ~1.18, full white, has a lime triangle beneath it,
+   and moves to the LEFTMOST position.
+   No backdrop-filter or blur.
    ========================================================================== */
 
-.nav-root {
+.nav-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1200;
-  height: var(--nav-h);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
-  padding: 0 clamp(16px, 2.4vw, 32px);
+  padding: clamp(16px, 2.4vw, 32px);
   pointer-events: none;
-  /* Always legible: a soft top fade over whichever surface is behind it. */
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.32) 0%,
-    rgba(0, 0, 0, 0.12) 60%,
-    rgba(0, 0, 0, 0) 100%
-  );
 }
 
-/* Reserved for the wordmark. Nothing is drawn yet — the box simply holds the
-   left edge of the band so the pill's position never changes when it does. */
+/* LEFT empty slot reserved for the logo / mark */
 .nav-logo-slot {
   pointer-events: auto;
-  min-width: clamp(72px, 9vw, 120px);
+  min-width: 140px;
   height: 32px;
 }
 
-/* ---------- The pill ---------- */
-
+/* Compact nav pill at TOP RIGHT */
 .nav-pill {
   pointer-events: auto;
   position: relative;
   display: flex;
   align-items: center;
-  gap: clamp(4px, 0.8vw, 12px);
-  padding: 4px clamp(10px, 1.4vw, 18px);
+  background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 10px 22px;
+  box-sizing: border-box;
 }
 
 .nav-list {
   display: flex;
   align-items: center;
-  gap: clamp(6px, 1.2vw, 18px);
+  gap: clamp(8px, 1.4vw, 20px);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* Each item reserves its SCALED width: every label is set inside a box sized
-   for the active state, and the inactive label is scaled DOWN inside it. That
-   is what keeps the pill's total width constant as the active word changes. */
 .nav-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: calc(var(--nav-item-w, 8ch) * 1.18);
+  position: relative;
 }
 
 .nav-link {
   position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 2px 12px;
+  display: inline-grid;
+  place-items: center;
+  padding: 4px 2px 8px;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(255, 255, 255, 0.55);
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: clamp(0.6rem, 0.82vw, 0.72rem);
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   white-space: nowrap;
-  transform: scale(0.85);
-  transform-origin: center;
-  transition:
-    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
-/* Inactive items are scaled down INSIDE the fixed-width box. */
-.nav-item:not(.is-active) .nav-link {
-  transform: scale(0.85);
+/* Sizer reserves the scaled (active) width at all times so total nav width never shifts */
+.nav-link-sizer {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+  transform: scale(1.18);
   transform-origin: left center;
 }
 
+.nav-link-text {
+  grid-area: 1 / 1;
+  display: inline-block;
+  transform-origin: left center;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease;
+}
+
 .nav-link:hover {
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
+}
+
+.nav-link:hover .nav-link-text {
+  color: #ffffff;
 }
 
 .nav-link:focus-visible {
@@ -110,159 +102,137 @@
   border-radius: 2px;
 }
 
-/* The active item: full size, full white, and the triangle beneath. */
-.nav-item.is-active .nav-link {
+/* Active item: scaled 1.18, full white */
+.nav-item.is-active .nav-link-text {
   transform: scale(1.18);
-  transform-origin: left center;
   color: #ffffff;
 }
 
+/* Small lime green triangle pointing DOWN centered beneath the active word */
 .nav-triangle {
   position: absolute;
   left: 50%;
   bottom: 0;
   width: 0;
   height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 6px solid #13ff00;
-  transform: translateX(-50%) translateY(0) scale(0);
-  transform-origin: center;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.nav-item.is-active .nav-triangle {
-  transform: translateX(-50%) scale(1);
-}
-
-/* ---------- Narrow-screen control ---------- */
-
-/* Hidden on wide screens; the pill shows all five items there. */
-.nav-menu-btn {
-  display: none;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 999px;
-  background: transparent;
-  color: #ffffff;
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.64rem;
-  font-weight: 500;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.nav-menu-triangle {
-  width: 0;
-  height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-top: 5px solid #13ff00;
-  transition: transform 0.25s ease;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
-.nav-menu-btn[aria-expanded='true'] .nav-menu-triangle {
-  transform: rotate(180deg);
+/* Mobile: <= 900px */
+.nav-mobile-bar {
+  display: none;
 }
-
-/* On narrow screens only the active word stays in the pill; the rest moves to
-   the dropdown. */
-@media (max-width: 900px) {
-  .nav-menu-btn {
-    display: inline-flex;
-  }
-
-  .nav-list {
-    display: none;
-  }
-}
-
-/* ---------- Dropdown (narrow screens) ---------- */
 
 .nav-dropdown {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  min-width: 180px;
-  padding: 8px;
+  background: rgba(0, 0, 0, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 14px;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  opacity: 0;
-  transform: translateY(-6px);
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
-}
-
-.nav-dropdown.is-open {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+  padding: 8px 0;
+  min-width: 170px;
+  z-index: 1210;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
 }
 
 .nav-dropdown-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
 }
 
 .nav-dropdown-link {
   display: block;
   width: 100%;
   text-align: left;
-  padding: 10px 12px;
-  border: none;
-  border-radius: 8px;
+  padding: 10px 20px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.72);
+  border: none;
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.68rem;
-  font-weight: 500;
+  font-size: 0.72rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-.nav-dropdown-link:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-}
-
+.nav-dropdown-link:hover,
 .nav-dropdown-link.is-active {
-  color: #13ff00;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .nav-dropdown-link:focus-visible {
   outline: 2px solid #13ff00;
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
 @media (max-width: 900px) {
-  .nav-logo-slot {
-    min-width: 56px;
-    height: 26px;
+  .nav-list {
+    display: none;
   }
 
-  .nav-root {
-    padding: 0 16px;
+  .nav-mobile-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nav-mobile-active {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 6px;
+  }
+
+  .nav-mobile-active-label {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #ffffff;
+    transform: scale(1.18);
+    transform-origin: left center;
+  }
+
+  .nav-menu-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    padding: 5px 12px;
+    color: #ffffff;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .nav-menu-btn:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .nav-menu-btn:focus-visible {
+    outline: 2px solid #13ff00;
+    outline-offset: 3px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nav-link,
-  .nav-triangle,
-  .nav-dropdown,
-  .nav-menu-triangle {
-    transition: none;
+  .nav-link-text,
+  .nav-dropdown-link,
+  .nav-menu-btn {
+    transition: none !important;
   }
 }

@@ -247,99 +247,102 @@ passive scroll listener writes to DOM refs; no React state per frame.
 | `HOLD_START` | 10 | first project holds |
 | `STEP` | 60 | scroll distance per project-to-project roll |
 | `HOLD_END` | 50 | last project holds (user can press "more") |
+### 6.4 Stage 2: WORKS → CONTACT (`WorksContactStage.tsx`)
+
+Pinned horizontal stage with fixed timeline constants (in `svh` units):
+
+| Constant | Value (svh) | Meaning |
+| :--- | :--- | :--- |
+| `HOLD_WORKS` | 80 | Works holds at the start while user interacts with carousel |
 | `SLIDE` | 100 | Works → Contact horizontal slide |
 | `HOLD_CONTACT` | 40 | Contact holds, then the page ends |
 
-Wrapper height = `100 + HOLD_START + (visible − 1) × STEP + HOLD_END + SLIDE +
-HOLD_CONTACT` (in svh; the CSS provides a `vh` fallback). It recomputes when the
-visible project count changes. With the four placeholders this is **480svh**;
-with seven it is **660svh**.
-
-- **Roll phase:** `x = clamp((s − HOLD_START) / STEP, 0, visible − 1)`, then a
-dwell-eased float index `f = floor(x) + easeInOutCubic(clamp((frac − 0.2) / 0.6,
-0, 1))`. Each project therefore sits still for roughly the first and last 20% of
-its step.
-- **Slide phase:** starts at `slideStart = HOLD_START + (visible − 1) × STEP +
-HOLD_END`. `q = clamp((s − slideStart) / SLIDE, 0, 1)`; the track's
-`translateX = −100vw × (1 − easeInOut(q))`. Contact's inner content has a
-parallax lag of up to `−6vw → 0`.
-- Contact's entry sequence fires once at `q ≥ 0.45`; Works' entry fires once via
-an IntersectionObserver as the wrapper's top enters the viewport.
-- Fully reversible when scrolling back up; native scrolling only, no wheel
-hijacking.
+Total wrapper height = `100 + HOLD_WORKS + SLIDE + HOLD_CONTACT = 320svh` (with `vh` fallback).
+- Works panel starts on screen (`translateX = -100vw`).
+- As user scrolls, the track translates from `-100vw` to `0vw` using `easeInOutCubic`, exiting Works to the RIGHT and entering Contact from the LEFT.
+- Contact layer has a parallax lag of `(1 - eased) * -6vw → 0`.
+- Works entry fires when reached; Contact entry fires at `q ≥ 0.45`.
 
 ---
 
-### 6.5 WORKS — the pinned project roller (`WorksSection.tsx` & `works.css`)
+### 6.5 WORKS — Diagonal Orbit Carousel & Detail Stage (`WorksSection.tsx` & `works.css`)
 
-Black monolith panel with a **Vanta TOPOLOGY** background (p5 1.1.9, loaded via
-dynamic import exactly like the birds; `color: 0x0f8f4b` on `backgroundColor:
-0x000000`). It is initialised only while the panel is on screen and destroyed
-once Contact fully covers it (`q ≥ 0.9`), then rebuilt on return — no leaked
-canvases. Under `prefers-reduced-motion` no Vanta is created at all.
+Black monolith panel (`#000000`) with faint dot grid (radial-gradient, 5% white, 28px pitch). Vanta Topology is completely dormant (no canvas/p5 mounted).
 
-- **Typography rebalance:** the heading takes About's exact title typography
-(`clamp(3.1rem, 8.6vw, 8.4rem)`), split as line 1 `GROW MORE WITH` (three masked
-words) and line 2 `VEBMORE` (About's mark pattern). Project names take the
-heading's **old** size via the `--wk-name-size` custom property.
-- **The roller:** items are absolutely positioned around the roller's vertical
-centre. For each item `d = i − f`: `d = 0` is active (scale 1, opacity 1);
-`|d| = 1` is a neighbour (scale ≈ 0.55, opacity ≈ 0.28, offset so it never
-overlaps the active row). `|d| > 1.25` → hidden. Only `transform` and `opacity`
-are animated, written through refs in the stage's rAF loop.
-- A soft `mask-image` fade at the top and bottom; two hairlines
-(`1px rgba(255,255,255,0.1)`) frame the active row and draw in from the left.
-- A live mono counter (`[01/04]`) updates only when the rounded index changes.
-- **"More" button:** `INITIAL_VISIBLE = 4`, `BATCH = 4`. Only the first four
-projects are in the roller at first; the header count shows the **total**. The
-chevron button rises when the active project is the last visible one and adds the
-next batch, after which the wrapper height recomputes and the page scrolls
-forward to the first newly added project.
-- Cursor-following preview plate on the active row (lerped follow, velocity tilt,
-name and tags). Because the stage track is transformed, the plate is positioned
-in the **panel's** coordinate space, not the viewport's.
+- **Layout:** Two-column grid (`1.25fr 0.75fr`) cleared from the fixed nav by `var(--panel-pad-top)`.
+- **Diagonal Orbit Carousel (Left column):**
+  - 5 featured projects (`FEATURED_COUNT = 5`).
+  - Cards: portrait rounded rectangles (`clamp(112px, 11vw, 168px)` at 3:4), lime mono index, Bebas Neue name, project gradient.
+  - Orbit tilted around axis by `AXIS_TILT_DEG = -30°`: `x = Rx * sin φ`, `y = -Ry * cos φ`, `w = cos φ` rotated by -30°.
+  - Scale `0.58 + 0.42 * (w+1)/2`, opacity `0.28 + 0.72 * (w+1)/2`, z-index from depth, subtle 3D `rotateY`.
+  - Orbit track ellipse in faint hairline (`rgba(255,255,255,0.08)`).
+  - One rAF loop writes transforms through refs when panel is on screen (`q < 0.98`).
+  - Auto-rotation: ~28s/revolution (~12.86°/s).
+  - Hover damping: eases to 0 over 350ms on card enter, resumes over 600ms after pointer leaves for 300ms.
+  - Controls: 44px circular ‹ › arrow buttons snap by 72° over 700ms ease-in-out tween; 3s pause after use. Arrow keys ← → and touch swipe supported.
+  - Reduced motion: static staggered arrangement without auto-rotation.
+- **Detail Stage (Right column):**
+  - Idle state: `[05]` count, mono lede, pulsing prompt, dashed plate placeholder.
+  - Active state: big plate (`16:10`, max 42svh, project gradient) with clip-path wipe reveal (`inset(100% 0 0 0) → inset(0)` + scale `1.04 → 1` over 550ms). Staggered meta: lime index, Bebas Neue name, mono meta line, description, tag chips, hint, and `VISIT PROJECT ↗` button.
+  - 300ms hover intent delay prevents flickering between cards and detail panel.
+- **"More Work" Button:**
+  - Pill button `MORE DESIGNS & WORK ↗` at the bottom of the right column navigating client-side to `/works`.
 
 ---
 
 ### 6.6 CONTACT (`ContactSection.tsx` & `contact.css`)
 
-Black panel (`#000`), white text, hairlines. A two-column grid (`1.1fr 0.9fr`) that
-stacks below 900px and fits inside 100svh on desktop. Works and Contact are both
-black, so the shared edge carries a 1px `rgba(255,255,255,0.14)` hairline (set on
-the Contact panel in `worksContactStage.css`) to keep the slide readable.
+Black panel with shared `var(--panel-pad-top)` top clearance. Two-column editorial layout.
 
-- **Left:** `CONTACT ""` label (green quotes), `BE MORE WITH` / `VEBMORE` title in
-About's exact typography and mask-reveal style, a mono lede in
-`rgba(255,255,255,0.5)`, and the copyright strip
-`© 2026 VEBMORE — A CREATIVE DIGITAL STUDIO FOR THE MODERN WEB.`
-- **Right:** three hairline-separated groups — `01 SOCIAL` (LinkedIn, Instagram),
-`02 EMAIL` (the white underlined address, plus Gmail and Outlook compose buttons
-with a prefilled subject), and `03 WHATSAPP` (two contact numbers as white `tel:`
-links, each with a `wa.me` button carrying a prefilled greeting). Group indices use
-`#13ff00`, which reads better than the deep brand green on black.
-- **Entry sequence** (fires once at `q ≥ 0.45`): label `+100ms`, `BE MORE WITH`
-`+280ms`, `VEBMORE` `+560ms`, lede `+760ms`, group hairlines `+900ms` / `+1050ms`
-/ `+1200ms`, buttons `+1350ms`, copyright `+1600ms`.
-- **Buttons** (`ContactButton.tsx`): rounded rectangle, `1px solid #fff` with white
-text on black. On hover they invert to a white fill with black text and icon, the
-icon pops and the arrow nudges up-right; there is also a subtle magnetic pull (max
-6px, fine pointers only, transform only). `:focus-visible` is `2px solid #13ff00`.
-- **Icons:** `simple-icons` v16 exports **Gmail, Instagram and WhatsApp**. It no
-longer exports **LinkedIn or Microsoft Outlook**, so those two use small inline
-SVG glyphs. Nothing is loaded remotely.
+- **Background Embellishments (static, zero JS loops):**
+  - Faint dot-grid with radial center mask (`mask-image: radial-gradient(...)`).
+  - Large faint SVG compass ring (~60vmin, 6% opacity) behind left column with slow CSS rotation (120s infinite, paused when off screen).
+  - Static green radial glow in bottom-right corner at 8-10% opacity.
+- **Left Column:**
+  - `CONTACT ""` label (lime quotes).
+  - `BE MORE WITH` / `VEBMORE` title (Bebas Neue, mask reveals).
+  - Agency-focused lede: *"HAVE AN IDEA, A BRIEF OR JUST A ROUGH SKETCH? TELL US WHAT YOU WANT TO BUILD. WE DESIGN AND DEVELOP WEBSITES AND DIGITAL PRODUCTS THAT LOOK SHARP AND PERFORM."*
+  - **Live Studio Clock:** Mono line `LOCAL TIME  HH:MM:SS  IST` formatted via `Intl.DateTimeFormat` (24h) for `Asia/Kolkata`. Ticks at 1Hz only while visible.
+  - Copyright line.
+- **Right Column:**
+  - Three action groups: `01 SOCIAL` (LinkedIn, Instagram), `02 EMAIL` (Gmail and Outlook buttons with prefilled subject; email address line removed), `03 WHATSAPP` (direct phone links and WhatsApp buttons with greeting).
 
 ---
 
-### 6.7 Fallbacks (≤ 900px or `prefers-reduced-motion: reduce`)
+### 6.7 NAVIGATION, CURSOR, ROUTING & CAPABILITIES
 
-Same rule the About stage uses: no pin, no roller, no horizontal slide, and no
-Vanta under reduced motion.
+- **Fixed Site Navigation (`SiteNav.tsx`, `nav.css`, `sectionMap.ts`):**
+  - Fixed top band at `z-index: 1200`. Left: reserved logo slot (`min-width: 140px`). Right: pill offset `clamp(16px, 2.4vw, 32px)`.
+  - Pill: `rgba(0,0,0,0.8)`, `1px solid rgba(255,255,255,0.14)`, `border-radius: 999px`, padding `10px 22px`, no blur.
+  - Active item: scaled 1.18, full white, lime `#13ff00` down-pointing triangle, and moves to LEFTMOST position.
+  - Visual reordering via CSS `order` with `motion/react` layout FLIP spring; DOM order stays canonical (`HOME`, `ABOUT`, `CAPABILITIES`, `WORK`, `CONTACT`).
+  - Scaled width reserved via CSS grid sizer so total pill width is completely constant.
+  - Active detection via single rAF-throttled scroll listener using stage geometry constants.
+  - Narrow screen (`<=900px`): active word + `MENU` button opening full dropdown list.
+- **Custom Cursor (`SiteCursor.tsx`, `cursor.css`):**
+  - Fine pointer only (`(hover: hover) and (pointer: fine)`), disabled under reduced motion.
+  - Dot: 6px white circle with 1px black outline.
+  - Ring: 30px with 1px black outline, 4 cardinal ticks (N/E/S/W), lerps 0.18/frame.
+  - States: interactive (48px, ticks rotate 45°), `data-cursor="view"` (64px with mono `VIEW` label), pressed (scaled down).
+  - Single rAF loop that sleeps after 1s of stillness and wakes on pointer move.
+- **Routing & `/works` Page (`router.tsx`, `WorksPage.tsx`, `worksPage.css`, `vercel.json`):**
+  - Tiny zero-dependency router: `usePath()`, `navigate()`, `<Link>`.
+  - `WorksPage`: black background, filter bar for tags, responsive 3/2/1 grid of all 8 projects, pop-in animation, footer link back to `/#contact`.
+  - Stages and WebGL unmount on `/works` and cleanly remount on `/`.
+  - `vercel.json` rewrite rule for production SPA refresh.
+- **Capabilities Alignment & Shared Tokens:**
+  - Tokens: `--nav-h: clamp(64px, 9vh, 92px)`, `--panel-pad-top: clamp(88px, 13vh, 168px)`.
+  - Applied to About, Capabilities, Tech Stack, Works, and Contact so labels line up precisely and content never overlaps nav.
+  - Capabilities rows tightened (`cap-btn` padding `clamp(8px, 1.4vh, 18px) 0`) so entire panel fits 100svh at 1920×1080, 1440×800, and 1280×720 without clipping.
 
-- Works becomes a normal stacked list of all visible projects, keeping the
-tap-to-expand inline preview, with the "more" button below the list.
-- Contact stacks **below** Works in normal flow (`flex-direction: column-reverse`
-reorders the DOM so Works reads first), with its entry sequence triggered by an
-IntersectionObserver.
+---
+
+### 6.8 Fallbacks (≤ 900px or `prefers-reduced-motion: reduce`)
+
+- No pin, no horizontal slide. Normal flow document stack.
+- Works stacks header, carousel, and detail panel.
+- Contact stacks below Works.
+- Nav displays active word + `MENU` dropdown.
 
 ---
 

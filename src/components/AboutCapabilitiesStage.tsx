@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import AboutSection from './AboutSection'
 import CapabilitiesSection from './CapabilitiesSection'
 import TechStackPanel from './TechStackPanel'
@@ -71,72 +71,68 @@ export default function AboutCapabilitiesStage({ aboutActive }: Props) {
     }
   }, [])
 
-  const tick = useCallback(() => {
-    if (isDisabled.current) {
-      rafRef.current = requestAnimationFrame(tick)
-      return
-    }
-
-    const wrap = wrapRef.current
-    const track = trackRef.current
-    if (!wrap || !track) {
-      rafRef.current = requestAnimationFrame(tick)
-      return
-    }
-
-    const rect = wrap.getBoundingClientRect()
-    const vh = window.innerHeight
-    const scrollRange = wrap.offsetHeight - vh
-    const rawP = scrollRange > 0 ? clamp(-rect.top / scrollRange, 0, 1) : 0
-    pRef.current = rawP
-
-    // ── Birds stay live for the whole stage (no fade, no teardown) ──
-
-    // ── Track slide 1: p 0.16–0.42, 0vw → -100vw ──
-    const slide1T = clamp((rawP - 0.16) / 0.26, 0, 1)
-    const eased1 = easeInOut(slide1T)
-
-    // ── Track slide 2: p 0.62–0.82, -100vw → -200vw ──
-    const slide2T = clamp((rawP - 0.62) / 0.2, 0, 1)
-    const eased2 = easeInOut(slide2T)
-
-    const trackX = -eased1 * 100 - eased2 * 100
-    track.style.transform = `translateX(${trackX}vw)`
-
-    // Capabilities parallax lag: 6vw extra offset that resolves to 0 by the
-    // end of slide 1 (the tech panel gets no parallax — it must read as a
-    // flat plate sliding in).
-    if (capParallaxRef.current) {
-      const parallax = (1 - eased1) * 6
-      capParallaxRef.current.style.transform = `translateX(${parallax}vw)`
-    }
-
-    // ── Capabilities entry at p ≥ 0.42 (once) ──
-    if (rawP >= 0.42 && !capFired.current) {
-      capFired.current = true
-      setCapTrigger(true)
-    }
-
-    // ── Tech tile sequence, with hysteresis ──
-    // Fire once the green plate has covered ~70% of the screen during slide 2
-    // (eased2 ≈ 0.7 lands near p 0.74); reset only when p falls back below 0.68,
-    // so sitting near the boundary neither re-fires nor rewinds. The reset lets
-    // tiles pop again on re-entry.
-    if (rawP >= 0.74 && !techFired.current) {
-      techFired.current = true
-      setTechTrigger(true)
-    } else if (rawP < 0.68 && techFired.current) {
-      techFired.current = false
-      setTechTrigger(false)
-    }
-
-    rafRef.current = requestAnimationFrame(tick)
-  }, [])
-
   useEffect(() => {
+    const tick = () => {
+      if (isDisabled.current) {
+        rafRef.current = requestAnimationFrame(tick)
+        return
+      }
+
+      const wrap = wrapRef.current
+      const track = trackRef.current
+      if (!wrap || !track) {
+        rafRef.current = requestAnimationFrame(tick)
+        return
+      }
+
+      const rect = wrap.getBoundingClientRect()
+      const vh = window.innerHeight
+      const scrollRange = wrap.offsetHeight - vh
+      const rawP = scrollRange > 0 ? clamp(-rect.top / scrollRange, 0, 1) : 0
+      pRef.current = rawP
+
+      // ── Birds stay live for the whole stage (no fade, no teardown) ──
+
+      // ── Track slide 1: p 0.16–0.42, 0vw → -100vw ──
+      const slide1T = clamp((rawP - 0.16) / 0.26, 0, 1)
+      const eased1 = easeInOut(slide1T)
+
+      // ── Track slide 2: p 0.62–0.82, -100vw → -200vw ──
+      const slide2T = clamp((rawP - 0.62) / 0.2, 0, 1)
+      const eased2 = easeInOut(slide2T)
+
+      const trackX = -eased1 * 100 - eased2 * 100
+      track.style.transform = `translateX(${trackX}vw)`
+
+      // Capabilities parallax lag: 6vw extra offset that resolves to 0 by the
+      // end of slide 1 (the tech panel gets no parallax — it must read as a
+      // flat plate sliding in).
+      if (capParallaxRef.current) {
+        const parallax = (1 - eased1) * 6
+        capParallaxRef.current.style.transform = `translateX(${parallax}vw)`
+      }
+
+      // ── Capabilities entry at p ≥ 0.42 (once) ──
+      if (rawP >= 0.42 && !capFired.current) {
+        capFired.current = true
+        setCapTrigger(true)
+      }
+
+      // ── Tech tile sequence, with hysteresis ──
+      if (rawP >= 0.74 && !techFired.current) {
+        techFired.current = true
+        setTechTrigger(true)
+      } else if (rawP < 0.68 && techFired.current) {
+        techFired.current = false
+        setTechTrigger(false)
+      }
+
+      rafRef.current = requestAnimationFrame(tick)
+    }
+
     rafRef.current = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafRef.current)
-  }, [tick])
+  }, [])
 
   return (
     <div ref={wrapRef} className="stg-track-wrap">
