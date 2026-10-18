@@ -1,3 +1,17 @@
+/* ------------------------------------------------------------------
+   SHARED TOKENS
+   The fixed nav sits above every panel, so every panel's content has to
+   clear it. Both values live here and are consumed by about.css,
+   capabilities.css, techstack.css, works.css and contact.css.
+   ------------------------------------------------------------------ */
+
+:root {
+  /* Height of the fixed nav band, measured from the top edge. */
+  --nav-h: clamp(64px, 9vh, 92px);
+  /* Distance from the panel's top edge to its first piece of content. */
+  --panel-pad-top: clamp(88px, 13vh, 168px);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -8,6 +22,20 @@ html, body, #root {
   width: 100%;
   height: auto;
   min-height: 100%;
+}
+
+/* The custom cursor takes over pointer duty only after the first fine-pointer
+   move, so there is never a frame without a cursor. Text fields keep theirs. */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
+}
+
+html.has-custom-cursor input,
+html.has-custom-cursor textarea,
+html.has-custom-cursor select,
+html.has-custom-cursor [contenteditable='true'] {
+  cursor: auto !important;
 }
 
 /* These two elements exist ONLY to give the page its scroll length — the acts

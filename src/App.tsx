@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Compass from './components/hero/Compass'
 import ScrollTextLines from './components/hero/ScrollTextLines'
 import AboutCapabilitiesStage from './components/AboutCapabilitiesStage'
-import WorksSection from './components/WorksSection'
+import WorksContactStage from './components/WorksContactStage'
 import './App.css'
 import './components/motion-world/about.css'
 
@@ -111,8 +111,8 @@ function App() {
       {/* About + Capabilities + Tech Stack: pinned horizontal stage */}
       <AboutCapabilitiesStage aboutActive={aboutActive} />
 
-      {/* Section 4: Works (Black Monolith) */}
-      <WorksSection />
+      {/* Section 4 + 5: Works → Contact pinned horizontal stage */}
+      <WorksContactStage />
     </>
   )
 }

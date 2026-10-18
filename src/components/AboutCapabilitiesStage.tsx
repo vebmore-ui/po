@@ -17,8 +17,9 @@ import './stage.css'
  *   p 0.42       Capabilities entry beats fire (once).
  *   p 0.42–0.62  Capabilities dwell — rows stay interactive.
  *   p 0.62–0.82  Track slides from -100vw to -200vw (same ease-in-out).
- *   p 0.82–0.855 Blank green hold, then tiles pop (~70ms apart).
- *   p 0.87–1.00  Final hold, all tiles hoverable. Pin releases.
+ *   p 0.74       Tiles start popping once the green plate covers ~70% of the
+ *                screen (~70ms apart).
+ *   p 0.82–1.00  Final hold, all tiles hoverable. Pin releases.
  *
  * The birds deliberately stay live for the whole stage: they no longer fade as
  * the track departs, so the flock keeps animating into the Capabilities slide.
@@ -117,13 +118,14 @@ export default function AboutCapabilitiesStage({ aboutActive }: Props) {
     }
 
     // ── Tech tile sequence, with hysteresis ──
-    // Fire once p crosses 0.855 (the green plate is settled); reset only when
-    // p falls back below 0.80, so sitting near the boundary neither re-fires
-    // nor rewinds. The reset lets tiles pop again on re-entry.
-    if (rawP >= 0.855 && !techFired.current) {
+    // Fire once the green plate has covered ~70% of the screen during slide 2
+    // (eased2 ≈ 0.7 lands near p 0.74); reset only when p falls back below 0.68,
+    // so sitting near the boundary neither re-fires nor rewinds. The reset lets
+    // tiles pop again on re-entry.
+    if (rawP >= 0.74 && !techFired.current) {
       techFired.current = true
       setTechTrigger(true)
-    } else if (rawP < 0.8 && techFired.current) {
+    } else if (rawP < 0.68 && techFired.current) {
       techFired.current = false
       setTechTrigger(false)
     }

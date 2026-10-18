@@ -1,0 +1,126 @@
+/* ------------------------------------------------------------------
+   VEBMORE — Works → Contact pinned horizontal stage
+   Two panels (Contact, Works) in a sticky-pinned horizontal track.
+   The track starts at -100vw so Works is on screen; scrolling moves it
+   to 0, so Works exits right and Contact enters left.
+   All classes prefixed `wc-`.
+   ------------------------------------------------------------------ */
+
+/* ---------- Track wrapper: provides scroll budget ---------- */
+
+.wc-wrap {
+  position: relative;
+  /* Height is set inline from the timeline (in svh). This is the vh fallback
+     for browsers without svh support. */
+  height: 400vh;
+  background: #000;
+  z-index: 955;
+}
+
+/* ---------- Sticky pin: the viewport-sized window ---------- */
+
+.wc-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: #000;
+}
+
+/* ---------- Track: the two-panel flex strip ---------- */
+
+.wc-track {
+  display: flex;
+  width: 200vw;
+  height: 100%;
+  /* Initial state in CSS so there is no flash of Contact before JS runs. */
+  transform: translateX(-100vw);
+  will-change: transform;
+}
+
+/* ---------- Panels ---------- */
+
+.wc-panel {
+  width: 100vw;
+  height: 100%;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Contact panel is a black surface too, so the slide needs a seam to read:
+   a 1px hairline on its right edge (the shared edge with Works). */
+.wc-panel:first-child {
+  background: #000;
+}
+
+.wc-panel:first-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.14);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.wc-parallax {
+  will-change: transform;
+}
+
+/* Panels fill the pin exactly. */
+.wc-panel .wk-root {
+  height: 100%;
+}
+
+/* ---------- Seam: the green Tech panel → Works ---------- */
+
+/* The stage sits directly under the green Tech Stack panel; a black wrapper
+   background means there is never a white or green gap at the handover. */
+.wc-wrap,
+.wc-pin {
+  background: #000;
+}
+
+/* ==========================================================================
+   Fallback: <= 900px or reduced motion.
+   No pin, no horizontal slide — Contact stacks below Works in normal flow.
+   ========================================================================== */
+
+@media (max-width: 900px), (prefers-reduced-motion: reduce) {
+  .wc-wrap {
+    height: auto !important;
+    background: #000;
+  }
+
+  .wc-pin {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+
+  .wc-track {
+    /* DOM order is Contact, Works — flip so Works reads first when stacked. */
+    flex-direction: column-reverse;
+    width: 100%;
+    transform: none !important;
+  }
+
+  .wc-panel {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .wc-parallax {
+    transform: none !important;
+  }
+
+  .wc-panel .wk-root {
+    height: auto;
+    min-height: 0;
+  }
+}

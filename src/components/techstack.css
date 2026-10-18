@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------
    VEBMORE — Tech stack panel (stage panel 3)
    A solid brand-green plate that arrives blank while the track slides,
-   then reveals a 5×3 grid of black technology tiles.
+   then reveals a 5×3 grid of translucent white technology tiles.
    All classes prefixed `ts-`.
    ------------------------------------------------------------------ */
 
@@ -89,10 +89,12 @@
   aspect-ratio: 4 / 3;
   min-height: 0;
   border-radius: clamp(14px, 1.6vw, 26px);
-  background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.32);
   box-sizing: border-box;
   color: #ffffff;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 
   /* Pop-in: hidden until `is-in`, then scale/translate overshoot to rest. */
   opacity: 0;
@@ -163,8 +165,8 @@
   }
 
   .ts-tile:not(.ts-tile-idle):hover {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: rgba(255, 255, 255, 0.92);
+    color: #0f8f4b;
     transform: scale(1.06) rotate(-1.5deg);
   }
 

@@ -1,0 +1,84 @@
+/* ==========================================================================
+   CUSTOM CURSOR — dot + trailing ring
+   A small lime dot sits exactly on the pointer; a larger ring lerps behind it.
+   The ring swells on interactive elements (a, button, [role=button]) via the
+   `is-hover` class, and the dot shrinks to the ring's centre on press. Both
+   are `transform`-only writes in one rAF loop through DOM refs, so React never
+   re-renders per frame.
+   Hidden entirely on coarse pointers and for prefers-reduced-motion.
+   Prefix: cur-
+   ========================================================================== */
+
+.cur-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+  display: none;
+}
+
+@media (pointer: fine) {
+  .cur-root {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cur-root {
+    display: none !important;
+  }
+}
+
+.cur-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: #13ff00;
+  will-change: transform;
+  transition: opacity 0.2s ease;
+}
+
+.cur-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(19, 255, 0, 0.55);
+  will-change: transform, width, height, margin;
+  transition:
+    opacity 0.2s ease,
+    width 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    margin 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s ease;
+}
+
+/* Hover state: the ring swells and the dot keeps its place inside it. */
+.cur-ring.is-hover {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-color: rgba(19, 255, 0, 0.85);
+}
+
+/* Press state: the dot dims, the ring tightens. */
+.cur-root.is-pressed .cur-ring {
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border-color: #13ff00;
+}
+
+/* Hidden until the first pointermove, so there is never a floating ghost at
+   (0,0) before the mouse has actually been seen. */
+.cur-root:not(.is-live) .cur-dot,
+.cur-root:not(.is-live) .cur-ring {
+  opacity: 0;
+}

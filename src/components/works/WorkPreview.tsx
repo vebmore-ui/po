@@ -4,26 +4,40 @@ import type { Project } from './worksData'
 interface WorkPreviewProps {
   project: Project | null
   visible: boolean
+  /**
+   * The element the plate is positioned INSIDE. The stage track is transformed,
+   * so `position: fixed` inside it resolves against the track rather than the
+   * viewport — the plate must therefore be placed in the panel's own coordinate
+   * space instead.
+   */
+  containerRef: React.RefObject<HTMLElement | null>
 }
 
 /**
  * Cursor-following floating preview plate for desktop (`pointer: fine`).
  *
- * Position & tilt are driven in a single rAF loop through DOM refs.
+ * Position & tilt are driven in a single rAF loop through DOM refs, and the
+ * coordinates are kept relative to the Works panel so the plate stays glued to
+ * the cursor even while the stage track is mid-slide.
  * The outer container tracks cursor position (lerp ~0.15) and tilts ±6° based on
  * horizontal velocity. The inner card handles the scale/opacity enter & leave.
  */
-export default function WorkPreview({ project, visible }: WorkPreviewProps) {
+export default function WorkPreview({
+  project,
+  visible,
+  containerRef,
+}: WorkPreviewProps) {
   const outerRef = useRef<HTMLDivElement>(null)
   const rafId = useRef<number>(0)
 
-  // Target and current coordinates
+  // Target and current coordinates, in panel-local space.
   const targetX = useRef<number>(0)
   const targetY = useRef<number>(0)
   const currentX = useRef<number>(0)
   const currentY = useRef<number>(0)
   const prevTargetX = useRef<number>(0)
   const currentTilt = useRef<number>(0)
+  const hasEntered = useRef(false)
 
   useEffect(() => {
     // Check for fine pointer and motion preference
@@ -32,13 +46,17 @@ export default function WorkPreview({ project, visible }: WorkPreviewProps) {
     if (!mqFine.matches || mqMotion.matches) return
 
     const handlePointerMove = (e: PointerEvent) => {
-      targetX.current = e.clientX
-      targetY.current = e.clientY
+      const host = containerRef.current
+      if (!host) return
+      // Convert the viewport-space pointer into panel-local space.
+      const rect = host.getBoundingClientRect()
+      targetX.current = e.clientX - rect.left
+      targetY.current = e.clientY - rect.top
     }
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
     return () => window.removeEventListener('pointermove', handlePointerMove)
-  }, [])
+  }, [containerRef])
 
   useEffect(() => {
     const mqFine = window.matchMedia('(pointer: fine)')
@@ -46,6 +64,7 @@ export default function WorkPreview({ project, visible }: WorkPreviewProps) {
     if (!mqFine.matches || mqMotion.matches) return
 
     if (!visible) {
+      hasEntered.current = false
       if (rafId.current) {
         cancelAnimationFrame(rafId.current)
         rafId.current = 0
@@ -53,8 +72,9 @@ export default function WorkPreview({ project, visible }: WorkPreviewProps) {
       return
     }
 
-    // Initialize position directly on first enter to prevent jumping from (0,0)
-    if (currentX.current === 0 && currentY.current === 0) {
+    // Initialize position directly on first enter to prevent jumping in from (0,0)
+    if (!hasEntered.current) {
+      hasEntered.current = true
       currentX.current = targetX.current
       currentY.current = targetY.current
       prevTargetX.current = targetX.current
@@ -93,11 +113,7 @@ export default function WorkPreview({ project, visible }: WorkPreviewProps) {
   }, [visible])
 
   return (
-    <aside
-      ref={outerRef}
-      className="wk-preview-wrap"
-      aria-hidden="true"
-    >
+    <aside ref={outerRef} className="wk-preview-wrap" aria-hidden="true">
       <div
         className={`wk-preview-card${visible && project ? ' is-visible' : ''}`}
         style={project ? { background: project.gradient } : undefined}

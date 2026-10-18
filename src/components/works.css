@@ -1,28 +1,61 @@
 /* ==========================================================================
-   WORKS SECTION (Black Monolith)
-   Tokens, Typography & Interactions for Section 4
+   WORKS SECTION (Black Monolith) — pinned project roller
+   A plain black plate with ONE static green glow. The heading takes About's
+   title typography; project names take the heading's old size.
    Prefix: wk-
    ========================================================================== */
 
 .wk-root {
   position: relative;
-  background-color: #000000;
+  background-color: #000;
   color: #ffffff;
   z-index: 2;
+  height: 100%;
   min-height: 100vh;
-  padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
+  min-height: 100svh;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+/* A single static radial glow in brand green, under 10% opacity, so the black
+   plate is not dead flat. No canvas, no WebGL, no animation — just a paint. */
+.wk-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    60vmax 60vmax at 85% 15%,
+    rgba(15, 143, 75, 0.09) 0%,
+    rgba(15, 143, 75, 0.04) 35%,
+    rgba(0, 0, 0, 0) 70%
+  );
+}
+
+.wk-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
+  box-sizing: border-box;
 }
 
 /* ---------- Header ---------- */
 
 .wk-header {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.5fr);
   gap: clamp(24px, 4vw, 64px);
   align-items: end;
-  margin-bottom: clamp(40px, 6.5vh, 80px);
+  margin-bottom: clamp(24px, 4vh, 56px);
+}
+
+.wk-header-left {
+  min-width: 0;
 }
 
 .wk-label {
@@ -34,14 +67,20 @@
   color: #ffffff;
   margin: 0 0 clamp(16px, 2.5vh, 28px);
   display: flex;
-  align-items: center;
-  gap: 0.8em;
+  align-items: baseline;
+  gap: 0.6em;
 }
 
-.wk-label-num {
-  color: #13ff00;
+.wk-quotes {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #0f8f4b;
+  margin-left: -0.24em;
 }
 
+/* Heading: About's exact title typography. */
 .wk-title {
   font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
   font-weight: 400;
@@ -57,7 +96,7 @@
   white-space: nowrap;
 }
 
-/* Word mask-slide reveal */
+/* Word mask-slide reveal (same system as About). */
 .wk-word-mask {
   display: inline-block;
   overflow: hidden;
@@ -86,12 +125,18 @@
   opacity: 1;
 }
 
+.wk-word-mark {
+  color: #ffffff;
+  letter-spacing: -0.005em;
+}
+
 /* Header right column */
 .wk-header-right {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   gap: 16px;
+  min-width: 0;
 }
 
 .wk-count-badge {
@@ -128,61 +173,101 @@
   transform: translateY(0);
 }
 
-/* ---------- Projects List ---------- */
+/* ---------- Roller ---------- */
 
-.wk-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-.wk-row {
+/* The roller is a column: the rows area takes the remaining height, and the
+   "more" button row sits under it with its space reserved, so the button can
+   never overlap a row. */
+.wk-roller {
   position: relative;
-  transition: opacity 0.3s ease-out;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Hairline above each row */
-.wk-row::before {
-  content: '';
-  display: block;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+/* The rows area: everything the roller needs vertically, with the soft fade. */
+.wk-roll-viewport {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  -webkit-mask-image: linear-gradient(
+    transparent 0%,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    transparent 0%,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
 }
 
-.wk-row.is-in::before {
-  transform: scaleX(1);
-}
-
-/* Bottom hairline after last row */
-.wk-row:last-child::after {
-  content: '';
+/* Two hairlines framing the active row, drawn in from the left. */
+.wk-hairline {
   position: absolute;
-  bottom: 0;
   left: 0;
   right: 0;
   height: 1px;
   background: rgba(255, 255, 255, 0.1);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 2;
+  pointer-events: none;
 }
 
-.wk-row:last-child.is-in::after {
+.wk-hairline-top {
+  top: 50%;
+  /* Half the active row above the centre; set from the measured row height by
+     the roller loop, with a sane fallback before the first measurement. */
+  margin-top: calc(-0.5 * var(--wk-row-h, 70px));
+}
+
+.wk-hairline-bottom {
+  top: 50%;
+  margin-top: calc(0.5 * var(--wk-row-h, 70px));
+  transition-delay: 0.08s;
+}
+
+.wk-roller.is-in .wk-hairline {
   transform: scaleX(1);
 }
 
-/* Row interactive link */
-.wk-row-link {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
+.wk-roll-list {
+  position: absolute;
+  inset: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Each item is absolutely positioned; its `transform` (translate3d only) is
+   written by the stage's rAF loop. The vertical stack is computed from measured
+   heights, so rows can never overlap. */
+.wk-roll-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  will-change: transform, opacity;
+  transition: none;
+}
+
+/* Before entry the rows are hidden; the rAF loop takes over once shown. */
+.wk-roll-list:not(.is-in) .wk-roll-item {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.wk-roll-link {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: clamp(16px, 3.5vw, 48px);
   width: 100%;
-  padding: clamp(22px, 3.2vh, 44px) 0;
   background: none;
   border: none;
   text-decoration: none;
@@ -193,27 +278,21 @@
   outline: none;
 }
 
-.wk-row-link:focus-visible {
+.wk-roll-link:focus-visible {
   outline: 2px solid #13ff00;
-  outline-offset: 4px;
+  outline-offset: 6px;
 }
 
-/* Row content mask-slide reveal */
-.wk-row-content {
-  display: contents;
-}
+/* ---------- LEFT block (index + name) — the only part that scales ---------- */
 
-.wk-row-item {
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 0.6s ease-out,
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.wk-row.is-in .wk-row-item {
-  opacity: 1;
-  transform: translateY(0);
+.wk-roll-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 3.5vw, 48px);
+  min-width: 0;
+  /* Scaling from the left edge is what keeps every name on one left rail. */
+  transform-origin: left center;
+  will-change: transform;
 }
 
 /* Index cell */
@@ -226,24 +305,40 @@
   white-space: nowrap;
 }
 
-/* Name cell */
+/* Name cell — the heading's OLD size, kept in a custom property so the two
+   sizes can never drift apart. */
 .wk-name-wrap {
   overflow: hidden;
+  min-width: 0;
 }
 
 .wk-name {
   display: inline-block;
   font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
   font-weight: 400;
-  font-size: clamp(3rem, 9vw, 9rem);
+  font-size: var(--wk-name-size, clamp(2.4rem, 6vw, 5.6rem));
   line-height: 0.9;
   letter-spacing: 0.005em;
   text-transform: uppercase;
   color: #ffffff;
-  transition:
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
+}
+
+/* ---------- RIGHT block (meta + arrow) — never scales, never shifts ---------- */
+
+.wk-roll-right {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 36px);
+  flex-shrink: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+/* Only the active row shows meta and arrow at full strength: at neighbour size
+   the meta is unreadable, so it is faded out entirely. */
+.wk-roll-item.is-neighbour .wk-roll-right {
+  opacity: 0;
 }
 
 /* Meta cell */
@@ -257,6 +352,7 @@
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.5);
   white-space: nowrap;
+  text-align: right;
 }
 
 .wk-meta-item strong {
@@ -280,54 +376,124 @@
   transition:
     transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
     color 0.3s ease;
-  transform-origin: center center;
+  transform-origin: center;
   will-change: transform;
 }
 
-/* ---------- Desktop Hover & Focus states ---------- */
+/* ---------- Hover / focus on the active row ---------- */
 
+/* The hover shift applies ONLY on hover/focus — never as a resting state, so
+   every name keeps the same left edge. */
 @media (hover: hover) and (pointer: fine) {
-  /* Dim other rows when list is hovered */
-  .wk-list:has(.wk-row:hover) .wk-row:not(:hover) {
-    opacity: 0.3;
-  }
-
-  .wk-row:hover .wk-name {
+  .wk-roll-item.is-active .wk-roll-link:hover .wk-name {
     transform: translateX(1.5vw);
-    color: #ffffff;
   }
 
-  .wk-row:hover .wk-arrow {
+  .wk-roll-item.is-active .wk-roll-link:hover .wk-arrow {
     transform: rotate(45deg);
     color: #13ff00;
   }
 }
 
-/* Keyboard focus parity */
-.wk-list:has(.wk-row:focus-within) .wk-row:not(:focus-within) {
-  opacity: 0.3;
-}
-
-.wk-row:focus-within .wk-name {
+.wk-roll-link:focus-visible .wk-name {
   transform: translateX(1.5vw);
-  color: #ffffff;
 }
 
-.wk-row:focus-within .wk-arrow {
+.wk-roll-link:focus-visible .wk-arrow {
   transform: rotate(45deg);
   color: #13ff00;
+}
+
+/* ---------- "All work" link ---------- */
+
+/* Sits in normal flow UNDER the rows (its own flex row inside the roller),
+   centred � the same slot the old "more" button held. */
+.wk-all-link {
+  position: relative;
+  flex-shrink: 0;
+  align-self: center;
+  margin-top: clamp(10px, 1.6vh, 20px);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px 6px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  text-decoration: none;
+  transition:
+    background-color 0.22s ease-out,
+    border-color 0.22s ease-out;
+}
+
+.wk-all-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.wk-all-label {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.6rem, 0.86vw, 0.7rem);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+@media (hover: hover) {
+  .wk-all-link:hover {
+    background: #0f8f4b;
+    border-color: #0f8f4b;
+  }
+}
+
+.wk-all-link:focus-visible {
+  outline: 2px solid #13ff00;
+  outline-offset: 3px;
+}
+
+/* ---------- Counter strip ---------- */
+
+.wk-counter-strip {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: clamp(12px, 2vh, 24px);
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+.wk-counter-strip.is-in {
+  opacity: 1;
+}
+
+.wk-counter-text {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* ---------- Cursor-following floating plate (Desktop) ---------- */
 
 .wk-preview-wrap {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 320px;
   height: 220px;
   pointer-events: none;
-  z-index: 60;
+  z-index: 20;
   will-change: transform;
   display: none;
 }
@@ -450,47 +616,23 @@
   box-sizing: border-box;
 }
 
-/* ---------- Footer Strip ---------- */
+/* ==========================================================================
+   Responsive / fallback: <= 900px or reduced motion.
+   No pin, no roller — a normal stacked list of the visible projects.
+   ========================================================================== */
 
-.wk-footer {
-  position: relative;
-  margin-top: clamp(48px, 8vh, 96px);
-  padding-top: clamp(20px, 3.2vh, 36px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+@media (max-width: 900px), (prefers-reduced-motion: reduce) {
+  .wk-root {
+    height: auto;
+    min-height: 0;
+  }
 
-.wk-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
+  .wk-inner {
+    height: auto;
+    min-height: 0;
+    padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
+  }
 
-.wk-footer.is-in::before {
-  transform: scaleX(1);
-}
-
-.wk-footer-text {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(0.68rem, 1vw, 0.82rem);
-  font-weight: 500;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0;
-}
-
-/* ---------- Responsive Breakpoint (<= 900px or Touch) ---------- */
-
-@media (max-width: 900px) {
   .wk-header {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -500,39 +642,85 @@
     white-space: normal;
   }
 
-  .wk-row-link {
-    grid-template-columns: auto 1fr auto;
-    grid-template-rows: auto auto;
+  .wk-roller {
+    flex: none;
+    display: block;
+  }
+
+  .wk-roll-viewport {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .wk-hairline {
+    display: none;
+  }
+
+  .wk-roll-list {
+    position: static;
+    inset: auto;
+  }
+
+  .wk-roll-item {
+    position: static;
+    top: auto;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .wk-roll-item:last-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .wk-roll-link {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     row-gap: 8px;
     column-gap: 16px;
     padding: 24px 0;
+    align-items: center;
   }
 
-  .wk-index {
+  .wk-roll-left {
     grid-column: 1;
     grid-row: 1;
+    transform: none !important;
   }
 
-  .wk-name-wrap {
+  .wk-name {
+    font-size: clamp(2.2rem, 11vw, 4rem);
+  }
+
+  .wk-roll-right {
     grid-column: 2;
-    grid-row: 1;
-  }
-
-  .wk-arrow-wrap {
-    grid-column: 3;
     grid-row: 1 / span 2;
-    align-self: center;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    opacity: 1 !important;
   }
 
   .wk-meta {
-    grid-column: 2;
-    grid-row: 2;
     flex-direction: row;
     gap: 12px;
   }
 
   .wk-inline-plate-wrap {
     display: grid;
+  }
+
+  .wk-all-link {
+    position: static;
+    left: auto;
+    bottom: auto;
+    margin: 20px auto 0;
+    display: flex;
+  }
+
+  .wk-counter-strip {
+    opacity: 1;
   }
 }
 
@@ -542,20 +730,17 @@
   }
 }
 
-/* ---------- Prefers-reduced-motion ---------- */
+/* ---------- Prefers-reduced-motion: everything simply visible ---------- */
 
 @media (prefers-reduced-motion: reduce) {
   .wk-rise,
-  .wk-word,
-  .wk-row-item {
+  .wk-word {
     transition: none;
     transform: none;
     opacity: 1;
   }
 
-  .wk-row::before,
-  .wk-row:last-child::after,
-  .wk-footer::before {
+  .wk-hairline {
     transition: none;
     transform: scaleX(1);
   }
@@ -570,13 +755,90 @@
     transform: none !important;
   }
 
-  .wk-row:hover,
-  .wk-row:focus-within {
-    opacity: 1 !important;
-  }
+
 
   .wk-inline-plate-wrap {
     transition: none;
   }
 }
 
+
+/* ==========================================================================
+   /works PAGE VARIANT — the full archive in normal flow
+   The stage's panel styles are untouched; this block only re-flows the list
+   when the same component is rendered as a standalone page (`wk-variant-page`).
+   ========================================================================== */
+
+.wk-variant-page .wk-inner {
+  padding-top: var(--panel-pad-top);
+  padding-bottom: clamp(40px, 8vh, 96px);
+}
+
+.wk-variant-page .wk-roller {
+  display: block;
+}
+
+.wk-variant-page .wk-roll-viewport {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.wk-variant-page .wk-hairline {
+  display: none;
+}
+
+.wk-variant-page .wk-roll-list {
+  position: static;
+  inset: auto;
+}
+
+.wk-variant-page .wk-roll-item {
+  position: static;
+  opacity: 1 !important;
+  visibility: visible !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wk-variant-page .wk-roll-item:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wk-variant-page .wk-roll-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  row-gap: 8px;
+  column-gap: 24px;
+  padding: clamp(20px, 3.2vh, 36px) 0;
+}
+
+.wk-variant-page .wk-roll-left {
+  transform: none !important;
+  min-width: 0;
+}
+
+.wk-variant-page .wk-roll-right {
+  opacity: 1 !important;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.wk-variant-page .wk-meta {
+  text-align: right;
+}
+
+.wk-variant-page .wk-preview-wrap {
+  display: none !important;
+}
+
+/* On the /works page the project blurb sits under the name. */
+.wk-blurb {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.62rem, 0.9vw, 0.74rem);
+  line-height: 1.7;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 52ch;
+  margin-top: 8px;
+}

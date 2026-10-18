@@ -11,3 +11,10 @@ declare module 'three' {
 }
 
 declare module 'vanta/dist/vanta.birds.min.js'
+
+declare module 'vanta/dist/vanta.topology.min.js'
+
+// p5 ships with @types/p5, but the runtime is only ever pulled in by Vanta's
+// topology bundle through a dynamic import, so a module declaration keeps that
+// import resolvable without leaning on the type package's DOM globals.
+declare module 'p5'

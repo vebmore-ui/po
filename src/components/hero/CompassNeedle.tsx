@@ -29,10 +29,10 @@ export default function CompassNeedle({ size = 400, visible = true }: { size: nu
       while (diff < -Math.PI) diff += Math.PI * 2
       currentAngle.current += diff * 0.06
 
-      // Pendulum: ±0.6° at a slow ~0.35Hz, disabled for reduced motion.
+      // Pendulum: ±1.1° at a brisker ~0.5Hz, disabled for reduced motion.
       const sway = prefersReducedMotion.current
         ? 0
-        : Math.sin(((now - start) / 1000) * Math.PI * 2 * 0.35) * (0.6 * Math.PI / 180)
+        : Math.sin(((now - start) / 1000) * Math.PI * 2 * 0.5) * (1.1 * Math.PI / 180)
 
       const deg = (currentAngle.current + sway) * (180 / Math.PI)
       needleRef.current.setAttribute('transform', `translate(${size / 2}, ${size / 2}) rotate(${deg})`)

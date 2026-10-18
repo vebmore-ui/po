@@ -1,0 +1,433 @@
+/* ------------------------------------------------------------------
+   VEBMORE — CONTACT section (the black panel Works slides into)
+   Editorial two-column layout: statement on the left, three action
+   groups on the right. Black surface, white text, hairline rules.
+   All classes prefixed `ct-`.
+   ------------------------------------------------------------------ */
+
+.ct-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  background: #000;
+  color: #fff;
+  padding: clamp(40px, 8vh, 120px) clamp(20px, 6vw, 104px);
+  box-sizing: border-box;
+}
+
+/* Parallax target: the stage nudges this from -6vw to 0 during the slide. */
+.ct-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(32px, 6vw, 88px);
+  align-items: center;
+  will-change: transform;
+}
+
+.ct-left {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+}
+
+.ct-left-top {
+  min-width: 0;
+}
+
+/* ---------- Label ---------- */
+
+.ct-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0 0 clamp(20px, 3.4vh, 34px);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.ct-quotes {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #0f8f4b;
+  margin-left: -0.24em;
+}
+
+/* ---------- Title (About's exact typography) ---------- */
+
+.ct-title {
+  margin: 0 0 clamp(24px, 4vh, 40px);
+  font-family: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(3.1rem, 8.6vw, 8.4rem);
+  line-height: 0.86;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.ct-title-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.ct-word-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+  vertical-align: bottom;
+  margin-right: 0.22em;
+}
+
+.ct-word-mask:last-child {
+  margin-right: 0;
+}
+
+.ct-word {
+  display: inline-block;
+  transform: translateY(105%);
+  opacity: 0;
+  transition:
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease-out;
+  will-change: transform, opacity;
+}
+
+.ct-word.is-in {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.ct-word-mark {
+  color: #fff;
+  letter-spacing: -0.005em;
+}
+
+/* ---------- Lede & copyright ---------- */
+
+.ct-lede {
+  max-width: 44ch;
+  margin: 0 0 auto;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.68rem, 1vw, 0.8rem);
+  font-weight: 400;
+  line-height: 1.85;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ct-copyright {
+  margin: clamp(32px, 6vh, 64px) 0 0;
+  padding-top: clamp(16px, 2.4vh, 24px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.6rem, 0.86vw, 0.7rem);
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---------- Right column groups ---------- */
+
+.ct-right {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ct-group {
+  position: relative;
+  padding: clamp(16px, 2.6vh, 26px) 0;
+}
+
+/* Hairline above each group, drawn in from the left on entry. */
+.ct-group::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ct-group.is-in::before {
+  transform: scaleX(1);
+}
+
+.ct-group-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8em;
+  margin: 0 0 clamp(12px, 2vh, 20px);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.62rem, 0.92vw, 0.74rem);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Green index numerals — the lime reads better than the deep brand green on
+   pure black. */
+.ct-group-index {
+  color: #13ff00;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+/* ---------- Email ---------- */
+
+.ct-email {
+  margin: 0 0 clamp(12px, 2vh, 18px);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.72rem, 1.05vw, 0.86rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ct-email-link {
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  transition:
+    border-color 0.22s ease-out,
+    color 0.22s ease-out;
+}
+
+@media (hover: hover) {
+  .ct-email-link:hover {
+    color: #13ff00;
+    border-color: #13ff00;
+  }
+}
+
+/* ---------- Button row ---------- */
+
+.ct-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(10px, 1.4vw, 16px);
+}
+
+/* ---------- Phone rows ---------- */
+
+.ct-phone-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 16px);
+}
+
+.ct-phone-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(12px, 2vw, 24px);
+}
+
+.ct-phone-label {
+  display: block;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.58rem, 0.82vw, 0.66rem);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ct-phone-number {
+  display: block;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.72rem, 1.05vw, 0.86rem);
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.22s ease-out;
+}
+
+@media (hover: hover) {
+  .ct-phone-number:hover {
+    color: #13ff00;
+  }
+}
+
+.ct-phone-row .ct-btn {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+/* ==========================================================================
+   The button itself (black surface)
+   ========================================================================== */
+
+.ct-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 clamp(14px, 1.4vw, 20px);
+  border-radius: clamp(12px, 1.2vw, 20px);
+  border: 1px solid #fff;
+  background: transparent;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.22s ease-out,
+    color 0.22s ease-out,
+    border-color 0.22s ease-out,
+    transform 0.22s ease-out;
+}
+
+.ct-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.22s ease-out;
+}
+
+.ct-btn-label {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.62rem, 0.9vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.ct-btn-arrow {
+  font-size: 0.85em;
+  line-height: 1;
+  transition: transform 0.22s ease-out;
+}
+
+/* Hover inverts: white fill, black text and icon. */
+@media (hover: hover) {
+  .ct-btn:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+
+  .ct-btn:hover .ct-btn-icon {
+    transform: scale(1.15);
+  }
+
+  .ct-btn:hover .ct-btn-arrow {
+    transform: translate(2px, -2px);
+  }
+}
+
+.ct-btn:focus-visible {
+  outline: 2px solid #13ff00;
+  outline-offset: 3px;
+}
+
+/* ---------- Buttons pop in as a group ---------- */
+
+.ct-btn-row {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ct-btn-row.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Shared rise utility ---------- */
+
+.ct-rise {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ct-rise.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Responsive: stacks below 900px
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .ct-root {
+    height: auto;
+    min-height: 0;
+    align-items: stretch;
+  }
+
+  .ct-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(32px, 6vh, 56px);
+  }
+
+  .ct-title-line {
+    white-space: normal;
+  }
+
+  .ct-title {
+    font-size: clamp(2.9rem, 13vw, 5.2rem);
+  }
+
+  .ct-lede {
+    max-width: none;
+    margin-bottom: clamp(24px, 5vh, 40px);
+  }
+
+  .ct-phone-row {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+/* ---------- Reduced motion: everything simply visible ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-word,
+  .ct-rise,
+  .ct-btn-row {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  .ct-group::before {
+    transition: none;
+    transform: scaleX(1);
+  }
+
+  .ct-btn,
+  .ct-btn-icon,
+  .ct-btn-arrow {
+    transition: none;
+  }
+}
