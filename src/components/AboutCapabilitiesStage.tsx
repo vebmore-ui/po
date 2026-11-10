@@ -62,7 +62,12 @@ export default function AboutCapabilitiesStage({ aboutActive }: Props) {
 
     const check = () => {
       isDisabled.current = mq900.matches || mqMotion.matches
+      if (isDisabled.current) {
+        setCapTrigger(true)
+        setTechTrigger(true)
+      }
     }
+    check()
     mq900.addEventListener('change', check)
     mqMotion.addEventListener('change', check)
     return () => {

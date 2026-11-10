@@ -1,26 +1,25 @@
 /**
  * CONTACT data.
  *
- * EVERY value below is a placeholder marked `// REPLACE`. They are collected
- * here so that replacing the studio's real details is a single-file edit: the
- * section and every button URL are built from these values, nothing is
- * hard-coded in a component.
+ * Studio details are collected here so the contact section and its links stay
+ * consistent without hard-coding contact data in components.
  */
 
 /** Studio local timezone for the live clock. */
-export const STUDIO_TIMEZONE = 'Asia/Kolkata' // REPLACE
+export const STUDIO_TIMEZONE = 'Asia/Kolkata'
 
 /** Studio timezone abbreviation display label. */
-export const STUDIO_TIMEZONE_LABEL = 'IST' // REPLACE
+export const STUDIO_TIMEZONE_LABEL = 'IST'
 
-/** The address shown in the UI and used to build the compose URLs. */
-export const CONTACT_EMAIL = 'hello@vebmore.com' // REPLACE
+/** Addresses used to build the email compose URLs. */
+export const GMAIL_ADDRESS = 'vebmore@gmail.com'
+export const OUTLOOK_ADDRESS = 'vebmore@outlook.com'
 
 /** LinkedIn profile URL. */
-export const LINKEDIN_URL = 'https://www.linkedin.com/company/vebmore' // REPLACE
+export const LINKEDIN_URL = 'https://www.linkedin.com/company/vebmore/'
 
 /** Instagram profile URL. */
-export const INSTAGRAM_URL = 'https://www.instagram.com/vebmore' // REPLACE
+export const INSTAGRAM_URL = 'https://www.instagram.com/vebmore'
 
 /** Subject prefilled into the Gmail / Outlook compose windows. */
 export const EMAIL_SUBJECT = 'Hello VEBMORE'
@@ -31,15 +30,14 @@ export const WHATSAPP_GREETING = 'Hello VEBMORE, I would like to talk about a pr
 export interface PhoneContact {
   /** Small mono label shown beside the number, e.g. `CONTACT 01`. */
   label: string
-  /** Human-readable number, e.g. `+91 98765 43210`. // REPLACE */
+  /** Human-readable phone number shown in the contact section. */
   display: string
-  /** Digits only, for the tel: and wa.me links, e.g. `919876543210`. // REPLACE */
+  /** Digits including the country code, for tel: and wa.me links. */
   digits: string
 }
 
 export const PHONES: PhoneContact[] = [
-  { label: 'CONTACT 01', display: '+91 98765 43210', digits: '919876543210' }, // REPLACE
-  { label: 'CONTACT 02', display: '+91 91234 56780', digits: '919123456780' }, // REPLACE
+  { label: 'CONTACT 01', display: '+91 9427550414', digits: '919427550414' },
 ]
 
 /** `mailto:`-style Gmail compose, opened in a new tab. */
@@ -47,7 +45,7 @@ export function gmailComposeUrl(): string {
   const params = new URLSearchParams({
     view: 'cm',
     fs: '1',
-    to: CONTACT_EMAIL,
+    to: GMAIL_ADDRESS,
     su: EMAIL_SUBJECT,
   })
   return `https://mail.google.com/mail/?${params.toString()}`
@@ -56,7 +54,7 @@ export function gmailComposeUrl(): string {
 /** Outlook web compose, opened in a new tab. */
 export function outlookComposeUrl(): string {
   const params = new URLSearchParams({
-    to: CONTACT_EMAIL,
+    to: OUTLOOK_ADDRESS,
     subject: EMAIL_SUBJECT,
   })
   return `https://outlook.live.com/mail/0/deeplink/compose?${params.toString()}`

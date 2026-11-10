@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react'
 
-export default function CompassNeedle({ size = 400, visible = true }: { size: number; visible?: boolean }) {
+export default function CompassNeedle({ size = 400, centerY = 78, visible = true }: { size: number; centerY?: number; visible?: boolean }) {
   const needleRef = useRef<SVGGElement>(null)
   const targetAngle = useRef(0)
   const currentAngle = useRef(0)
@@ -45,13 +45,13 @@ export default function CompassNeedle({ size = 400, visible = true }: { size: nu
   useEffect(() => {
     const handlePointerMove = (e: PointerEvent) => {
       const cx = window.innerWidth / 2
-      const cy = window.innerHeight * 0.78
+      const cy = window.innerHeight * (centerY / 100)
       const angle = Math.atan2(-(e.clientY - cy), e.clientX - cx)
       targetAngle.current = Math.PI / 2 - angle
     }
     window.addEventListener('pointermove', handlePointerMove)
     return () => window.removeEventListener('pointermove', handlePointerMove)
-  }, [])
+  }, [centerY])
 
   const needleLen = size * 0.38
   const needleWidth = size * 0.055

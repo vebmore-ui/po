@@ -49,6 +49,10 @@ export default function WorksContactStage() {
     const mqMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const check = () => {
       isDisabled.current = mq900.matches || mqMotion.matches
+      if (isDisabled.current) {
+        setWorksTrigger(true)
+        setContactTrigger(true)
+      }
     }
     check()
     mq900.addEventListener('change', check)

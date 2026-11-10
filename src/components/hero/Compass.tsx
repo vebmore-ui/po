@@ -12,6 +12,12 @@ const NOTICE_TEXT = '01 "NEEDLE DIRECTION — SET BY YOUR CURSOR"'
 const NOTICE_START = 1500
 const NOTICE_SPEED = 42 // ms per character
 
+function getCompassSize() {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  return Math.round(Math.min(420, vw * 0.9, vh * 0.46))
+}
+
 function CompassNotice() {
   const [typed, setTyped] = useState(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -50,16 +56,10 @@ function CompassNotice() {
 }
 
 export default function Compass({ compassProgress = 0 }: { compassProgress?: number }) {
-  const [size, setSize] = useState(() => {
-    const vw = window.innerWidth
-    const vh = window.innerHeight
-    const base = Math.min(vw * 0.28, vh * 0.40)
-    const minSize = vw < 480 ? 140 : vw < 1024 ? 180 : 280
-    return Math.round(Math.min(Math.max(minSize, base), 420))
-  })
+  const [size, setSize] = useState(getCompassSize)
   const [topPos, setTopPos] = useState(() => {
     const vw = window.innerWidth
-    if (vw <= 480) return 62
+    if (vw <= 480) return 72
     if (vw >= 1024) return 78
     return 78 - ((1024 - vw) / (1024 - 480)) * 13
   })
@@ -69,11 +69,8 @@ export default function Compass({ compassProgress = 0 }: { compassProgress?: num
   useEffect(() => {
     const handleResize = () => {
       const vw = window.innerWidth
-      const vh = window.innerHeight
-      const base = Math.min(vw * 0.28, vh * 0.40)
-      const minSize = vw < 480 ? 140 : vw < 1024 ? 180 : 280
-      setSize(Math.round(Math.min(Math.max(minSize, base), 420)))
-      if (vw <= 480) setTopPos(62)
+      setSize(getCompassSize())
+      if (vw <= 480) setTopPos(72)
       else if (vw >= 1024) setTopPos(78)
       else setTopPos(78 - ((1024 - vw) / (1024 - 480)) * 13)
     }
@@ -83,11 +80,14 @@ export default function Compass({ compassProgress = 0 }: { compassProgress?: num
 
   useEffect(() => {
     const handlePointerMove = (e: PointerEvent) => {
-      setCursorPos({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight })
+      setCursorPos({
+        x: (e.clientX - window.innerWidth / 2) / window.innerWidth + 0.5,
+        y: (e.clientY - (window.innerHeight * topPos) / 100) / window.innerHeight + 0.5,
+      })
     }
     window.addEventListener('pointermove', handlePointerMove)
     return () => window.removeEventListener('pointermove', handlePointerMove)
-  }, [])
+  }, [topPos])
 
   useEffect(() => {
     const timers = [
@@ -128,7 +128,7 @@ export default function Compass({ compassProgress = 0 }: { compassProgress?: num
     >
       <div style={{ width: '100%', height: '100%', position: 'relative', pointerEvents: 'none' }}>
         <CompassFace size={size} animationStage={animationStage} cursorPos={cursorPos} />
-        <CompassNeedle size={size} visible={animationStage >= 6} />
+        <CompassNeedle size={size} centerY={topPos} visible={animationStage >= 6} />
         <CompassGlass />
         {animationStage >= 6 && <CompassNotice />}
       </div>

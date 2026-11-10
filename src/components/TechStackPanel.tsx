@@ -38,6 +38,7 @@ export default function TechStackPanel({ triggerPop }: Props) {
   const rootRef = useRef<HTMLElement>(null)
   const timers = useRef<number[]>([])
   const [popped, setPopped] = useState(false)
+  const [showAllTools, setShowAllTools] = useState(false)
 
   const clearTimers = () => {
     timers.current.forEach(clearTimeout)
@@ -97,11 +98,26 @@ export default function TechStackPanel({ triggerPop }: Props) {
             screen is sliding in, it must read as a completely blank plate. */}
         <p className={`ts-label ts-fade${popped ? ' is-in' : ''}`}>Tools we fly with</p>
 
-        <ul className="ts-grid" role="list">
+        <ul
+          id="tech-stack-grid"
+          className={`ts-grid${showAllTools ? ' is-expanded' : ''}`}
+          role="list"
+        >
           {techStack.map((item, i) => (
             <TechTile key={item.id} item={item} index={i} popped={popped} />
           ))}
         </ul>
+
+        <button
+          type="button"
+          className="ts-more"
+          aria-label={showAllTools ? 'Show fewer tools' : 'Show all tools'}
+          aria-expanded={showAllTools}
+          aria-controls="tech-stack-grid"
+          onClick={() => setShowAllTools((expanded) => !expanded)}
+        >
+          <span aria-hidden="true">•••</span>
+        </button>
 
         <p className={`ts-caption ts-fade${popped ? ' is-in' : ''}`}>
           [{techStack.length}] Technologies

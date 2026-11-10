@@ -85,8 +85,6 @@ export default function SiteNav({ items, activeId, onSelect }: Props) {
     onSelect(id)
   }
 
-  const activeItem = items.find((i) => i.id === activeId) ?? items[0]
-
   return (
     <header className="nav-header">
       {/* LEFT slot reserved for the wordmark / logo */}
@@ -134,13 +132,9 @@ export default function SiteNav({ items, activeId, onSelect }: Props) {
           })}
         </ul>
 
-        {/* <= 900px screens: active word + MENU toggle */}
+        {/* <= 900px screens: MENU toggle */}
         {isNarrow && (
           <div className="nav-mobile-bar">
-            <div className="nav-mobile-active">
-              <span className="nav-mobile-active-label">{activeItem.label}</span>
-              <span className="nav-triangle" aria-hidden="true" />
-            </div>
             <button
               type="button"
               className="nav-menu-btn"

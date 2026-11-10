@@ -178,7 +178,7 @@
 .wk-card {
   position: absolute;
   width: clamp(112px, 11vw, 168px);
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 3;
   border-radius: clamp(14px, 1.6vw, 26px);
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-sizing: border-box;
@@ -545,7 +545,7 @@
     height: auto;
     min-height: auto;
     overflow: visible;
-    padding: clamp(60px, 8vh, 90px) 20px;
+    padding: var(--panel-pad-top) var(--pad-x) clamp(36px, 6svh, 56px);
   }
 
   .wk-layout {
@@ -554,9 +554,13 @@
     gap: 32px;
   }
 
+  .wk-left-col {
+    height: auto;
+  }
+
   .wk-carousel-wrap {
     min-height: 280px;
-    height: 320px;
+    height: clamp(280px, 86vw, 360px);
   }
 
   .wk-card {
@@ -565,6 +569,10 @@
 
   .wk-right-col {
     height: auto;
+  }
+
+  .wk-detail-container {
+    min-height: 0;
   }
 
   .wk-detail-idle .wk-prompt-text {
@@ -592,4 +600,3 @@
     transform: none !important;
   }
 }
-

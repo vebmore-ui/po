@@ -153,6 +153,10 @@
   white-space: nowrap;
 }
 
+.ts-more {
+  display: none;
+}
+
 /* ---------- Hover (desktop, pointer: fine only) ---------- */
 
 @media (hover: hover) {
@@ -210,8 +214,58 @@
 }
 
 @media (max-width: 480px) {
+  .ts-root {
+    overflow: visible;
+  }
+
   .ts-grid {
     grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+    gap: clamp(14px, 4vw, 20px);
+  }
+
+  .ts-tile {
+    width: 88%;
+    justify-self: center;
+    aspect-ratio: 1.15;
+  }
+
+  .ts-tile:nth-child(n + 5) {
+    display: none;
+  }
+
+  .ts-grid.is-expanded .ts-tile:nth-child(n + 5) {
+    display: flex;
+  }
+
+  .ts-more {
+    display: grid;
+    place-items: center;
+    align-self: center;
+    width: 52px;
+    height: 44px;
+    margin-top: 18px;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    font-size: 1.3rem;
+    letter-spacing: 0.16em;
+    cursor: pointer;
+  }
+
+  .ts-more:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+  }
+
+  .ts-inner {
+    padding-right: var(--pad-x);
+    padding-left: var(--pad-x);
+  }
+
+  .ts-name {
+    font-size: clamp(0.58rem, 2.8vw, 0.7rem);
+    letter-spacing: 0.12em;
   }
 }
 

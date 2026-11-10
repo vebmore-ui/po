@@ -24,7 +24,7 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
   const [questionRevealed, setQuestionRevealed] = useState(false)
   const [lineHeight, setLineHeight] = useState(() => {
     const vw = window.innerWidth
-    if (vw <= 480) return 14
+    if (vw <= 480) return 7
     if (vw >= 1024) return 20
     return 20 - ((1024 - vw) / (1024 - 480)) * 4
   })
@@ -39,7 +39,7 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
     const handleResize = () => {
       const vw = window.innerWidth
       if (vw <= 480) {
-        setLineHeight(14)
+        setLineHeight(7)
         setQuestionHeight(5)
       } else if (vw >= 1024) {
         setLineHeight(20)
@@ -102,6 +102,9 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
         .text-line {
           transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.1s, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
         }
+        .text-word {
+          padding-right: 2rem;
+        }
         .word {
           animation: fadeWord 0.5s ease-out both;
         }
@@ -128,12 +131,10 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
         }
 
         @media (max-width: 390px) {
-          .lines-container {
-            padding-top: 10vh !important;
-            padding-bottom: 10vh !important;
-            transform: translateY(-4vh) !important;
+          .text-line:not(.question-line) {
+            top: 8vh;
           }
-          .text-line span[style*="paddingRight"] {
+          .text-word {
             padding-right: 0.75rem !important;
           }
           .question-track {
@@ -161,8 +162,8 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
               items.push(
                 <span
                   key={`${set}-${i}`}
+                  className="text-word"
                   style={{
-                    paddingRight: '2rem',
                     color: isOutline ? '#000000' : '#ffffff',
                     WebkitTextStroke: isOutline ? '2px #666666' : '0px',
                     paintOrder: 'stroke fill',
@@ -189,7 +190,7 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
 
           return (
             <div
-              className={`text-line ${isQuestion ? 'question-line' : ''}`}
+              className={`text-line${isQuestion ? ' question-line' : ''}`}
               key={index}
               style={{
                 position: 'relative',
@@ -211,6 +212,7 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
                     {items.map((item, i) => (
                       <span
                         key={i}
+                        className="question-word"
                         style={{ paddingRight: '2rem', whiteSpace: 'nowrap' }}
                       >
                         {item.props.children}

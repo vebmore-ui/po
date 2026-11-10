@@ -93,6 +93,12 @@ export default function SiteCursor() {
       const target = e.target as Element | null
       if (!target) return
 
+      const navTarget = target.closest('.nav-header')
+      if (navTarget && !target.closest('.nav-menu-btn')) {
+        root.classList.remove('is-view', 'is-interactive')
+        return
+      }
+
       const viewEl = target.closest('[data-cursor="view"]')
       if (viewEl) {
         root.classList.add('is-view')
@@ -166,4 +172,3 @@ export default function SiteCursor() {
     </div>
   )
 }
-

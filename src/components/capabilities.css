@@ -510,6 +510,19 @@
     gap: 8px;
   }
 
+  .stg-panel .cap-list {
+    display: block;
+    flex: initial;
+  }
+
+  .stg-panel .cap-row {
+    display: block;
+    flex: initial;
+    min-height: 0;
+    overflow: visible;
+    transition: none;
+  }
+
   .cap-bearing {
     grid-column: 1;
   }
@@ -519,13 +532,23 @@
     grid-row: 1;
   }
 
-  .cap-name {
+  .cap-name-wrap {
     grid-column: 1 / -1;
+  }
+
+  .cap-name {
     font-size: clamp(2rem, 10vw, 3.4rem);
   }
 
   .cap-name-wrap {
     max-height: clamp(2.2rem, 10.5vw, 3.6rem);
+  }
+
+  .stg-panel .cap-desc-wrap {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
   }
 
   .cap-tags {

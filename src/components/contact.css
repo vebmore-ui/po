@@ -462,6 +462,11 @@
     height: auto;
     min-height: 0;
     align-items: stretch;
+    overflow: hidden;
+  }
+
+  .ct-glow-corner {
+    right: 0;
   }
 
   .ct-grid {
@@ -484,6 +489,19 @@
 
   .ct-phone-row {
     grid-template-columns: 1fr auto;
+  }
+
+  .ct-left {
+    height: auto;
+  }
+
+  .ct-clock {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .ct-btn-row {
+    gap: 10px;
   }
 }
 

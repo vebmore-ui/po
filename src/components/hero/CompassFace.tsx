@@ -7,18 +7,20 @@ export default function CompassFace({ size = 400, animationStage = 6, cursorPos 
     const c = canvasRef.current
     if (!c) return
     const ctx = c.getContext('2d')!
+    const designSize = 420
+    const scale = size / designSize
     const s = size * 2
     c.width = s
     c.height = s
-    ctx.scale(2, 2)
+    ctx.scale(scale * 2, scale * 2)
 
-    const cx = size / 2
-    const cy = size / 2
-    const outerR = size / 2 - 3
-    const innerR = size / 2 - 14
+    const cx = designSize / 2
+    const cy = designSize / 2
+    const outerR = designSize / 2 - 3
+    const innerR = designSize / 2 - 14
     const dialR = innerR - 5
 
-    ctx.clearRect(0, 0, size, size)
+    ctx.clearRect(0, 0, designSize, designSize)
 
     if (animationStage < 1) return
 
@@ -176,7 +178,7 @@ export default function CompassFace({ size = 400, animationStage = 6, cursorPos 
     if (animationStage < 5) return
 
     // cardinal letters - INNER BAND, Times New Roman, smaller, elegant
-    ctx.font = `${Math.round(size * 0.06)}px Times New Roman, serif`
+    ctx.font = `${Math.round(designSize * 0.06)}px Times New Roman, serif`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillStyle = '#000000'

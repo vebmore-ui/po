@@ -124,9 +124,9 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
     const measure = () => {
       const w = region.clientWidth || 400
       const h = region.clientHeight || 400
-      // Cards are approx 140px wide x 186px high
+      // Cards are landscape, approximately 140px wide x 105px high.
       const cardW = Math.min(Math.max(w * 0.28, 112), 168)
-      const cardH = cardW * (4 / 3)
+      const cardH = cardW * (3 / 4)
       const rx = Math.max((w - cardW) * 0.44, 40)
       const ry = Math.max((h - cardH) * 0.42, 30)
       dimsRef.current = { w, h, rx, ry }
@@ -216,7 +216,6 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
           // Normal auto-rotation with hover damping
           const isPaused =
             isHoveredRef.current ||
-            isDetailHoveredRef.current ||
             timestamp < pauseUntilRef.current
 
           const targetVelocity = isPaused ? 0 : BASE_VELOCITY
