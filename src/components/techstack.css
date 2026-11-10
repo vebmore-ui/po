@@ -190,22 +190,22 @@
 @media (max-width: 900px) {
   .ts-root {
     height: auto;
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 0;
     border-left: none;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
   }
 
   .ts-inner {
     height: auto;
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 0;
+    padding: 88px clamp(20px, 6vw, 40px) 28px;
   }
 
   .ts-grid {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: none;
     gap: clamp(10px, 2vw, 18px);
+    flex: 0 0 auto;
   }
 
   .ts-tile {
@@ -221,13 +221,13 @@
   .ts-grid {
     grid-template-columns: repeat(2, 1fr);
     align-items: center;
-    gap: clamp(14px, 4vw, 20px);
+    gap: 10px;
   }
 
   .ts-tile {
-    width: 88%;
+    width: 100%;
     justify-self: center;
-    aspect-ratio: 1.15;
+    aspect-ratio: 1.55;
   }
 
   .ts-tile:nth-child(n + 5) {
@@ -243,8 +243,8 @@
     place-items: center;
     align-self: center;
     width: 52px;
-    height: 44px;
-    margin-top: 18px;
+    height: 32px;
+    margin-top: 6px;
     border: 0;
     background: transparent;
     color: #ffffff;
@@ -261,6 +261,14 @@
   .ts-inner {
     padding-right: var(--pad-x);
     padding-left: var(--pad-x);
+  }
+
+  .ts-label {
+    margin-bottom: 14px;
+  }
+
+  .ts-caption {
+    margin-top: 8px;
   }
 
   .ts-name {

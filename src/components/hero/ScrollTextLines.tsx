@@ -131,8 +131,8 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
         }
 
         @media (max-width: 390px) {
-          .text-line:not(.question-line) {
-            top: 8vh;
+          .lines-container {
+            transform: translateY(-7vh) !important;
           }
           .text-word {
             padding-right: 0.75rem !important;

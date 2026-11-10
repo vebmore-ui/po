@@ -93,6 +93,7 @@
 @media (max-width: 900px), (prefers-reduced-motion: reduce) {
   .wc-wrap {
     height: auto !important;
+    min-height: 0 !important;
     background: #000;
   }
 
@@ -122,5 +123,6 @@
   .wc-panel .wk-root {
     height: auto;
     min-height: 0;
+    padding-top: var(--panel-pad-top);
   }
 }

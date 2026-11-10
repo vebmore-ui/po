@@ -20,6 +20,39 @@ const NAV_ITEMS: NavItem[] = SECTION_IDS.map((id) => ({
   label: SECTION_LABELS[id],
 }))
 
+type HeaderTheme = {
+  tone: 'dark' | 'light'
+  surface: 'ink' | 'paper' | 'green'
+}
+
+function getHeaderTheme(): HeaderTheme {
+  const sections: Array<[string, HeaderTheme]> = [
+    ['.ab-root', { tone: 'dark', surface: 'paper' }],
+    ['.cap-root', { tone: 'dark', surface: 'paper' }],
+    ['.ts-root', { tone: 'light', surface: 'green' }],
+    ['.wk-root', { tone: 'light', surface: 'ink' }],
+    ['.ct-root', { tone: 'light', surface: 'ink' }],
+  ]
+  const probeX = window.innerWidth / 2
+  const probeY = Math.min(80, window.innerHeight * 0.12)
+
+  for (const [selector, tone] of sections) {
+    const section = document.querySelector<HTMLElement>(selector)
+    if (!section) continue
+    const rect = section.getBoundingClientRect()
+    if (
+      rect.top <= probeY &&
+      rect.bottom > probeY &&
+      rect.left <= probeX &&
+      rect.right > probeX
+    ) {
+      return tone
+    }
+  }
+
+  return { tone: 'light', surface: 'ink' }
+}
+
 function getAnchorContext(): AnchorContext {
   return {
     aboutStage: document.querySelector('.stg-track-wrap'),
@@ -36,6 +69,10 @@ export default function App() {
   const path = usePath()
   const isWorksPage = path === '/works'
   const [activeSection, setActiveSection] = useState<SectionId>('home')
+  const [headerTheme, setHeaderTheme] = useState<HeaderTheme>({
+    tone: 'light',
+    surface: 'ink',
+  })
   const rafScrollRef = useRef(0)
 
   // ── Scroll to a specific section anchor ──
@@ -80,7 +117,13 @@ export default function App() {
           ticking = false
           const ctx = getAnchorContext()
           const currentId = getActiveSection(ctx)
+          const nextTheme = getHeaderTheme()
           setActiveSection((prev) => (prev !== currentId ? currentId : prev))
+          setHeaderTheme((prev) =>
+            prev.tone === nextTheme.tone && prev.surface === nextTheme.surface
+              ? prev
+              : nextTheme,
+          )
         })
       }
     }
@@ -125,6 +168,8 @@ export default function App() {
         items={NAV_ITEMS}
         activeId={isWorksPage ? 'work' : activeSection}
         onSelect={handleNavSelect}
+        tone={headerTheme.tone}
+        surface={headerTheme.surface}
       />
 
       {/* Pages: unmounts / mounts per path */}

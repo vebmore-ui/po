@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'motion/react'
+import darkLogo from '../../assets/vebmore-logo-dark.png'
+import lightLogo from '../../assets/vebmore-logo-light.png'
 import './nav.css'
 
 export interface NavItem {
@@ -11,9 +13,17 @@ interface Props {
   items: NavItem[]
   activeId: string
   onSelect: (id: string) => void
+  tone: 'dark' | 'light'
+  surface: 'ink' | 'paper' | 'green'
 }
 
-export default function SiteNav({ items, activeId, onSelect }: Props) {
+export default function SiteNav({
+  items,
+  activeId,
+  onSelect,
+  tone,
+  surface,
+}: Props) {
   const [open, setOpen] = useState(false)
   const [isNarrow, setIsNarrow] = useState(false)
   const rootRef = useRef<HTMLElement>(null)
@@ -86,10 +96,14 @@ export default function SiteNav({ items, activeId, onSelect }: Props) {
   }
 
   return (
-    <header className="nav-header">
-      {/* LEFT slot reserved for the wordmark / logo */}
-      <div className="nav-logo-slot" aria-hidden="true">
-        {/* LOGO GOES HERE */}
+    <header className="nav-header" data-tone={tone} data-surface={surface}>
+      <div className="nav-logo-slot">
+        <img
+          key={tone}
+          className="nav-logo-image"
+          src={tone === 'dark' ? darkLogo : lightLogo}
+          alt="Vebmore"
+        />
       </div>
 
       {/* TOP RIGHT nav pill */}
