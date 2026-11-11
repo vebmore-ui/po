@@ -23,6 +23,7 @@ export type ContactIcon = 'linkedin' | 'instagram' | 'gmail' | 'outlook' | 'what
 
 interface Props {
   href: string
+  mobileHref?: string
   label: string
   icon: ContactIcon
   /** Optional subject/greeting already baked into `href` by the caller. */
@@ -58,7 +59,13 @@ function SimpleIconGlyph({ icon }: { icon: ContactIcon }) {
   )
 }
 
-export default function ContactButton({ href, label, icon, ariaLabel }: Props) {
+export default function ContactButton({
+  href,
+  mobileHref,
+  label,
+  icon,
+  ariaLabel,
+}: Props) {
   const ref = useRef<HTMLAnchorElement>(null)
 
   // Magnetic pull: max ~6px, fine pointers only, transform only.
@@ -90,6 +97,17 @@ export default function ContactButton({ href, label, icon, ariaLabel }: Props) {
 
   const usesFallback = icon === 'linkedin' || icon === 'outlook'
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // If mobileHref is provided and device is touch/mobile, launch native compose
+    if (
+      mobileHref &&
+      window.matchMedia('(max-width: 900px), (pointer: coarse)').matches
+    ) {
+      e.preventDefault()
+      window.location.href = mobileHref
+    }
+  }
+
   return (
     <a
       ref={ref}
@@ -98,6 +116,7 @@ export default function ContactButton({ href, label, icon, ariaLabel }: Props) {
       rel="noopener noreferrer"
       className="ct-btn"
       aria-label={ariaLabel ?? label}
+      onClick={handleClick}
     >
       <span className="ct-btn-icon" aria-hidden="true">
         {usesFallback ? (

@@ -6,8 +6,11 @@ import {
   PHONES,
   STUDIO_TIMEZONE,
   STUDIO_TIMEZONE_LABEL,
+  GMAIL_ADDRESS,
+  OUTLOOK_ADDRESS,
   gmailComposeUrl,
   outlookComposeUrl,
+  mailtoUrl,
   whatsappUrl,
   telUrl,
 } from './contact/contactData'
@@ -243,11 +246,19 @@ export default function ContactSection({ triggerEntry }: Props) {
               <span>EMAIL</span>
             </p>
             <div className={`ct-btn-row${shown(8) ? ' is-in' : ''}`}>
-              <ContactButton href={gmailComposeUrl()} label="Gmail" icon="gmail" />
+              <ContactButton
+                href={gmailComposeUrl()}
+                mobileHref={mailtoUrl(GMAIL_ADDRESS)}
+                label="Gmail"
+                icon="gmail"
+                ariaLabel="Email VEBMORE via Gmail (Subject & Body prefilled)"
+              />
               <ContactButton
                 href={outlookComposeUrl()}
+                mobileHref={mailtoUrl(OUTLOOK_ADDRESS)}
                 label="Outlook"
                 icon="outlook"
+                ariaLabel="Email VEBMORE via Outlook (Subject & Body prefilled)"
               />
             </div>
           </div>

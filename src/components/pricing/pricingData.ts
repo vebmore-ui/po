@@ -46,8 +46,7 @@ export interface SpecializedTier {
 const PRIMARY_PHONE_DIGITS = PHONES[0]?.digits ?? '919427550414'
 
 export function buildPricingWhatsappUrl(greeting: string): string {
-  const params = new URLSearchParams({ text: greeting })
-  return `https://wa.me/${PRIMARY_PHONE_DIGITS}?${params.toString()}`
+  return `https://wa.me/${PRIMARY_PHONE_DIGITS}?text=${encodeURIComponent(greeting)}`
 }
 
 export const CORE_PLANS: PricingPlan[] = [
@@ -72,8 +71,15 @@ export const CORE_PLANS: PricingPlan[] = [
       { text: 'DIRECT WHATSAPP INSTANT CONTACT INTEGRATION', highlight: true },
     ],
     ctaText: 'START WITH STARTER ↗',
-    whatsappGreeting:
-      'HELLO VEBMORE, I WOULD LIKE TO GET STARTED WITH THE STARTER PLAN (₹5,999).',
+    whatsappGreeting: `Hello VEBMORE,
+
+I would like to get started with the STARTER Plan (₹5,999).
+
+• Scope: Landing Page / Studio Presence (Up to 2 web pages)
+• Included: 6 Months Free Maintenance + Free Cloud Hosting
+• Contact Integration: Direct WhatsApp
+
+Please share the onboarding details and kickoff timeline.`,
   },
   {
     id: 'pro',
@@ -98,8 +104,15 @@ export const CORE_PLANS: PricingPlan[] = [
       { text: 'FREE HIGH-SPEED HOSTING (DOMAIN CHARGES DIFFER)' },
     ],
     ctaText: 'CHOOSE PRO PLAN ↗',
-    whatsappGreeting:
-      'HELLO VEBMORE, I AM INTERESTED IN THE PRO PLAN (₹11,999). LET US DISCUSS MY PROJECT.',
+    whatsappGreeting: `Hello VEBMORE,
+
+I am interested in building our digital presence with the PRO Plan (₹11,999).
+
+• Scope: 5–7 Web Pages (Up to 3 extendable long-scroll pages)
+• Features: Bespoke Animation & Choreographed Scroll Effects
+• Included: 1 Year Free Maintenance + Cloud Hosting + Custom Contact Form
+
+Let's discuss my project details and get started.`,
   },
   {
     id: 'plus',
@@ -123,8 +136,15 @@ export const CORE_PLANS: PricingPlan[] = [
       { text: 'EDGE CDN ASSET OPTIMIZATION & PRIORITY TECHNICAL SUPPORT' },
     ],
     ctaText: 'BUILD WITH PLUS ↗',
-    whatsappGreeting:
-      'HELLO VEBMORE, I WANT TO BUILD OUR DIGITAL PRESENCE WITH THE PLUS PLAN (₹24,499).',
+    whatsappGreeting: `Hello VEBMORE,
+
+I want to build our digital presence with the PLUS Flagship Platform (₹24,499).
+
+• Scope: Up to 20 Web Pages
+• Key Features: Custom Admin Dashboard (CMS) + Dedicated Image Storage Server
+• Included: 2 Years Free Maintenance + Fluid Storytelling & CDN Optimization
+
+Please let me know your availability for an architectural discussion.`,
   },
 ]
 
@@ -148,6 +168,13 @@ export const SPECIALIZED_TIER: SpecializedTier = {
     'DEDICATED DATABASE SERVER & CLOUD INFRASTRUCTURE DEPLOYMENT',
   ],
   ctaText: 'DISCUSS ARCHITECTURE ↗',
-  whatsappGreeting:
-    'HELLO VEBMORE, I WOULD LIKE TO DISCUSS AN E-BOOKING / E-COMMERCE CUSTOM PROJECT (STARTING FROM ₹31,999).',
+  whatsappGreeting: `Hello VEBMORE,
+
+I would like to discuss a custom project for the E-BOOKING / E-COMMERCE Tier (Starting from ₹31,999).
+
+• Architecture: E-Commerce Storefront / Real-Time Booking & Reservation Engine
+• Deliverables: Payment Processing, Inventory / Appointments & Admin Analytics
+• Included: 18 Months Dedicated Maintenance & Cloud Infrastructure
+
+Let's schedule an architectural discussion to finalize our scope and quotation.`,
 }
