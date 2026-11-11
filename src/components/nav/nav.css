@@ -41,8 +41,8 @@
 }
 
 .nav-header[data-archive='true'] {
-  --nav-surface: #000000;
-  --nav-border: rgba(255, 255, 255, 0.14);
+  --nav-surface: #ffffff;
+  --nav-border: rgba(0, 0, 0, 0.12);
 }
 
 /* Brand mark aligned with the navigation on the opposite edge. */

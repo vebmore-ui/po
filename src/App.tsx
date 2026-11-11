@@ -69,7 +69,7 @@ function getAnchorContext(): AnchorContext {
 
 export default function App() {
   const path = usePath()
-  const isWorksPage = path === '/works'
+  const isWorksPage = path === '/works' || path === '/work'
   const [activeSection, setActiveSection] = useState<SectionId>('home')
   const [headerTheme, setHeaderTheme] = useState<HeaderTheme>({
     tone: 'light',
@@ -170,8 +170,8 @@ export default function App() {
         items={NAV_ITEMS}
         activeId={isWorksPage ? 'work' : activeSection}
         onSelect={handleNavSelect}
-        tone={headerTheme.tone}
-        surface={headerTheme.surface}
+        tone={isWorksPage ? 'dark' : headerTheme.tone}
+        surface={isWorksPage ? 'paper' : headerTheme.surface}
         archive={isWorksPage}
       />
 

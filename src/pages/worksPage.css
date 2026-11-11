@@ -1,6 +1,6 @@
 /* ==========================================================================
-   WORKS PAGE (/works) — The Full Archive
-   Normal document-flow page with black background and a 3/2/1 project grid.
+   WORKS PAGE (/works & /work) — The Full Archive
+   Normal document-flow page with white background and a 3/2/1 project grid.
    Prefix: wp-
    ========================================================================== */
 
@@ -8,8 +8,8 @@
   position: relative;
   min-height: 100vh;
   min-height: 100svh;
-  background: #000000;
-  color: #ffffff;
+  background: #ffffff;
+  color: #000000;
   padding: var(--panel-pad-top) clamp(20px, 6vw, 104px) clamp(60px, 10vh, 120px);
   box-sizing: border-box;
 }
@@ -17,7 +17,7 @@
 .wp-grid-bg {
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
   background-size: 28px 28px;
   pointer-events: none;
   z-index: 0;
@@ -38,7 +38,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   padding-bottom: clamp(24px, 4vh, 48px);
 }
 
@@ -52,7 +52,7 @@
   font-weight: 500;
   letter-spacing: 0.34em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: #000000;
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -64,7 +64,7 @@
 }
 
 .wp-quote {
-  color: #13ff00;
+  color: #0f8f4b;
   font-weight: 700;
 }
 
@@ -83,6 +83,7 @@
   margin: 0;
   text-transform: uppercase;
   font-weight: 400;
+  color: #000000;
 }
 
 .wp-mask {
@@ -106,7 +107,7 @@
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: clamp(1rem, 1.8vw, 2rem);
   font-weight: 700;
-  color: #13ff00;
+  color: #0f8f4b;
   letter-spacing: 0.1em;
   margin: 0;
 }
@@ -125,7 +126,7 @@
   font-size: clamp(0.72rem, 1vw, 0.85rem);
   line-height: 1.6;
   letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(0, 0, 0, 0.65);
   margin: 0;
 }
 
@@ -134,17 +135,18 @@
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.16em;
-  color: #13ff00;
+  color: #000000;
   text-decoration: none;
   padding: 8px 16px;
-  border: 1px solid rgba(19, 255, 0, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.25);
   border-radius: 999px;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .wp-back:hover {
-  background-color: #13ff00;
-  color: #000000;
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
 }
 
 /* 3 / 2 / 1 Grid */
@@ -159,11 +161,11 @@
   flex-direction: column;
   gap: 14px;
   text-decoration: none;
-  color: #ffffff;
+  color: #000000;
   border-radius: clamp(14px, 1.6vw, 24px);
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.02);
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
   opacity: 0;
   transform: translateY(24px) scale(0.97);
@@ -179,9 +181,9 @@
 
 @media (hover: hover) and (pointer: fine) {
   .wp-card:hover {
-    transform: translateY(-4px) scale(1.03);
-    border-color: #13ff00;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    transform: translateY(-4px) scale(1.02);
+    border-color: #000000;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -231,6 +233,7 @@
   line-height: 0.9;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  color: #ffffff;
 }
 
 .wp-card-actions {
@@ -250,7 +253,7 @@
   padding: 0 14px;
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.75);
   color: #ffffff;
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.62rem;
@@ -282,7 +285,7 @@
 .wp-card-meta {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(0, 0, 0, 0.55);
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -291,7 +294,7 @@
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.68rem;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(0, 0, 0, 0.75);
   margin: 0;
 }
 
@@ -302,7 +305,7 @@
   justify-content: space-between;
   gap: 20px;
   padding-top: clamp(32px, 6vh, 64px);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
   flex-wrap: wrap;
 }
 
@@ -312,7 +315,7 @@
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(0, 0, 0, 0.75);
 }
 
 .wp-footer-btn {
@@ -320,8 +323,8 @@
   align-items: center;
   padding: 12px 28px;
   border-radius: 999px;
-  border: 1px solid #ffffff;
-  color: #ffffff;
+  border: 1px solid #000000;
+  color: #000000;
   background: transparent;
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.75rem;
@@ -332,8 +335,8 @@
 }
 
 .wp-footer-btn:hover {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: #000000;
+  color: #ffffff;
 }
 
 /* Responsive Grid Breakpoints */
