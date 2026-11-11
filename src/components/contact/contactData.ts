@@ -19,7 +19,7 @@ export const OUTLOOK_ADDRESS = 'vebmore@outlook.com'
 export const LINKEDIN_URL = 'https://www.linkedin.com/company/vebmore/'
 
 /** Instagram profile URL. */
-export const INSTAGRAM_URL = 'https://www.instagram.com/vebmore'
+export const INSTAGRAM_URL = 'https://www.instagram.com/vebmore/'
 
 /** Subject prefilled into the Gmail / Outlook compose windows. */
 export const EMAIL_SUBJECT =

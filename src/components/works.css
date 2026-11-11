@@ -400,7 +400,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
-  max-height: 42svh;
+  max-height: clamp(200px, 35svh, 380px);
   border-radius: clamp(14px, 1.6vw, 26px);
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-sizing: border-box;
@@ -506,7 +506,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 4px;
+  flex-wrap: wrap;
+  margin-top: clamp(6px, 1.2vh, 12px);
+  padding-bottom: clamp(6px, 1.2vh, 12px);
 }
 
 .wk-project-actions {
@@ -547,7 +549,7 @@
 /* ── More Work Button ── */
 .wk-more-wrap {
   margin-top: auto;
-  padding-top: 14px;
+  padding-top: clamp(28px, 4.5vh, 52px);
 }
 
 .wk-more-btn {
@@ -619,6 +621,16 @@
 
   .wk-detail-idle .wk-prompt-text {
     font-size: 0.7rem;
+  }
+
+  .wk-detail-actions {
+    margin-top: 10px;
+    padding-bottom: 0;
+  }
+
+  .wk-more-wrap {
+    margin-top: clamp(28px, 6vw, 44px);
+    padding-top: 0;
   }
 }
 
