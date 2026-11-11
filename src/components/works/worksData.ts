@@ -1,3 +1,6 @@
+import haulwiseImage from '../../assets/haulwise-cover.png'
+import femiknitImage from '../../assets/femiknit-cover.png'
+
 /**
  * The Works archive.
  *
@@ -24,6 +27,8 @@ export interface Project {
   image?: string
   /** External project URL. */
   url: string
+  /** Optional secondary destination, such as a separate design preview. */
+  secondaryUrl?: string
   /** Included in the homepage carousel (first 5). */
   featured: boolean
   /** 1-2 short sentences in brand voice about web design and development. */
@@ -34,36 +39,39 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    id: 'orbit',
-    slug: 'orbit',
-    name: 'ORBIT',
+    id: 'haulwise',
+    slug: 'haulwise',
+    name: 'HAULWISE',
     year: '2026',
-    role: 'DESIGN & DEV',
-    tags: ['THREE.JS', 'WEBGL', 'DESIGN SYSTEM'],
+    role: 'PRODUCT DESIGN & DEVELOPMENT',
+    tags: ['LOGISTICS', 'TRUCK BOOKING', 'LIVE TRACKING'],
     gradient:
-      'radial-gradient(ellipse at 70% 30%, #13ff00 0%, #064c24 35%, #000000 80%)',
-    url: '#', // REPLACE
+      'linear-gradient(135deg, #f3f6f7 0%, #17445a 55%, #f47a1f 100%)',
+    image: haulwiseImage,
+    url: 'https://transportsample.vercel.app/',
     featured: true,
     description:
-      'A WebGL launchpad for a satellite-data platform. Real-time telemetry, procedural globe shaders, and a design system engineered to scale.',
+      'A B2B truck-booking platform connecting shippers with verified carriers across India. Fixed upfront fares, part-load and full-truck bookings, OTP-sealed doors, and WhatsApp GPS tracking bring clarity to every dispatch.',
     blurb:
-      'A WebGL launchpad for a satellite-data platform. Real-time telemetry, procedural globe shaders, and a design system engineered to scale.',
+      'A B2B truck-booking platform connecting shippers with verified carriers across India. Fixed upfront fares, part-load and full-truck bookings, OTP-sealed doors, and WhatsApp GPS tracking bring clarity to every dispatch.',
   },
   {
-    id: 'meridian',
-    slug: 'meridian',
-    name: 'MERIDIAN',
+    id: 'femiknit',
+    slug: 'femiknit',
+    name: 'Femiknit',
     year: '2026',
-    role: 'CREATIVE DEV',
-    tags: ['GSAP MOTION', 'SHADERS', 'ARCHITECTURE'],
+    role: 'ECOMMERCE DESIGN & DEVELOPMENT',
+    tags: ['ETHNIC WEAR', 'FASHION', 'ECOMMERCE'],
     gradient:
-      'linear-gradient(135deg, #0f8f4b 0%, #064c24 45%, #111111 100%)',
-    url: '#', // REPLACE
+      'linear-gradient(135deg, #8b0a3b 0%, #ef174b 55%, #ff9a00 100%)',
+    image: femiknitImage,
+    url: 'https://femiknit.vebmore.workers.dev/',
+    secondaryUrl: 'https://femiknit-storefront.vercel.app/',
     featured: true,
     description:
-      'Interactive portfolio and spatial storytelling for an architectural practice. Choreographed transitions where structure mirrors physical form.',
+      'A family-focused ethnic-wear storefront for sarees, kurtas, and kidswear. Festive collections, easy product discovery, and a confident shopping flow bring traditional styles to a modern online store.',
     blurb:
-      'Interactive portfolio and spatial storytelling for an architectural practice. Choreographed transitions where structure mirrors physical form.',
+      'A family-focused ethnic-wear storefront for sarees, kurtas, and kidswear. Festive collections, easy product discovery, and a confident shopping flow bring traditional styles to a modern online store.',
   },
   {
     id: 'northline',

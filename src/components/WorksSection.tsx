@@ -413,6 +413,7 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
                   onTouchStart={() => handleCardTouch(p)}
                   aria-label={`${p.name} — ${p.role}`}
                 >
+                  {p.image && <img className="wk-card-image" src={p.image} alt="" />}
                   <span className="wk-card-index">0{idx + 1}</span>
                   <span className="wk-card-name">{p.name}</span>
                 </a>
@@ -453,6 +454,9 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
                   className="wk-plate"
                   style={{ background: activeProject.gradient }}
                 >
+                  {activeProject.image && (
+                    <img className="wk-plate-image" src={activeProject.image} alt="" />
+                  )}
                   <span className="wk-plate-index">
                     0{featuredProjects.indexOf(activeProject) + 1} / 05
                   </span>
@@ -483,14 +487,26 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
                     <p className="wk-detail-hint">
                       CLICK THE ROTATING PROJECT TO VISIT IT ↗
                     </p>
-                    <a
-                      href={activeProject.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="wk-visit-btn"
-                    >
-                      VISIT PROJECT ↗
-                    </a>
+                    <div className="wk-project-actions">
+                      <a
+                        href={activeProject.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="wk-visit-btn"
+                      >
+                        LIVE ↗
+                      </a>
+                      {activeProject.secondaryUrl && (
+                        <a
+                          href={activeProject.secondaryUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="wk-visit-btn"
+                        >
+                          DESIGN ↗
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

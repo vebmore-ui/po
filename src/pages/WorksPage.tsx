@@ -2,28 +2,19 @@
  * /works — THE FULL ARCHIVE
  *
  * A normal document-flow page (nothing here is pinned). Same black canvas, same
- * card language as the homepage carousel, but laid out as a filterable grid.
+ * card language as the homepage carousel, arranged in a simple grid.
  * Entry animations fire once via one IntersectionObserver and are skipped
  * entirely under reduced motion.
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from '../router'
 import { projects } from '../components/works/worksData'
 import { PROJECT_COUNT } from '../sectionMap'
 import './worksPage.css'
 
-const ALL = 'ALL'
-
-/** Display label for a tag: `DESIGN SYSTEM` reads better than the raw string. */
-function chipLabel(tag: string): string {
-  return tag.toUpperCase()
-}
-
 export default function WorksPage() {
-  const [filter, setFilter] = useState<string>(ALL)
   const rootRef = useRef<HTMLElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     document.title = 'VEBMORE — The Full Archive'
@@ -32,22 +23,6 @@ export default function WorksPage() {
       document.title = 'VEBMORE — A Creative Digital Studio'
     }
   }, [])
-
-  /* The filter chips are derived from the data, never hand-listed. */
-  const filters = useMemo(() => {
-    const seen: string[] = []
-    for (const p of projects) {
-      for (const t of p.tags) {
-        if (!seen.includes(t)) seen.push(t)
-      }
-    }
-    return [ALL, ...seen]
-  }, [])
-
-  const visible = useMemo(
-    () => (filter === ALL ? projects : projects.filter((p) => p.tags.includes(filter))),
-    [filter],
-  )
 
   /* Entry animation: fires once, then disconnects. */
   useEffect(() => {
@@ -80,7 +55,7 @@ export default function WorksPage() {
       <div className="wp-inner">
         <header className="wp-head">
           <p className="wp-label">
-            ALL WORK <span className="wp-quote">“”</span>
+            SELECTED WORK <span className="wp-quote">“”</span>
           </p>
 
           <div className="wp-title-row">
@@ -99,9 +74,8 @@ export default function WorksPage() {
 
           <div className="wp-head-foot">
             <p className="wp-lede">
-              EVERY PROJECT WE HAVE SHIPPED, IN ONE PLACE. WEB DESIGN AND
-              DEVELOPMENT, DESIGN SYSTEMS AND MOTION — FILTER BY DISCIPLINE TO
-              NARROW THE LIST.
+              A GROWING COLLECTION OF DIGITAL PRODUCTS, STOREFRONTS, AND
+              EXPERIENCES BUILT WITH OUR CLIENTS.
             </p>
             <Link to="/" className="wp-back">
               ← BACK TO HOME
@@ -109,53 +83,52 @@ export default function WorksPage() {
           </div>
         </header>
 
-        <div className="wp-filters" role="group" aria-label="Filter projects">
-          {filters.map((f) => (
-            <button
-              key={f}
-              type="button"
-              className={`wp-chip${f === filter ? ' is-active' : ''}`}
-              aria-pressed={f === filter}
-              onClick={() => setFilter(f)}
-            >
-              {chipLabel(f)}
-            </button>
-          ))}
-        </div>
-
-        <div className="wp-cards" ref={gridRef} key={filter}>
-          {visible.map((p, i) => (
-            <a
+        <div className="wp-cards">
+          {projects.map((p, i) => (
+            <article
               key={p.id}
               className="wp-card"
-              href={p.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-cursor="view"
               style={{ animationDelay: `${i * 70}ms` }}
             >
               <div className="wp-card-plate" style={{ background: p.gradient }}>
-                <span className="wp-card-index">
-                  {String(projects.indexOf(p) + 1).padStart(2, '0')}
-                </span>
+                {p.image && (
+                  <img className="wp-card-image" src={p.image} alt={`${p.name} website preview`} />
+                )}
+                <span className="wp-card-shade" aria-hidden="true" />
+                <span className="wp-card-index">{String(i + 1).padStart(2, '0')}</span>
                 <span className="wp-card-name">{p.name}</span>
+                {(p.url !== '#' || p.secondaryUrl) && (
+                  <span className="wp-card-actions">
+                    {p.url !== '#' && (
+                      <a
+                        href={p.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-cursor="view"
+                      >
+                        LIVE
+                      </a>
+                    )}
+                  {p.secondaryUrl && (
+                    <a
+                      href={p.secondaryUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-cursor="view"
+                    >
+                      DESIGN
+                    </a>
+                  )}
+                  </span>
+                )}
               </div>
               <div className="wp-card-foot">
                 <span className="wp-card-meta">
                   {p.year} · {p.role}
                 </span>
-                <span className="wp-card-tags">
-                  {p.tags.map((t) => (
-                    <span key={t} className="wp-card-tag">
-                      {t}
-                    </span>
-                  ))}
-                </span>
-                <span className="wp-card-arrow" aria-hidden="true">
-                  ↗
-                </span>
+                <p className="wp-card-description">{p.description}</p>
               </div>
-            </a>
+            </article>
           ))}
         </div>
 

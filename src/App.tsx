@@ -170,6 +170,7 @@ export default function App() {
         onSelect={handleNavSelect}
         tone={headerTheme.tone}
         surface={headerTheme.surface}
+        archive={isWorksPage}
       />
 
       {/* Pages: unmounts / mounts per path */}

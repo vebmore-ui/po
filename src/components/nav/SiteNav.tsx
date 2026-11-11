@@ -15,6 +15,7 @@ interface Props {
   onSelect: (id: string) => void
   tone: 'dark' | 'light'
   surface: 'ink' | 'paper' | 'green'
+  archive?: boolean
 }
 
 export default function SiteNav({
@@ -23,6 +24,7 @@ export default function SiteNav({
   onSelect,
   tone,
   surface,
+  archive = false,
 }: Props) {
   const [open, setOpen] = useState(false)
   const [isNarrow, setIsNarrow] = useState(false)
@@ -96,7 +98,12 @@ export default function SiteNav({
   }
 
   return (
-    <header className="nav-header" data-tone={tone} data-surface={surface}>
+    <header
+      className="nav-header"
+      data-tone={tone}
+      data-surface={surface}
+      data-archive={archive || undefined}
+    >
       <div className="nav-logo-slot">
         <img
           key={tone}
