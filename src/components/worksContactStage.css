@@ -1,8 +1,10 @@
 /* ------------------------------------------------------------------
-   VEBMORE — Works → Contact pinned horizontal stage
-   Two panels (Contact, Works) in a sticky-pinned horizontal track.
-   The track starts at -100vw so Works is on screen; scrolling moves it
-   to 0, so Works exits right and Contact enters left.
+   VEBMORE — Works (with Pricing underneath) → Contact (from left)
+   Two horizontal panels: Contact on left, Main (Works + Pricing) on right.
+   Track starts at -100vw so Main (Works) is on screen.
+   Scrolling moves:
+     1. Vertical track inside Main: Works -> Pricing (Pricing rises from UNDER Works)
+     2. Horizontal track: -100vw -> 0vw (Contact enters from the LEFT)
    All classes prefixed `wc-`.
    ------------------------------------------------------------------ */
 
@@ -12,8 +14,8 @@
   position: relative;
   /* Height is set inline from the timeline (in svh). This is the vh fallback
      for browsers without svh support. */
-  height: 400vh;
-  background: #000;
+  height: 490vh;
+  background: #000000;
   z-index: 955;
 }
 
@@ -25,16 +27,15 @@
   height: 100vh;
   height: 100svh;
   overflow: hidden;
-  background: #000;
+  background: #000000;
 }
 
-/* ---------- Track: the two-panel flex strip ---------- */
+/* ---------- Track: Contact on left, Main on right ---------- */
 
 .wc-track {
   display: flex;
   width: 200vw;
   height: 100%;
-  /* Initial state in CSS so there is no flash of Contact before JS runs. */
   transform: translateX(-100vw);
   will-change: transform;
 }
@@ -49,13 +50,13 @@
   overflow: hidden;
 }
 
-/* Contact panel is a black surface too, so the slide needs a seam to read:
-   a 1px hairline on its right edge (the shared edge with Works). */
-.wc-panel:first-child {
-  background: #000;
+/* Contact panel is on the left (first child) */
+.wc-panel-contact {
+  background: #000000;
 }
 
-.wc-panel:first-child::after {
+/* 1px vertical hairline on the right edge of Contact panel separating it from Main */
+.wc-panel-contact::after {
   content: '';
   position: absolute;
   top: 0;
@@ -67,34 +68,98 @@
   pointer-events: none;
 }
 
-.wc-parallax {
+.wc-parallax-layer {
+  width: 100%;
+  height: 100%;
   will-change: transform;
 }
 
-/* Panels fill the pin exactly. */
-.wc-panel .wk-root {
+/* ---------- Right Panel: Main (holds vertical track of Works & Pricing) ---------- */
+
+.wc-panel-main {
+  background: #000000;
+  overflow: hidden;
+}
+
+.wc-vertical-track {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.wc-subpanel {
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.wc-subpanel-works {
+  will-change: opacity;
+}
+
+/* Dedicated transition breathing space & editorial separator between Works and Pricing */
+.wc-vertical-separator {
+  width: 100%;
+  height: clamp(160px, 32vh, 300px);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0 var(--pad-x);
+  box-sizing: border-box;
+}
+
+.wc-separator-line {
+  position: absolute;
+  left: var(--pad-x);
+  right: var(--pad-x);
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.wc-separator-tag {
+  position: relative;
+  background: #000000;
+  padding: 0 20px;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.56rem, 0.76vw, 0.66rem);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  z-index: 1;
+}
+
+.wc-subpanel-works .wk-root,
+.wc-subpanel-pricing .pr-root,
+.wc-panel-contact .ct-root {
   height: 100%;
 }
 
 /* ---------- Seam: the green Tech panel → Works ---------- */
 
-/* The stage sits directly under the green Tech Stack panel; a black wrapper
-   background means there is never a white or green gap at the handover. */
 .wc-wrap,
 .wc-pin {
-  background: #000;
+  background: #000000;
 }
 
 /* ==========================================================================
    Fallback: <= 900px or reduced motion.
-   No pin, no horizontal slide — Contact stacks below Works in normal flow.
+   No pin, no horizontal slide — Works, Pricing, Contact stack in normal flow.
    ========================================================================== */
 
 @media (max-width: 900px), (prefers-reduced-motion: reduce) {
   .wc-wrap {
     height: auto !important;
     min-height: 0 !important;
-    background: #000;
+    background: #000000;
   }
 
   .wc-pin {
@@ -104,7 +169,7 @@
   }
 
   .wc-track {
-    /* DOM order is Contact, Works — flip so Works reads first when stacked. */
+    /* Flip so wc-panel-main (Works + Pricing) comes before wc-panel-contact */
     flex-direction: column-reverse;
     width: 100%;
     transform: none !important;
@@ -116,13 +181,49 @@
     overflow: visible;
   }
 
-  .wc-parallax {
+  .wc-panel-contact::after {
+    display: none;
+  }
+
+  .wc-parallax-layer {
+    transform: none !important;
+    height: auto;
+  }
+
+  .wc-vertical-track {
+    height: auto;
     transform: none !important;
   }
 
-  .wc-panel .wk-root {
+  .wc-subpanel {
+    height: auto;
+    overflow: visible;
+  }
+
+  .wc-subpanel-works {
+    opacity: 1 !important;
+  }
+
+  .wc-subpanel-works .wk-root {
     height: auto;
     min-height: 0;
     padding-top: var(--panel-pad-top);
+    padding-bottom: clamp(24px, 5vh, 48px);
+  }
+
+  .wc-vertical-separator {
+    height: auto;
+    padding: clamp(36px, 8vh, 64px) max(var(--pad-x), env(safe-area-inset-left, 0px));
+    margin: clamp(20px, 4vh, 40px) 0;
+  }
+
+  .wc-subpanel-pricing .pr-root {
+    height: auto;
+    min-height: 0;
+  }
+
+  .wc-panel-contact .ct-root {
+    height: auto;
+    min-height: 0;
   }
 }

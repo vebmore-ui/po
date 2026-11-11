@@ -1,22 +1,35 @@
 import { useRef, useEffect, useState } from 'react'
 import WorksSection from './WorksSection'
+import PricingSection from './PricingSection'
 import ContactSection from './ContactSection'
-import { HOLD_WORKS, SLIDE, HOLD_CONTACT } from '../sectionMap'
+import {
+  HOLD_WORKS,
+  VERTICAL_WORKS_PRICING,
+  HOLD_PRICING,
+  SLIDE_PRICING_CONTACT,
+  HOLD_CONTACT,
+} from '../sectionMap'
 import './worksContactStage.css'
 
 /**
- * Pinned horizontal stage: WORKS → CONTACT.
+ * Pinned stage: WORKS (with PRICING underneath) → CONTACT (from the left).
  *
- * DOM order: Contact first, then Works. The track starts at -100vw so
- * Works is initially the panel on screen. As user scrolls, track moves to 0,
- * so Works exits to the RIGHT and Contact enters from the LEFT.
+ * DOM structure:
+ * - Left panel (wc-panel-contact): ContactSection
+ * - Right panel (wc-panel-main):
+ *     Vertical track (wc-vertical-track):
+ *       - WorksSection (top subpanel)
+ *       - PricingSection (bottom subpanel, underneath Works)
  *
- * Timeline constants (in svh units):
- *   HOLD_WORKS   80   Works holds at the start
- *   SLIDE       100   Works → Contact horizontal slide
- *   HOLD_CONTACT 40   Contact holds, then the page ends
- *
- * Total wrapper height = 100 + 80 + 100 + 40 = 320svh
+ * Track starts at translateX(-100vw), so the right panel (Works) is on screen.
+ * Timeline:
+ *   1. HOLD_WORKS (70svh): Works holds, carousel active.
+ *   2. VERTICAL_WORKS_PRICING (90svh): wc-vertical-track moves translateY(0 -> -50%)
+ *      Works scrolls up, and Pricing rises from UNDER Works.
+ *   3. HOLD_PRICING (80svh): Pricing holds, fully interactive.
+ *   4. SLIDE_PRICING_CONTACT (100svh): Track moves translateX(-100vw -> 0vw).
+ *      Pricing exits right, and Contact enters from the LEFT (as it was originally!).
+ *   5. HOLD_CONTACT (50svh): Contact holds, clock ticks, page ends.
  */
 
 function clamp(v: number, lo: number, hi: number): number {
@@ -30,18 +43,29 @@ function easeInOut(t: number): number {
 export default function WorksContactStage() {
   const wrapRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
+  const verticalTrackRef = useRef<HTMLDivElement>(null)
+  const worksSubpanelRef = useRef<HTMLDivElement>(null)
+  const separatorRef = useRef<HTMLDivElement>(null)
   const contactParallaxRef = useRef<HTMLDivElement>(null)
 
   const [worksTrigger, setWorksTrigger] = useState(false)
+  const [pricingTrigger, setPricingTrigger] = useState(false)
   const [contactTrigger, setContactTrigger] = useState(false)
 
-  const slideRef = useRef(0)
+  const worksSlideRef = useRef(0)
   const rafRef = useRef(0)
   const worksFired = useRef(false)
+  const pricingFired = useRef(false)
   const contactFired = useRef(false)
 
-  // Total wrapper height: 320svh
-  const wrapperSvh = 100 + HOLD_WORKS + SLIDE + HOLD_CONTACT
+  // Total wrapper height: 490svh
+  const wrapperSvh =
+    100 +
+    HOLD_WORKS +
+    VERTICAL_WORKS_PRICING +
+    HOLD_PRICING +
+    SLIDE_PRICING_CONTACT +
+    HOLD_CONTACT
 
   const isDisabled = useRef(false)
   useEffect(() => {
@@ -51,6 +75,7 @@ export default function WorksContactStage() {
       isDisabled.current = mq900.matches || mqMotion.matches
       if (isDisabled.current) {
         setWorksTrigger(true)
+        setPricingTrigger(true)
         setContactTrigger(true)
       }
     }
@@ -72,7 +97,8 @@ export default function WorksContactStage() {
 
       const wrap = wrapRef.current
       const track = trackRef.current
-      if (!wrap || !track) {
+      const vertTrack = verticalTrackRef.current
+      if (!wrap || !track || !vertTrack) {
         rafRef.current = requestAnimationFrame(tick)
         return
       }
@@ -87,22 +113,52 @@ export default function WorksContactStage() {
         setWorksTrigger(true)
       }
 
-      // Slide phase
-      const q = clamp((s - HOLD_WORKS) / SLIDE, 0, 1)
-      slideRef.current = q
-      const eased = easeInOut(q)
-      track.style.transform = `translateX(${-100 * (1 - eased)}vw)`
+      // Step 1: Vertical scroll Works -> Pricing
+      const sVertStart = HOLD_WORKS
+      const qVert = clamp((s - sVertStart) / VERTICAL_WORKS_PRICING, 0, 1)
+      worksSlideRef.current = qVert
+      const easedVert = easeInOut(qVert)
 
-      // Contact parallax lag: -6vw → 0 across the slide
+      // Travel distance: full height of Works (window.innerHeight) + separator buffer
+      const sepHeight =
+        separatorRef.current?.offsetHeight ?? Math.round(window.innerHeight * 0.28)
+      const travelY = window.innerHeight + sepHeight
+      vertTrack.style.transform = `translateY(${-easedVert * travelY}px)`
+
+      // Works gracefully fades out as it scrolls up into the buffer
+      if (worksSubpanelRef.current) {
+        const worksOpacity = clamp(1 - qVert * 2.2, 0, 1)
+        worksSubpanelRef.current.style.opacity = worksOpacity.toString()
+      }
+
+      // Pricing entry trigger: fires at qVert >= 0.45, resets when scrolling back up (qVert < 0.20)
+      if (qVert >= 0.45 && !pricingFired.current) {
+        pricingFired.current = true
+        setPricingTrigger(true)
+      } else if (qVert < 0.20 && pricingFired.current) {
+        pricingFired.current = false
+        setPricingTrigger(false)
+      }
+
+      // Step 2: Horizontal slide from Pricing to Contact (Contact enters from LEFT)
+      const sHorizStart = sVertStart + VERTICAL_WORKS_PRICING + HOLD_PRICING
+      const qHoriz = clamp((s - sHorizStart) / SLIDE_PRICING_CONTACT, 0, 1)
+      const easedHoriz = easeInOut(qHoriz)
+      track.style.transform = `translateX(${-100 * (1 - easedHoriz)}vw)`
+
+      // Contact parallax lag: -6vw -> 0 across the horizontal slide
       if (contactParallaxRef.current) {
-        const lag = (1 - eased) * -6
+        const lag = (1 - easedHoriz) * -6
         contactParallaxRef.current.style.transform = `translateX(${lag}vw)`
       }
 
-      // Contact entry trigger: fires at q >= 0.45
-      if (!contactFired.current && q >= 0.45) {
+      // Contact entry trigger: fires at qHoriz >= 0.45, resets when scrolling back right (qHoriz < 0.20)
+      if (qHoriz >= 0.45 && !contactFired.current) {
         contactFired.current = true
         setContactTrigger(true)
+      } else if (qHoriz < 0.20 && contactFired.current) {
+        contactFired.current = false
+        setContactTrigger(false)
       }
 
       rafRef.current = requestAnimationFrame(tick)
@@ -123,19 +179,39 @@ export default function WorksContactStage() {
     >
       <div className="wc-pin">
         <div ref={trackRef} className="wc-track">
-          {/* Contact panel: sits at left of track, revealed as track moves right */}
+          {/* Contact panel: sits on the LEFT of the track, revealed as track moves right */}
           <div className="wc-panel wc-panel-contact">
             <div ref={contactParallaxRef} className="wc-parallax-layer">
               <ContactSection triggerEntry={contactTrigger} />
             </div>
           </div>
 
-          {/* Works panel: sits at right of track, visible initially */}
-          <div className="wc-panel wc-panel-works">
-            <WorksSection
-              triggerEntry={worksTrigger}
-              slideProgressRef={slideRef}
-            />
+          {/* Right panel: holds Works and Pricing (underneath Works) */}
+          <div className="wc-panel wc-panel-main">
+            <div ref={verticalTrackRef} className="wc-vertical-track">
+              <div ref={worksSubpanelRef} className="wc-subpanel wc-subpanel-works">
+                <WorksSection
+                  triggerEntry={worksTrigger}
+                  slideProgressRef={worksSlideRef}
+                />
+              </div>
+
+              {/* Dedicated breathing space & editorial separator between Works and Pricing */}
+              <div
+                ref={separatorRef}
+                className="wc-vertical-separator"
+                aria-hidden="true"
+              >
+                <div className="wc-separator-line" />
+                <span className="wc-separator-tag">
+                  // STUDIO PLANS & ARCHITECTURE
+                </span>
+              </div>
+
+              <div className="wc-subpanel wc-subpanel-pricing">
+                <PricingSection triggerEntry={pricingTrigger} />
+              </div>
+            </div>
           </div>
         </div>
       </div>

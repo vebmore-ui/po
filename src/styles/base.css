@@ -1,0 +1,130 @@
+/* Global reset and responsive layout/reveal primitives. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+a,
+[role='button'] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+}
+
+:where(.panel-grid, .panel-grid > *, .panel p, .panel h1, .panel h2, .panel h3) {
+  min-width: 0;
+}
+
+:where(code, .mono, .panel p) {
+  overflow-wrap: anywhere;
+}
+
+/* Future sections using .panel/.panel-grid get nav clearance, safe areas and
+   a stacked single-column layout automatically. */
+.panel {
+  position: relative;
+  width: 100%;
+  padding: var(--panel-pad-top) var(--pad-x) var(--pad-y);
+  padding-left: max(var(--pad-x), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--pad-x), env(safe-area-inset-right, 0px));
+  scroll-margin-top: var(--nav-h);
+}
+
+.panel-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: clamp(24px, 5vw, 72px);
+}
+
+.stack-only {
+  display: none !important;
+}
+
+@media (max-width: 900px),
+(max-height: 560px) {
+  .panel {
+    min-height: 0;
+    padding-top: var(--panel-pad-top);
+    padding-bottom: calc(var(--pad-y) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .panel-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .stack-only {
+    display: revert !important;
+  }
+
+  .pin-only {
+    display: none !important;
+  }
+}
+
+/* Visible unless JS has explicitly armed the section's entry transition. */
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+
+[data-reveal-armed] .reveal:not(.is-in):not([data-reveal-done]) {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+[data-reveal-done] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+
+  html.has-custom-cursor input,
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor select,
+  html.has-custom-cursor [contenteditable='true'] {
+    cursor: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  .reveal,
+  [data-reveal-armed] .reveal:not(.is-in) {
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+  }
+}

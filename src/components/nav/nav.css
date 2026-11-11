@@ -15,14 +15,34 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: max(env(safe-area-inset-top, 0px), clamp(16px, 2.4vw, 32px))
+  padding: max(env(safe-area-inset-top, 0px), clamp(14px, 1.8vw, 24px))
     clamp(16px, 2.4vw, 32px);
-  pointer-events: none;
+  --nav-surface: #000000;
+  --nav-border: rgba(255, 255, 255, 0.14);
+  background: var(--nav-surface);
+  border-bottom: 1px solid var(--nav-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  pointer-events: auto;
+}
+
+.nav-header[data-surface='paper'] {
+  --nav-surface: #ffffff;
+  --nav-border: rgba(0, 0, 0, 0.12);
+}
+
+.nav-header[data-surface='green'] {
+  --nav-surface: #0f8f4b;
+  --nav-border: rgba(0, 0, 0, 0.18);
+}
+
+.nav-header[data-surface='ink'] {
+  --nav-surface: #000000;
+  --nav-border: rgba(255, 255, 255, 0.14);
 }
 
 .nav-header[data-archive='true'] {
-  background: #000000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  --nav-surface: #000000;
+  --nav-border: rgba(255, 255, 255, 0.14);
 }
 
 /* Brand mark aligned with the navigation on the opposite edge. */
@@ -222,19 +242,7 @@
 
 @media (max-width: 900px) {
   .nav-header {
-    --nav-surface: #000000;
-    background: var(--nav-surface);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  }
-
-  .nav-header[data-surface='paper'] {
-    --nav-surface: #ffffff;
-    border-bottom-color: rgba(0, 0, 0, 0.12);
-  }
-
-  .nav-header[data-surface='green'] {
-    --nav-surface: #0f8f4b;
-    border-bottom-color: rgba(0, 0, 0, 0.18);
+    padding: max(env(safe-area-inset-top, 0px), 10px) clamp(16px, 5vw, 24px);
   }
 
   .nav-logo-slot {

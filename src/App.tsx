@@ -31,6 +31,7 @@ function getHeaderTheme(): HeaderTheme {
     ['.cap-root', { tone: 'dark', surface: 'paper' }],
     ['.ts-root', { tone: 'light', surface: 'green' }],
     ['.wk-root', { tone: 'light', surface: 'ink' }],
+    ['.pr-root', { tone: 'light', surface: 'ink' }],
     ['.ct-root', { tone: 'light', surface: 'ink' }],
   ]
   const probeX = window.innerWidth / 2
@@ -61,6 +62,7 @@ function getAnchorContext(): AnchorContext {
     capabilitiesPanel: document.querySelector('.cap-root'),
     techPanel: document.querySelector('.ts-root'),
     worksPanel: document.querySelector('.wk-root'),
+    pricingPanel: document.querySelector('.pr-root'),
     contactPanel: document.querySelector('.ct-root'),
   }
 }

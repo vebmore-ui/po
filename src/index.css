@@ -22,6 +22,8 @@ html, body, #root {
   width: 100%;
   height: auto;
   min-height: 100%;
+  background: #000000;
+  overflow-x: clip;
 }
 
 /* The custom cursor takes over pointer duty only after the first fine-pointer

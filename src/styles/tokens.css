@@ -1,0 +1,66 @@
+/* Design tokens — imported before component styles in main.tsx. */
+:root {
+  --pad-x: clamp(24px, 6vw, 104px);
+  --pad-y: clamp(64px, 8vh, 120px);
+  --nav-h: clamp(64px, 9vh, 92px);
+  --panel-pad-top: clamp(88px, 13vh, 168px);
+
+  --font-display: 'Bebas Neue', 'Anton', system-ui, sans-serif;
+  --font-anton: 'Anton', 'Bebas Neue', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Preserve the existing desktop scale exactly (details.md §3). */
+  --fs-title: clamp(3.1rem, 8.6vw, 8.4rem);
+  --lh-title: 0.86;
+  --fs-label: clamp(0.68rem, 1.1vw, 0.82rem);
+  --ls-label: 0.34em;
+  --fs-body: clamp(0.68rem, 1vw, 0.8rem);
+  --lh-body: 1.85;
+  --ls-body: 0.055em;
+  --fs-caption: clamp(0.6rem, 0.86vw, 0.7rem);
+  --ls-caption: 0.24em;
+  --fs-hero-row: clamp(3rem, 10vw, 12rem);
+  --fs-hero-strip: clamp(0.7rem, 1.9vw, 1.4rem);
+
+  --radius-s: clamp(10px, 1.2vw, 18px);
+  --radius-m: clamp(14px, 1.6vw, 26px);
+  --radius-pill: 999px;
+  --hairline-light: rgba(255, 255, 255, 0.14);
+  --hairline-dark: rgba(0, 0, 0, 0.1);
+  --black: #000;
+  --white: #fff;
+  --green: #0f8f4b;
+  --lime: #13ff00;
+  --tap: 44px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-reveal: 0.72s;
+}
+
+/* Must match STACK_QUERY in src/lib/layout.ts exactly. */
+@media (max-width: 900px),
+(max-height: 560px) {
+  :root {
+    --pad-x: clamp(16px, 5vw, 32px);
+    --pad-y: clamp(40px, 7svh, 72px);
+    --nav-h: calc(56px + env(safe-area-inset-top, 0px));
+    --panel-pad-top: calc(var(--nav-h) + clamp(24px, 5svh, 44px));
+    --fs-title: clamp(2.4rem, 13.2vw, 5.2rem);
+    --fs-label: max(0.7rem, clamp(0.68rem, 1.1vw, 0.82rem));
+    --ls-label: 0.22em;
+    --fs-body: max(0.75rem, clamp(0.68rem, 1vw, 0.8rem));
+    --lh-body: 1.75;
+    --fs-caption: max(0.66rem, clamp(0.6rem, 0.86vw, 0.7rem));
+    --ls-caption: 0.18em;
+    --fs-hero-row: clamp(2.6rem, 17vw, 7rem);
+    --fs-hero-strip: clamp(0.62rem, 2.7vw, 0.95rem);
+  }
+}
+
+@media (max-height: 560px) and (min-width: 561px) {
+  :root {
+    --nav-h: calc(48px + env(safe-area-inset-top, 0px));
+    --panel-pad-top: calc(var(--nav-h) + 18px);
+    --pad-y: clamp(28px, 6svh, 48px);
+    --fs-title: clamp(2.4rem, 8.6svh, 4rem);
+  }
+}

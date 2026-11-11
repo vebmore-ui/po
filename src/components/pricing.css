@@ -1,0 +1,661 @@
+/* ------------------------------------------------------------------
+   VEBMORE — Pricing & Plans Section
+   Desktop: 3-column card grid + wide architectural tile for E-Booking / E-Commerce.
+   Stacked: Vertical single-column editorial cards with 44px+ touch targets.
+   All classes prefixed `pr-`.
+   ------------------------------------------------------------------ */
+
+.pr-root {
+  position: relative;
+  width: 100vw;
+  height: 100%;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: clamp(60px, 8.5vh, 88px) var(--pad-x) clamp(14px, 2vh, 24px);
+  padding-left: max(var(--pad-x), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--pad-x), env(safe-area-inset-right, 0px));
+  overflow: hidden;
+  z-index: 2;
+  scroll-margin-top: calc(var(--nav-h) + 16px);
+}
+
+/* ---------- Dot grid background (matching Works & Contact) ---------- */
+.pr-dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.12) 1px,
+    transparent 1px
+  );
+  background-size: 32px 32px;
+  background-position: center;
+  pointer-events: none;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 30%, transparent 80%);
+}
+
+.pr-glow-corner {
+  position: absolute;
+  bottom: -10vw;
+  right: -10vw;
+  width: 35vw;
+  height: 35vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(19, 255, 0, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ---------- Container ---------- */
+.pr-container {
+  position: relative;
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.3vh, 16px);
+  z-index: 1;
+}
+
+/* ---------- Header ---------- */
+.pr-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(16px, 3vw, 48px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: clamp(6px, 1vh, 10px);
+}
+
+.pr-header-left {
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.pr-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0 0 clamp(3px, 0.6vh, 6px);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.pr-quotes {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #0f8f4b;
+  margin-left: -0.24em;
+}
+
+.pr-title {
+  margin: 0;
+  font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 3.3vw, 3.4rem);
+  line-height: 0.88;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.pr-title-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.pr-word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.05em;
+  margin-right: 0.22em;
+}
+
+.pr-word {
+  display: inline-block;
+  transform: translateY(115%);
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pr-word.is-in {
+  transform: translateY(0);
+}
+
+.pr-word-mark {
+  color: #13ff00;
+}
+
+.pr-lede {
+  margin: 0 0 2px 0;
+  max-width: 440px;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.58rem, 0.72vw, 0.68rem);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ---------- 3-Column Core Plans Grid ---------- */
+.pr-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 1.2vw, 18px);
+  width: 100%;
+}
+
+/* ---------- Plan Card ---------- */
+.pr-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-m);
+  padding: clamp(10px, 1.4vh, 16px) clamp(12px, 1.2vw, 18px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(8px, 1.1vh, 12px);
+  min-width: 0;
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+  text-transform: uppercase;
+}
+
+.pr-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-2px);
+}
+
+.pr-card.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.pr-card.is-in:hover {
+  transform: translateY(-2px);
+}
+
+/* Popular (PRO) Card Highlighting */
+.pr-card.is-popular {
+  background: rgba(19, 255, 0, 0.02);
+  border-color: rgba(19, 255, 0, 0.38);
+}
+
+.pr-card.is-popular:hover {
+  background: rgba(19, 255, 0, 0.04);
+  border-color: #13ff00;
+}
+
+.pr-card-badge {
+  position: absolute;
+  top: -9px;
+  right: 16px;
+  background: #13ff00;
+  color: #000000;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  z-index: 2;
+}
+
+/* Card Header */
+.pr-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pr-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pr-card-index {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #13ff00;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pr-card-category {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.pr-card-name {
+  margin: 0;
+  font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.pr-card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 1px;
+}
+
+.pr-card-price {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(1.2rem, 1.6vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.pr-card-period {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Maintenance Highlight Pill */
+.pr-maintenance-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(19, 255, 0, 0.08);
+  border: 1px solid rgba(19, 255, 0, 0.28);
+  color: #13ff00;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  width: fit-content;
+  margin-top: 2px;
+}
+
+.pr-maintenance-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #13ff00;
+}
+
+/* Feature List */
+.pr-features-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 7px;
+}
+
+.pr-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.56rem, 0.68vw, 0.64rem);
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pr-feature-item.is-highlight {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.pr-feature-icon {
+  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
+  margin-top: 2px;
+  color: #13ff00;
+}
+
+/* CTA Button */
+.pr-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #ffffff;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.56rem, 0.7vw, 0.65rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.22s var(--ease-out);
+}
+
+.pr-cta-btn:hover {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.pr-card.is-popular .pr-cta-btn {
+  background: #13ff00;
+  color: #000000;
+  border-color: #13ff00;
+}
+
+.pr-card.is-popular .pr-cta-btn:hover {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.pr-cta-btn:focus-visible {
+  outline: 2px solid #13ff00;
+  outline-offset: 3px;
+}
+
+/* ---------- 4th Plan: Special E-Booking / E-Commerce Banner ---------- */
+.pr-special-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-m);
+  padding: clamp(9px, 1.2vh, 13px) clamp(14px, 1.5vw, 20px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: clamp(12px, 1.8vw, 24px);
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+  text-transform: uppercase;
+}
+
+.pr-special-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.pr-special-card.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.pr-special-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pr-special-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pr-special-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.pr-special-title {
+  margin: 0;
+  font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.pr-special-desc {
+  margin: 0;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.56rem, 0.68vw, 0.64rem);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.pr-special-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.pr-tag-chip {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.pr-special-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  text-align: right;
+  min-width: 0;
+}
+
+.pr-special-price-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.pr-special-price {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #13ff00;
+}
+
+.pr-special-note {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.pr-special-cta {
+  width: auto;
+  min-width: 190px;
+  min-height: 38px;
+  padding: 7px 14px;
+}
+
+/* ---------- Shared Rise & Reveal Transitions ---------- */
+.pr-rise {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-reveal-armed] .pr-rise:not(.is-in) {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+/* ==========================================================================
+   COMPACT DESKTOP HEIGHT (>= 901px and <= 760px)
+   ========================================================================== */
+
+@media (min-width: 901px) and (max-height: 760px) {
+  .pr-root {
+    padding-top: 56px;
+    padding-bottom: 10px;
+  }
+  .pr-container {
+    gap: 8px;
+  }
+  .pr-card {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .pr-features-list {
+    gap: 3px;
+    padding-top: 5px;
+  }
+  .pr-special-card {
+    padding: 7px 12px;
+    gap: 10px;
+  }
+  .pr-cta-btn {
+    min-height: 34px;
+    padding: 5px 10px;
+  }
+  .pr-special-cta {
+    min-height: 34px;
+    padding: 5px 12px;
+  }
+}
+
+/* ==========================================================================
+   STACKED / MOBILE FALLBACK (<= 900px or (max-height: 560px))
+   ========================================================================== */
+
+@media (max-width: 900px), (max-height: 560px) {
+  .pr-root {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: var(--panel-pad-top) max(var(--pad-x), env(safe-area-inset-left, 0px))
+      var(--pad-y)
+      max(var(--pad-x), env(safe-area-inset-right, 0px));
+  }
+
+  .pr-container {
+    gap: 24px;
+  }
+
+  .pr-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .pr-title-line {
+    white-space: normal;
+  }
+
+  .pr-lede {
+    max-width: none;
+  }
+
+  .pr-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .pr-card {
+    padding: 22px 18px;
+    gap: 18px;
+  }
+
+  .pr-card:hover {
+    transform: none;
+  }
+
+  .pr-special-card {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 18px;
+    padding: 20px 18px;
+  }
+
+  .pr-special-right {
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .pr-special-price-wrap {
+    align-items: flex-start;
+  }
+
+  .pr-special-cta {
+    width: 100%;
+    min-width: 0;
+    min-height: var(--tap);
+  }
+}
+
+/* Touch active inversion */
+@media (hover: none), (pointer: coarse) {
+  .pr-cta-btn:active {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+  }
+}

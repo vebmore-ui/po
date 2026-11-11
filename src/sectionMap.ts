@@ -14,6 +14,7 @@ export const SECTION_IDS = [
   'about',
   'capabilities',
   'work',
+  'pricing',
   'contact',
 ] as const
 
@@ -24,6 +25,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   about: 'ABOUT',
   capabilities: 'CAPABILITIES',
   work: 'WORK',
+  pricing: 'PRICING',
   contact: 'CONTACT',
 }
 
@@ -43,12 +45,24 @@ export const ABOUT_STAGE_VIEWPORTS = 4
 export const ABOUT_STAGE_SLIDE1_MID = 0.29
 
 /**
- * Works → Contact stage timeline, in svh units:
- * HOLD_WORKS = 80, SLIDE = 100, HOLD_CONTACT = 40 (total 320svh).
+ * Works → Pricing (vertical under Works) → Contact (horizontal from left) timeline:
+ * HOLD_WORKS              70   Works holds at the start
+ * VERTICAL_WORKS_PRICING  90   Works → Pricing vertical rise
+ * HOLD_PRICING            80   Pricing holds, cards interactive
+ * SLIDE_PRICING_CONTACT  100   Contact slides in from the LEFT
+ * HOLD_CONTACT            50   Contact holds, clock ticks, page ends
+ *
+ * Total scroll budget: 100 + 70 + 90 + 80 + 100 + 50 = 490svh.
  */
-export const HOLD_WORKS = 80
-export const SLIDE = 100
-export const HOLD_CONTACT = 40
+export const HOLD_WORKS = 70
+export const VERTICAL_WORKS_PRICING = 90
+export const HOLD_PRICING = 80
+export const SLIDE_PRICING_CONTACT = 100
+export const HOLD_CONTACT = 50
+
+/** Backwards-compatible aliases */
+export const SLIDE = SLIDE_PRICING_CONTACT
+export const SLIDE_WORKS_PRICING = VERTICAL_WORKS_PRICING
 
 export const FEATURED_COUNT = 5
 
@@ -70,6 +84,7 @@ export interface AnchorContext {
   capabilitiesPanel: HTMLElement | null
   techPanel: HTMLElement | null
   worksPanel: HTMLElement | null
+  pricingPanel: HTMLElement | null
   contactPanel: HTMLElement | null
 }
 
@@ -83,7 +98,8 @@ function docTop(el: HTMLElement): number {
  * - about: heroTrack (just after About panel is fully revealed)
  * - capabilities: where slide 1 completes (p 0.42 of about stage)
  * - work: where Works is fully entered (worksStageTop)
- * - contact: where Works → Contact slide completes (worksStageTop + (HOLD_WORKS + SLIDE) * h / 100)
+ * - pricing: where Works → Pricing vertical rise completes
+ * - contact: where Contact horizontal slide from left completes
  */
 export function getAnchors(ctx: AnchorContext): Record<SectionId, number> {
   const h = vh()
@@ -95,6 +111,7 @@ export function getAnchors(ctx: AnchorContext): Record<SectionId, number> {
       about: ctx.aboutPanel ? docTop(ctx.aboutPanel) : 0,
       capabilities: ctx.capabilitiesPanel ? docTop(ctx.capabilitiesPanel) : 0,
       work: ctx.worksPanel ? docTop(ctx.worksPanel) : 0,
+      pricing: ctx.pricingPanel ? docTop(ctx.pricingPanel) : 0,
       contact: ctx.contactPanel ? docTop(ctx.contactPanel) : 0,
     }
     return {
@@ -102,7 +119,8 @@ export function getAnchors(ctx: AnchorContext): Record<SectionId, number> {
       about: base.about,
       capabilities: Math.max(base.capabilities, base.about),
       work: Math.max(base.work, base.capabilities),
-      contact: Math.max(base.contact, base.work),
+      pricing: Math.max(base.pricing, base.work),
+      contact: Math.max(base.contact, base.pricing),
     }
   }
 
@@ -124,10 +142,16 @@ export function getAnchors(ctx: AnchorContext): Record<SectionId, number> {
   // Works is fully entered at the start of stage 2
   const work = worksStageTop
 
-  // Contact is fully entered where the Works → Contact slide completes
-  const contact = worksStageTop + ((HOLD_WORKS + SLIDE) * h) / 100
+  // Pricing is fully entered where Works → Pricing vertical scroll completes
+  const pricing =
+    worksStageTop + ((HOLD_WORKS + VERTICAL_WORKS_PRICING) * h) / 100
 
-  return { home: 0, about: aboutStart, capabilities, work, contact }
+  // Contact is fully entered where Contact slides in from the left
+  const contact =
+    worksStageTop +
+    ((HOLD_WORKS + VERTICAL_WORKS_PRICING + HOLD_PRICING + SLIDE_PRICING_CONTACT) * h) / 100
+
+  return { home: 0, about: aboutStart, capabilities, work, pricing, contact }
 }
 
 /**
@@ -135,7 +159,8 @@ export function getAnchors(ctx: AnchorContext): Record<SectionId, number> {
  * - home: hero until About reveal begins (heroProgress >= 0.85)
  * - about: About panel until first stage slide reaches midpoint (slide1Mid)
  * - capabilities: from midpoint through Capabilities and Tech Stack to end of stage 1
- * - work: Works panel until second stage slide reaches midpoint
+ * - work: Works panel until Works → Pricing vertical rise reaches midpoint
+ * - pricing: Pricing panel until Contact slide from left reaches midpoint
  * - contact: after that
  */
 export function getActiveSection(ctx: AnchorContext): SectionId {
@@ -145,6 +170,7 @@ export function getActiveSection(ctx: AnchorContext): SectionId {
   if (stacked) {
     const middle = window.scrollY + h * 0.5
     if (ctx.contactPanel && middle >= docTop(ctx.contactPanel)) return 'contact'
+    if (ctx.pricingPanel && middle >= docTop(ctx.pricingPanel)) return 'pricing'
     if (ctx.worksPanel && middle >= docTop(ctx.worksPanel)) return 'work'
     if (ctx.techPanel && middle >= docTop(ctx.techPanel)) return 'capabilities'
     if (ctx.capabilitiesPanel && middle >= docTop(ctx.capabilitiesPanel)) return 'capabilities'
@@ -173,9 +199,16 @@ export function getActiveSection(ctx: AnchorContext): SectionId {
   // capabilities: through to end of stage 1
   if (y < worksStageTop) return 'capabilities'
 
-  // work: Works panel until second stage slide reaches midpoint
-  const slide2Mid = worksStageTop + ((HOLD_WORKS + SLIDE / 2) * h) / 100
-  if (y < slide2Mid) return 'work'
+  // work: Works panel until Works → Pricing vertical rise reaches midpoint
+  const vMid =
+    worksStageTop + ((HOLD_WORKS + VERTICAL_WORKS_PRICING / 2) * h) / 100
+  if (y < vMid) return 'work'
+
+  // pricing: Pricing panel until Contact slide reaches midpoint
+  const hMid =
+    worksStageTop +
+    ((HOLD_WORKS + VERTICAL_WORKS_PRICING + HOLD_PRICING + SLIDE_PRICING_CONTACT / 2) * h) / 100
+  if (y < hMid) return 'pricing'
 
   // contact: after that
   return 'contact'

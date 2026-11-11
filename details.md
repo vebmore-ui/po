@@ -402,3 +402,38 @@ When designing or coding the next section, adhere strictly to these principles:
 - Responsive breakpoint: `900px` or `768px` where multi-column layouts gracefully collapse to vertical stacks.
 
 ---
+
+## 9. Pricing & Plans Section (`src/components/PricingSection.tsx`)
+
+A dedicated studio pricing panel positioned immediately after Works and before Contact in the pinned horizontal stage (`WorksContactStage.tsx`).
+
+### 1. Structure & Tiers
+- **01 STARTER (`₹5,999` one-time):**
+  - Scope: High-impact landing page, up to 2 web pages (1 long-scrollable page + 1 short sub-page)
+  - Free Maintenance: 6 months included
+  - Infrastructure: Free cloud hosting (domain charges differ / billed at actuals)
+  - CTA: Direct WhatsApp connect with pre-filled greeting
+- **02 PRO (`₹11,999` one-time — Popular / Recommended):**
+  - Scope: 5–7 web pages (up to 3 extendable long-scroll narrative pages)
+  - Free Maintenance: 1 year included
+  - Features: Everything in Starter + High-class animations and scroll effects, pre-filled contact buttons, and interactive contact form
+  - Infrastructure: Free cloud hosting (domain charges differ)
+  - CTA: Dedicated WhatsApp onboarding with pre-filled plan query
+- **03 PLUS (`₹24,499` one-time — Flagship):**
+  - Scope: Up to 20 extensive web pages
+  - Free Maintenance: 2 years included
+  - Features: Custom Admin Dashboard (CMS to edit details, upload/delete images), free database server for image storage, fluid scrollable animations, edge CDN asset optimization, priority studio support
+  - Infrastructure: Free cloud hosting + dedicated database server
+  - CTA: Direct WhatsApp studio consultation
+- **04 E-BOOKING / E-COMMERCE (`Starting from ₹31,999` — Enterprise Tile):**
+  - Scope: Full e-commerce storefront or real-time booking/scheduling engine
+  - Free Maintenance: 18 months included
+  - Deliverables: Multi-gateway payments (UPI, cards, net banking), dynamic inventory/calendar management, admin analytics suite, automated SMS/Email/WhatsApp alerts, custom database architecture
+  - Price note: Final price decided upon architectural discussion
+  - CTA: Architectural discussion consultation
+
+### 2. Stage Integration & Responsive Flow
+- Stage sequence: `WORKS` (with `PRICING` rising from underneath in a vertical track with dedicated buffer zone), followed by `CONTACT` sliding in from the left (`490svh` total scroll budget).
+- Stacked fallback (`<= 900px` or `prefers-reduced-motion`): Natural single-column document flow where Works is followed by a section divider, Pricing, and then Contact.
+- Nav synchronization: `PRICING` is a first-class section in `SECTION_IDS` (`sectionMap.ts`), updating desktop nav pill visual reordering and mobile fullscreen menu.
+
