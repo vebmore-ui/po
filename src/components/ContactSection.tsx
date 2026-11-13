@@ -29,9 +29,10 @@ const MARK = 'VEBMORE'
 
 interface Props {
   triggerEntry?: boolean
+  isStandalone?: boolean
 }
 
-export default function ContactSection({ triggerEntry }: Props) {
+export default function ContactSection({ triggerEntry, isStandalone = false }: Props) {
   const rootRef = useRef<HTMLElement>(null)
   const timers = useRef<number[]>([])
   const [beat, setBeat] = useState(0)
@@ -181,30 +182,57 @@ export default function ContactSection({ triggerEntry }: Props) {
               </span>
             </p>
 
-            <h2 id="ct-heading" className="ct-title">
-              <span className="ct-title-line">
-                {WORDS.map((word, i) => (
-                  <span className="ct-word-mask" key={word}>
+            {isStandalone ? (
+              <h1 id="ct-heading" className="ct-title">
+                <span className="ct-title-line">
+                  {WORDS.map((word, i) => (
+                    <span className="ct-word-mask" key={word}>
+                      <span
+                        className={`ct-word${shown(2) ? ' is-in' : ''}`}
+                        style={{ transitionDelay: `${i * 90}ms` }}
+                      >
+                        {word}
+                      </span>
+                    </span>
+                  ))}
+                </span>
+                <span className="ct-title-line">
+                  <span className="ct-word-mask">
                     <span
-                      className={`ct-word${shown(2) ? ' is-in' : ''}`}
-                      style={{ transitionDelay: `${i * 90}ms` }}
+                      className={`ct-word ct-word-mark${shown(3) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: '120ms' }}
                     >
-                      {word}
+                      {MARK}
                     </span>
                   </span>
-                ))}
-              </span>
-              <span className="ct-title-line">
-                <span className="ct-word-mask">
-                  <span
-                    className={`ct-word ct-word-mark${shown(3) ? ' is-in' : ''}`}
-                    style={{ transitionDelay: '120ms' }}
-                  >
-                    {MARK}
+                </span>
+              </h1>
+            ) : (
+              <h2 id="ct-heading" className="ct-title">
+                <span className="ct-title-line">
+                  {WORDS.map((word, i) => (
+                    <span className="ct-word-mask" key={word}>
+                      <span
+                        className={`ct-word${shown(2) ? ' is-in' : ''}`}
+                        style={{ transitionDelay: `${i * 90}ms` }}
+                      >
+                        {word}
+                      </span>
+                    </span>
+                  ))}
+                </span>
+                <span className="ct-title-line">
+                  <span className="ct-word-mask">
+                    <span
+                      className={`ct-word ct-word-mark${shown(3) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: '120ms' }}
+                    >
+                      {MARK}
+                    </span>
                   </span>
                 </span>
-              </span>
-            </h2>
+              </h2>
+            )}
           </div>
 
           <p className={`ct-lede ct-rise${shown(4) ? ' is-in' : ''}`}>
@@ -212,6 +240,24 @@ export default function ContactSection({ triggerEntry }: Props) {
             TO BUILD. WE DESIGN AND DEVELOP WEBSITES AND DIGITAL PRODUCTS THAT
             LOOK SHARP AND PERFORM.
           </p>
+
+          <div
+            className={`ct-editorial-desc ct-rise${shown(4) ? ' is-in' : ''}`}
+            style={{
+              fontSize: '0.85rem',
+              lineHeight: 1.6,
+              color: 'rgba(255, 255, 255, 0.65)',
+              margin: '1.25rem 0',
+              maxWidth: '440px',
+            }}
+          >
+            <p style={{ margin: '0 0 0.75rem 0' }}>
+              Whether launching a new brand identity, engineering an interactive showcase, or building a high-speed corporate storefront, Vebmore collaborates closely with businesses across Ahmedabad, Surendranagar, and Bhubaneswar, India.
+            </p>
+            <p style={{ margin: 0 }}>
+              All client inquiries receive a direct review and response within 24 hours. Contact our team below via Gmail, Outlook, phone, or WhatsApp to schedule a discussion.
+            </p>
+          </div>
 
           {/* ── Live studio clock ── */}
           <div className={`ct-clock ct-rise${shown(4) ? ' is-in' : ''}`}>

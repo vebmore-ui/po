@@ -17,7 +17,7 @@ const QUESTION_REVEAL = 1200
 const COMPASS_ANIM = 1200
 const HERO_SCROLL_VIEWPORTS = 1.6
 
-export default function HomePage() {
+export default function HomePage({ currentRoute = '/' }: { currentRoute?: string }) {
   const [showCompass, setShowCompass] = useState(false)
   const [animationComplete, setAnimationComplete] = useState(false)
   const [, setScrollTick] = useState(0)
@@ -82,10 +82,12 @@ export default function HomePage() {
   const heroDone = heroProgress >= 1
   const aboutActive = heroProgress >= 0.85
 
+  const isHomeRoute = currentRoute === '/' || currentRoute === ''
+
   return (
     <>
       {/* Route-level dynamic SEO metadata */}
-      <SEO path="/" />
+      <SEO path={currentRoute} />
 
       {/* Spacer providing scroll distance for hero exit */}
       <div className="scroll-spacer" style={{ height: Math.round(viewport.heroTrack) }} />
@@ -103,7 +105,7 @@ export default function HomePage() {
         {showCompass && <Compass compassProgress={compassProgress} />}
         <ScrollTextLines textProgress={textProgress} animationComplete={animationComplete} />
 
-        {/* Visible, real-text H1 describing the studio & locations (fades out as hero exits) */}
+        {/* Visible, real-text H1 describing the studio & locations on homepage */}
         <div
           className="hero-studio-header"
           style={{
@@ -117,32 +119,53 @@ export default function HomePage() {
             transition: 'opacity 0.2s linear',
           }}
         >
-          <h1
-            style={{
-              margin: 0,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 'clamp(0.65rem, 0.95vw, 0.8rem)',
-              fontWeight: 500,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'rgba(255, 255, 255, 0.65)',
-              lineHeight: 1.5,
-            }}
-          >
-            <span style={{ color: '#ffffff', fontWeight: 700 }}>VEBMORE</span>
-            <span style={{ color: '#13ff00', margin: '0 0.5rem' }}>//</span>
-            <span>Website Design &amp; Web Development Studio</span>
-            <span style={{ color: 'rgba(255, 255, 255, 0.35)', margin: '0 0.5rem' }}>·</span>
-            <span>Ahmedabad, Surendranagar &amp; Bhubaneswar, India</span>
-          </h1>
+          {isHomeRoute ? (
+            <h1
+              style={{
+                margin: 0,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 'clamp(0.65rem, 0.95vw, 0.8rem)',
+                fontWeight: 500,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'rgba(255, 255, 255, 0.65)',
+                lineHeight: 1.5,
+              }}
+            >
+              <span style={{ color: '#ffffff', fontWeight: 700 }}>VEBMORE</span>
+              <span style={{ color: '#13ff00', margin: '0 0.5rem' }}>//</span>
+              <span>Website Design &amp; Web Development Studio</span>
+              <span style={{ color: 'rgba(255, 255, 255, 0.35)', margin: '0 0.5rem' }}>·</span>
+              <span>Ahmedabad, Surendranagar &amp; Bhubaneswar, India</span>
+            </h1>
+          ) : (
+            <p
+              style={{
+                margin: 0,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 'clamp(0.65rem, 0.95vw, 0.8rem)',
+                fontWeight: 500,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'rgba(255, 255, 255, 0.65)',
+                lineHeight: 1.5,
+              }}
+            >
+              <span style={{ color: '#ffffff', fontWeight: 700 }}>VEBMORE</span>
+              <span style={{ color: '#13ff00', margin: '0 0.5rem' }}>//</span>
+              <span>Website Design &amp; Web Development Studio</span>
+              <span style={{ color: 'rgba(255, 255, 255, 0.35)', margin: '0 0.5rem' }}>·</span>
+              <span>Ahmedabad, Surendranagar &amp; Bhubaneswar, India</span>
+            </p>
+          )}
         </div>
       </div>
 
       {/* About + Capabilities + Tech Stack pinned stage */}
-      <AboutCapabilitiesStage aboutActive={aboutActive} />
+      <AboutCapabilitiesStage aboutActive={aboutActive} currentRoute={currentRoute} />
 
       {/* Works → Contact pinned stage */}
-      <WorksContactStage />
+      <WorksContactStage currentRoute={currentRoute} />
 
       {/* Crawlable plain-text Services & FAQ section */}
       <ServicesFaqSection />

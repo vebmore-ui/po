@@ -36,9 +36,10 @@ function clamp(v: number, lo: number, hi: number): number {
 
 interface Props {
   aboutActive: boolean
+  currentRoute?: string
 }
 
-export default function AboutCapabilitiesStage({ aboutActive }: Props) {
+export default function AboutCapabilitiesStage({ aboutActive, currentRoute = '/' }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const capParallaxRef = useRef<HTMLDivElement>(null)
@@ -145,13 +146,13 @@ export default function AboutCapabilitiesStage({ aboutActive }: Props) {
         <div ref={trackRef} className="stg-track">
           {/* ── Panel 1: About ── */}
           <div className="stg-panel">
-            <AboutSection active={aboutActive} />
+            <AboutSection active={aboutActive} isStandalone={currentRoute === '/about'} />
           </div>
 
           {/* ── Panel 2: Capabilities ── */}
           <div className="stg-panel">
             <div ref={capParallaxRef} style={{ width: '100%', height: '100%' }}>
-              <CapabilitiesSection triggerEntry={capTrigger} />
+              <CapabilitiesSection triggerEntry={capTrigger} isStandalone={currentRoute === '/services'} />
             </div>
           </div>
 

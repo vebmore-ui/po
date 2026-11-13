@@ -7,6 +7,8 @@ import { usePath, navigate } from './router'
 import {
   SECTION_IDS,
   SECTION_LABELS,
+  SECTION_ROUTES,
+  sectionIdFromPath,
   type SectionId,
   getActiveSection,
   getAnchors,
@@ -94,14 +96,16 @@ export default function App() {
   const handleNavSelect = useCallback(
     (id: string) => {
       const sectionId = id as SectionId
+      const targetRoute = SECTION_ROUTES[sectionId] ?? '/'
       if (isWorksPage) {
-        if (sectionId === 'home') {
-          navigate('/')
-        } else {
-          navigate(`/#${sectionId}`)
-        }
+        navigate(targetRoute)
       } else {
-        scrollToSection(sectionId)
+        if (sectionId === 'work') {
+          navigate('/works')
+        } else {
+          navigate(targetRoute)
+          scrollToSection(sectionId)
+        }
       }
     },
     [isWorksPage, scrollToSection],
@@ -143,9 +147,17 @@ export default function App() {
     }
   }, [isWorksPage])
 
-  // ── Handle incoming hash when mounting on homepage ──
+  // ── Handle incoming path or hash when mounting on homepage ──
   useEffect(() => {
     if (isWorksPage) return
+
+    const initialSection = sectionIdFromPath(path)
+    if (initialSection && initialSection !== 'home') {
+      const id = requestAnimationFrame(() => {
+        scrollToSection(initialSection)
+      })
+      return () => cancelAnimationFrame(id)
+    }
 
     const hash = window.location.hash
     if (!hash) return
@@ -158,7 +170,9 @@ export default function App() {
       scrollToSection(targetSection)
     })
     return () => cancelAnimationFrame(id)
-  }, [isWorksPage, scrollToSection])
+  }, [isWorksPage, path, scrollToSection])
+
+  const initialActive = isWorksPage ? 'work' : (sectionIdFromPath(path) ?? activeSection)
 
   return (
     <>
@@ -168,7 +182,7 @@ export default function App() {
       {/* Primary Site Navigation (persists across pages) */}
       <SiteNav
         items={NAV_ITEMS}
-        activeId={isWorksPage ? 'work' : activeSection}
+        activeId={initialActive}
         onSelect={handleNavSelect}
         tone={isWorksPage ? 'dark' : headerTheme.tone}
         surface={isWorksPage ? 'paper' : headerTheme.surface}
@@ -176,7 +190,7 @@ export default function App() {
       />
 
       {/* Pages: unmounts / mounts per path */}
-      {isWorksPage ? <WorksPage /> : <HomePage />}
+      {isWorksPage ? <WorksPage /> : <HomePage currentRoute={path} />}
     </>
   )
 }

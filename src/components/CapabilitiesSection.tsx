@@ -55,7 +55,13 @@ const TITLE_LINE_2 = ['NAVIGATE']
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export default function CapabilitiesSection({ triggerEntry }: { triggerEntry?: boolean }) {
+export default function CapabilitiesSection({
+  triggerEntry,
+  isStandalone = false,
+}: {
+  triggerEntry?: boolean
+  isStandalone?: boolean
+}) {
   const rootRef = useRef<HTMLElement>(null)
   const [beat, setBeat] = useState(0)
   const [openIdx, setOpenIdx] = useState<number | null>(null)
@@ -132,32 +138,61 @@ export default function CapabilitiesSection({ triggerEntry }: { triggerEntry?: b
             </span>
           </p>
 
-          <h2 id="cap-heading" className="cap-title">
-            <span className="cap-title-line">
-              {TITLE_LINE_1.map((word, i) => (
-                <span className="cap-word-mask" key={word}>
-                  <span
-                    className={`cap-word${shown(2) ? ' is-in' : ''}`}
-                    style={{ transitionDelay: `${i * 90}ms` }}
-                  >
-                    {word}
+          {isStandalone ? (
+            <h1 id="cap-heading" className="cap-title">
+              <span className="cap-title-line">
+                {TITLE_LINE_1.map((word, i) => (
+                  <span className="cap-word-mask" key={word}>
+                    <span
+                      className={`cap-word${shown(2) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: `${i * 90}ms` }}
+                    >
+                      {word}
+                    </span>
                   </span>
-                </span>
-              ))}
-            </span>
-            <span className="cap-title-line">
-              {TITLE_LINE_2.map((word, i) => (
-                <span className="cap-word-mask" key={word}>
-                  <span
-                    className={`cap-word${shown(2) ? ' is-in' : ''}`}
-                    style={{ transitionDelay: `${(TITLE_LINE_1.length + i) * 90}ms` }}
-                  >
-                    {word}
+                ))}
+              </span>
+              <span className="cap-title-line">
+                {TITLE_LINE_2.map((word, i) => (
+                  <span className="cap-word-mask" key={word}>
+                    <span
+                      className={`cap-word${shown(2) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: `${(TITLE_LINE_1.length + i) * 90}ms` }}
+                    >
+                      {word}
+                    </span>
                   </span>
-                </span>
-              ))}
-            </span>
-          </h2>
+                ))}
+              </span>
+            </h1>
+          ) : (
+            <h2 id="cap-heading" className="cap-title">
+              <span className="cap-title-line">
+                {TITLE_LINE_1.map((word, i) => (
+                  <span className="cap-word-mask" key={word}>
+                    <span
+                      className={`cap-word${shown(2) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: `${i * 90}ms` }}
+                    >
+                      {word}
+                    </span>
+                  </span>
+                ))}
+              </span>
+              <span className="cap-title-line">
+                {TITLE_LINE_2.map((word, i) => (
+                  <span className="cap-word-mask" key={word}>
+                    <span
+                      className={`cap-word${shown(2) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: `${(TITLE_LINE_1.length + i) * 90}ms` }}
+                    >
+                      {word}
+                    </span>
+                  </span>
+                ))}
+              </span>
+            </h2>
+          )}
         </div>
 
         <p className={`cap-lede cap-rise${shown(3) ? ' is-in' : ''}`}>

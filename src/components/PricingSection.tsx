@@ -11,9 +11,10 @@ const TITLE_MARK = 'VEBMORE'
 
 interface Props {
   triggerEntry?: boolean
+  isStandalone?: boolean
 }
 
-export default function PricingSection({ triggerEntry }: Props) {
+export default function PricingSection({ triggerEntry, isStandalone = false }: Props) {
   const rootRef = useRef<HTMLElement>(null)
   const [beat, setBeat] = useState(0)
   const entryFired = useRef(false)
@@ -103,30 +104,57 @@ export default function PricingSection({ triggerEntry }: Props) {
               </span>
             </p>
 
-            <h2 id="pr-heading" className="pr-title">
-              <span className="pr-title-line">
-                {TITLE_WORDS.map((word, i) => (
-                  <span className="pr-word-mask" key={word}>
+            {isStandalone ? (
+              <h1 id="pr-heading" className="pr-title">
+                <span className="pr-title-line">
+                  {TITLE_WORDS.map((word, i) => (
+                    <span className="pr-word-mask" key={word}>
+                      <span
+                        className={`pr-word${shown(2) ? ' is-in' : ''}`}
+                        style={{ transitionDelay: `${i * 90}ms` }}
+                      >
+                        {word}
+                      </span>
+                    </span>
+                  ))}
+                </span>
+                <span className="pr-title-line">
+                  <span className="pr-word-mask">
                     <span
-                      className={`pr-word${shown(2) ? ' is-in' : ''}`}
-                      style={{ transitionDelay: `${i * 90}ms` }}
+                      className={`pr-word pr-word-mark${shown(3) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: '280ms' }}
                     >
-                      {word}
+                      {TITLE_MARK}
                     </span>
                   </span>
-                ))}
-              </span>
-              <span className="pr-title-line">
-                <span className="pr-word-mask">
-                  <span
-                    className={`pr-word pr-word-mark${shown(3) ? ' is-in' : ''}`}
-                    style={{ transitionDelay: '280ms' }}
-                  >
-                    {TITLE_MARK}
+                </span>
+              </h1>
+            ) : (
+              <h2 id="pr-heading" className="pr-title">
+                <span className="pr-title-line">
+                  {TITLE_WORDS.map((word, i) => (
+                    <span className="pr-word-mask" key={word}>
+                      <span
+                        className={`pr-word${shown(2) ? ' is-in' : ''}`}
+                        style={{ transitionDelay: `${i * 90}ms` }}
+                      >
+                        {word}
+                      </span>
+                    </span>
+                  ))}
+                </span>
+                <span className="pr-title-line">
+                  <span className="pr-word-mask">
+                    <span
+                      className={`pr-word pr-word-mark${shown(3) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: '280ms' }}
+                    >
+                      {TITLE_MARK}
+                    </span>
                   </span>
                 </span>
-              </span>
-            </h2>
+              </h2>
+            )}
           </div>
 
           <p className={`pr-lede pr-rise${shown(4) ? ' is-in' : ''}`}>

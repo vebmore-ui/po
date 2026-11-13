@@ -40,7 +40,11 @@ function easeInOut(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
 }
 
-export default function WorksContactStage() {
+interface Props {
+  currentRoute?: string
+}
+
+export default function WorksContactStage({ currentRoute = '/' }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const verticalTrackRef = useRef<HTMLDivElement>(null)
@@ -182,7 +186,10 @@ export default function WorksContactStage() {
           {/* Contact panel: sits on the LEFT of the track, revealed as track moves right */}
           <div className="wc-panel wc-panel-contact">
             <div ref={contactParallaxRef} className="wc-parallax-layer">
-              <ContactSection triggerEntry={contactTrigger} />
+              <ContactSection
+                triggerEntry={contactTrigger}
+                isStandalone={currentRoute === '/contact'}
+              />
             </div>
           </div>
 
@@ -209,7 +216,10 @@ export default function WorksContactStage() {
               </div>
 
               <div className="wc-subpanel wc-subpanel-pricing">
-                <PricingSection triggerEntry={pricingTrigger} />
+                <PricingSection
+                  triggerEntry={pricingTrigger}
+                  isStandalone={currentRoute === '/pricing'}
+                />
               </div>
             </div>
           </div>

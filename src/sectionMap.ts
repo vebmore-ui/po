@@ -29,6 +29,38 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   contact: 'CONTACT',
 }
 
+export const SECTION_ROUTES: Record<SectionId, string> = {
+  home: '/',
+  about: '/about',
+  capabilities: '/services',
+  work: '/works',
+  pricing: '/pricing',
+  contact: '/contact',
+}
+
+export function sectionIdFromPath(path: string): SectionId | null {
+  const clean = path.replace(/\/$/, '')
+  switch (clean) {
+    case '':
+    case '/':
+      return 'home'
+    case '/about':
+      return 'about'
+    case '/services':
+    case '/capabilities':
+      return 'capabilities'
+    case '/work':
+    case '/works':
+      return 'work'
+    case '/pricing':
+      return 'pricing'
+    case '/contact':
+      return 'contact'
+    default:
+      return null
+  }
+}
+
 /** Hero scroll budget, in viewports. Mirrors HERO_SCROLL_VIEWPORTS in App.tsx. */
 export const HERO_SCROLL_VIEWPORTS = 1.6
 

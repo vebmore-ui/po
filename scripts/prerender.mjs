@@ -19,6 +19,24 @@ const ROUTES = [
     canonical: `${SITE_URL}/`,
   },
   {
+    path: '/about',
+    outputPath: path.join(distDir, 'about', 'index.html'),
+    aliasPath: path.join(distDir, 'about.html'),
+    title: 'About Vebmore | Web Design Studio in Ahmedabad, India',
+    description:
+      'Learn about Vebmore, a digital design and web development agency creating affordable, high-performance websites across Ahmedabad, Surendranagar, and Bhubaneswar.',
+    canonical: `${SITE_URL}/about`,
+  },
+  {
+    path: '/services',
+    outputPath: path.join(distDir, 'services', 'index.html'),
+    aliasPath: path.join(distDir, 'services.html'),
+    title: 'Web Design & Development Services | Vebmore Solutions',
+    description:
+      "Discover Vebmore's website design, web development, and affordable digital solutions tailored for growing brands in Ahmedabad, Surendranagar, and Bhubaneswar, India.",
+    canonical: `${SITE_URL}/services`,
+  },
+  {
     path: '/works',
     outputPath: path.join(distDir, 'works', 'index.html'),
     aliasPath: path.join(distDir, 'works.html'),
@@ -26,6 +44,24 @@ const ROUTES = [
     description:
       'Explore selected website design, web development, and digital solution projects by Vebmore for clients across Ahmedabad, Surendranagar, and Bhubaneswar, India.',
     canonical: `${SITE_URL}/works`,
+  },
+  {
+    path: '/pricing',
+    outputPath: path.join(distDir, 'pricing', 'index.html'),
+    aliasPath: path.join(distDir, 'pricing.html'),
+    title: 'Affordable Web Design & Development Pricing | Vebmore',
+    description:
+      'Transparent, affordable website design and development pricing starting at ₹5,999. Tailored packages for businesses in Ahmedabad, Surendranagar, and Bhubaneswar.',
+    canonical: `${SITE_URL}/pricing`,
+  },
+  {
+    path: '/contact',
+    outputPath: path.join(distDir, 'contact', 'index.html'),
+    aliasPath: path.join(distDir, 'contact.html'),
+    title: 'Contact Vebmore | Web Design Agency in India & Remote',
+    description:
+      'Get in touch with Vebmore for your website design and web development needs. Serving clients across Ahmedabad, Surendranagar, and Bhubaneswar, Gujarat, India.',
+    canonical: `${SITE_URL}/contact`,
   },
 ]
 
@@ -71,13 +107,14 @@ function startServer(port) {
   return new Promise((resolve, reject) => {
     const server = http.createServer((req, res) => {
       let reqPath = req.url.split('?')[0]
-      if (reqPath === '/' || reqPath === '/works' || reqPath === '/work') {
+      const ext = path.extname(reqPath)
+      if (!ext) {
         reqPath = '/index.html'
       }
       const filePath = path.join(distDir, reqPath)
       if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-        const ext = path.extname(filePath).toLowerCase()
-        res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' })
+        const fileExt = path.extname(filePath).toLowerCase()
+        res.writeHead(200, { 'Content-Type': mimeTypes[fileExt] || 'application/octet-stream' })
         fs.createReadStream(filePath).pipe(res)
       } else {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })

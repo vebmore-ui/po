@@ -53,12 +53,15 @@ export default {
       })
     }
 
-    // 4. Dedicated handling for /works and /work to guarantee prerendered HTML is served directly
-    if (pathname === '/works' || pathname === '/works/' || pathname === '/work' || pathname === '/work/') {
-      const worksUrl = new URL('/works/index.html', request.url)
-      const worksRes = await env.ASSETS.fetch(new Request(worksUrl.toString(), request))
-      if (worksRes.status === 200) {
-        return worksRes
+    // 4. Dedicated handling for pre-rendered section routes to guarantee static HTML is served directly
+    const KNOWN_PAGE_ROUTES = ['/about', '/services', '/capabilities', '/works', '/work', '/pricing', '/contact']
+    const cleanPath = pathname.replace(/\/$/, '')
+    if (KNOWN_PAGE_ROUTES.includes(cleanPath)) {
+      const targetSubPath = cleanPath === '/work' ? '/works' : cleanPath === '/capabilities' ? '/services' : cleanPath
+      const routeUrl = new URL(`${targetSubPath}/index.html`, request.url)
+      const routeRes = await env.ASSETS.fetch(new Request(routeUrl.toString(), request))
+      if (routeRes.status === 200) {
+        return routeRes
       }
     }
 

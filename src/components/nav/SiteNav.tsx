@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { Link } from '../../router'
+import { SECTION_ROUTES, type SectionId } from '../../sectionMap'
 import darkLogo from '../../assets/vebmore-logo-dark.png'
 import lightLogo from '../../assets/vebmore-logo-light.png'
 import './nav.css'
@@ -136,7 +137,7 @@ export default function SiteNav({
               >
                 <a
                   className="nav-link"
-                  href={`#${item.id}`}
+                  href={SECTION_ROUTES[item.id as SectionId] ?? `#${item.id}`}
                   aria-current={active ? 'location' : undefined}
                   onClick={(e) => {
                     if (e.defaultPrevented) return
@@ -179,14 +180,19 @@ export default function SiteNav({
                 const active = item.id === activeId
                 return (
                   <li key={item.id}>
-                    <button
-                      type="button"
+                    <a
+                      href={SECTION_ROUTES[item.id as SectionId] ?? `#${item.id}`}
                       className={`nav-dropdown-link${active ? ' is-active' : ''}`}
                       aria-current={active ? 'location' : undefined}
-                      onClick={() => handleSelect(item.id)}
+                      onClick={(e) => {
+                        if (e.defaultPrevented) return
+                        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+                        e.preventDefault()
+                        handleSelect(item.id)
+                      }}
                     >
                       {item.label}
-                    </button>
+                    </a>
                   </li>
                 )
               })}

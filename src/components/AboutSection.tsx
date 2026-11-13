@@ -18,7 +18,12 @@ import VantaBirds from './about/VantaBirds'
 const WORDS = ['FLY', 'MORE', 'WITH']
 const MARK = 'VEBMORE'
 
-export default function AboutSection({ active }: { active: boolean }) {
+interface Props {
+  active: boolean
+  isStandalone?: boolean
+}
+
+export default function AboutSection({ active, isStandalone = false }: Props) {
   // One flag per beat, so each element can be given its own stagger without a
   // library. The order below IS the reveal order.
   const [beat, setBeat] = useState(0)
@@ -68,41 +73,76 @@ export default function AboutSection({ active }: { active: boolean }) {
             </span>
           </p>
 
-          <h2 className="ab-title">
-            {/* Word by word, so the sentence builds rather than appearing. Each
-                word sits in its own overflow-hidden wrapper, which is what lets it
-                slide up from nothing instead of fading in. */}
-            <span className="ab-title-line">
-              {WORDS.map((word, i) => (
-                <span className="ab-word-mask" key={word}>
+          {isStandalone ? (
+            <h1 className="ab-title">
+              <span className="ab-title-line">
+                {WORDS.map((word, i) => (
+                  <span className="ab-word-mask" key={word}>
+                    <span
+                      className={`ab-word${shown(2) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: `${i * 90}ms` }}
+                    >
+                      {word}
+                    </span>
+                  </span>
+                ))}
+              </span>
+              <span className="ab-title-line">
+                <span className="ab-word-mask">
                   <span
-                    className={`ab-word${shown(2) ? ' is-in' : ''}`}
-                    style={{ transitionDelay: `${i * 90}ms` }}
+                    className={`ab-word ab-word-mark${shown(3) ? ' is-in' : ''}`}
+                    style={{ transitionDelay: '120ms' }}
                   >
-                    {word}
+                    {MARK}
                   </span>
                 </span>
-              ))}
-            </span>
-            <span className="ab-title-line">
-              <span className="ab-word-mask">
-                <span
-                  className={`ab-word ab-word-mark${shown(3) ? ' is-in' : ''}`}
-                  style={{ transitionDelay: '120ms' }}
-                >
-                  {MARK}
+              </span>
+            </h1>
+          ) : (
+            <h2 className="ab-title">
+              <span className="ab-title-line">
+                {WORDS.map((word, i) => (
+                  <span className="ab-word-mask" key={word}>
+                    <span
+                      className={`ab-word${shown(2) ? ' is-in' : ''}`}
+                      style={{ transitionDelay: `${i * 90}ms` }}
+                    >
+                      {word}
+                    </span>
+                  </span>
+                ))}
+              </span>
+              <span className="ab-title-line">
+                <span className="ab-word-mask">
+                  <span
+                    className={`ab-word ab-word-mark${shown(3) ? ' is-in' : ''}`}
+                    style={{ transitionDelay: '120ms' }}
+                  >
+                    {MARK}
+                  </span>
                 </span>
               </span>
-            </span>
-          </h2>
+            </h2>
+          )}
 
           <div className={`ab-copy ab-rise${shown(4) ? ' is-in' : ''}`}>
             <p className="ab-lede">Website design, web development &amp; digital solutions.</p>
             <p>
-              Vebmore is a focused digital agency providing modern website design, web development,
+              Vebmore is an independent digital agency providing modern website design, web development,
               and affordable digital solutions for brands across Ahmedabad, Surendranagar,
-              and Bhubaneswar, India. We combine design sensibility with clean engineering to create
-              digital experiences that feel considered, intentional, and enduring.
+              and Bhubaneswar, India. We combine aesthetic discipline with clean engineering to create
+              digital storefronts and web architectures that feel considered, intentional, and enduring.
+            </p>
+            <p>
+              Our studio approaches every project as a balance of form and utility. From initial interface
+              concepts and responsive layout design to frontend engineering with React, TypeScript, and
+              Vite, we eliminate unnecessary complexity while optimizing load speeds, search engine
+              discoverability, and Core Web Vitals.
+            </p>
+            <p>
+              Whether partnering with emerging founders in Gujarat or growing enterprises across India,
+              our objective remains consistent: crafting accessible, high-performance web presences
+              that elevate brand credibility and drive meaningful digital engagement.
             </p>
           </div>
         </div>
