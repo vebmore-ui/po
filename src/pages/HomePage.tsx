@@ -3,6 +3,8 @@ import Compass from '../components/hero/Compass'
 import ScrollTextLines from '../components/hero/ScrollTextLines'
 import AboutCapabilitiesStage from '../components/AboutCapabilitiesStage'
 import WorksContactStage from '../components/WorksContactStage'
+import ServicesFaqSection from '../components/faq/ServicesFaqSection'
+import SEO from '../components/SEO'
 import '../components/motion-world/about.css'
 
 function getScrollTop(): number {
@@ -82,10 +84,8 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Primary Accessible H1 for Search Engine & Screen Reader Discovery */}
-      <h1 className="sr-only">
-        Vebmore — Website Design &amp; Web Development Agency in Ahmedabad, Surendranagar &amp; Bhubaneswar, India
-      </h1>
+      {/* Route-level dynamic SEO metadata */}
+      <SEO path="/" />
 
       {/* Spacer providing scroll distance for hero exit */}
       <div className="scroll-spacer" style={{ height: Math.round(viewport.heroTrack) }} />
@@ -102,6 +102,40 @@ export default function HomePage() {
       >
         {showCompass && <Compass compassProgress={compassProgress} />}
         <ScrollTextLines textProgress={textProgress} animationComplete={animationComplete} />
+
+        {/* Visible, real-text H1 describing the studio & locations (fades out as hero exits) */}
+        <div
+          className="hero-studio-header"
+          style={{
+            position: 'absolute',
+            bottom: 'clamp(1rem, 3vh, 2rem)',
+            left: 'clamp(1rem, 3.5vw, 2.5rem)',
+            zIndex: 10,
+            pointerEvents: 'none',
+            maxWidth: 'calc(100vw - 2rem)',
+            opacity: Math.max(0, 1 - heroProgress * 2.5),
+            transition: 'opacity 0.2s linear',
+          }}
+        >
+          <h1
+            style={{
+              margin: 0,
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 'clamp(0.65rem, 0.95vw, 0.8rem)',
+              fontWeight: 500,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: 'rgba(255, 255, 255, 0.65)',
+              lineHeight: 1.5,
+            }}
+          >
+            <span style={{ color: '#ffffff', fontWeight: 700 }}>VEBMORE</span>
+            <span style={{ color: '#13ff00', margin: '0 0.5rem' }}>//</span>
+            <span>Website Design &amp; Web Development Studio</span>
+            <span style={{ color: 'rgba(255, 255, 255, 0.35)', margin: '0 0.5rem' }}>·</span>
+            <span>Ahmedabad, Surendranagar &amp; Bhubaneswar, India</span>
+          </h1>
+        </div>
       </div>
 
       {/* About + Capabilities + Tech Stack pinned stage */}
@@ -109,6 +143,9 @@ export default function HomePage() {
 
       {/* Works → Contact pinned stage */}
       <WorksContactStage />
+
+      {/* Crawlable plain-text Services & FAQ section */}
+      <ServicesFaqSection />
     </>
   )
 }

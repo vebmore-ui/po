@@ -11,17 +11,14 @@ import { useEffect, useRef } from 'react'
 import { Link } from '../router'
 import { projects } from '../components/works/worksData'
 import { PROJECT_COUNT } from '../sectionMap'
+import SEO from '../components/SEO'
 import './worksPage.css'
 
 export default function WorksPage() {
   const rootRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    document.title = 'VEBMORE — The Full Archive'
     window.scrollTo(0, 0)
-    return () => {
-      document.title = 'VEBMORE — A Creative Digital Studio'
-    }
   }, [])
 
   /* Entry animation: fires once, then disconnects. */
@@ -50,6 +47,9 @@ export default function WorksPage() {
 
   return (
     <main className="wp-root" ref={rootRef}>
+      {/* Route-level dynamic SEO metadata */}
+      <SEO path="/works" />
+
       <div className="wp-grid-bg" aria-hidden="true" />
 
       <div className="wp-inner">
@@ -92,7 +92,13 @@ export default function WorksPage() {
             >
               <div className="wp-card-plate" style={{ background: p.gradient }}>
                 {p.image && (
-                  <img className="wp-card-image" src={p.image} alt={`${p.name} website preview`} />
+                  <img
+                    className="wp-card-image"
+                    src={p.image}
+                    alt={`${p.name} website preview`}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 )}
                 <span className="wp-card-shade" aria-hidden="true" />
                 <span className="wp-card-index">{String(i + 1).padStart(2, '0')}</span>

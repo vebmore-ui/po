@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'motion/react'
+import { Link } from '../../router'
 import darkLogo from '../../assets/vebmore-logo-dark.png'
 import lightLogo from '../../assets/vebmore-logo-light.png'
 import './nav.css'
@@ -105,12 +106,14 @@ export default function SiteNav({
       data-archive={archive || undefined}
     >
       <div className="nav-logo-slot">
-        <img
-          key={tone}
-          className="nav-logo-image"
-          src={tone === 'dark' ? darkLogo : lightLogo}
-          alt="Vebmore — Website Design &amp; Development Studio"
-        />
+        <Link to="/" className="nav-logo-link" aria-label="Vebmore Homepage">
+          <img
+            key={tone}
+            className="nav-logo-image"
+            src={tone === 'dark' ? darkLogo : lightLogo}
+            alt="Vebmore — Website Design &amp; Development Studio"
+          />
+        </Link>
       </div>
 
       {/* TOP RIGHT nav pill */}

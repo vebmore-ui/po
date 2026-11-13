@@ -1,0 +1,143 @@
+.sf-root {
+  position: relative;
+  background: #000000;
+  color: #ffffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 4rem);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  z-index: 10;
+}
+
+.sf-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sf-head {
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.sf-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #888888;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sf-label-green {
+  color: #13ff00;
+}
+
+.sf-title {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin: 0 0 1rem 0;
+  color: #ffffff;
+}
+
+.sf-lede {
+  font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 780px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sf-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+@media (min-width: 860px) {
+  .sf-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.sf-col-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #13ff00;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.sf-services-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sf-service-item {
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+  padding-left: 1.25rem;
+}
+
+.sf-service-name {
+  font-family: 'Anton', sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 0.4rem 0;
+}
+
+.sf-service-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+.sf-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.sf-faq-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.25rem 1.5rem;
+  border-radius: 4px;
+}
+
+.sf-faq-q {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 0.6rem 0;
+  letter-spacing: 0.02em;
+}
+
+.sf-faq-a {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+.sf-link {
+  color: #13ff00;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(19, 255, 0, 0.4);
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.sf-link:hover {
+  opacity: 0.85;
+  border-color: #13ff00;
+}

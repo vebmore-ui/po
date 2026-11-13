@@ -1,0 +1,241 @@
+import http from 'http'
+import fs from 'fs'
+import path from 'path'
+import { execFile } from 'child_process'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const distDir = path.resolve(__dirname, '../dist')
+
+const SITE_URL = 'https://your.vebmore-3f4.workers.dev'
+
+const ROUTES = [
+  {
+    path: '/',
+    outputPath: path.join(distDir, 'index.html'),
+    title: 'Vebmore | Website Design & Development in Ahmedabad, India',
+    description:
+      'Vebmore provides modern website design, web development, and affordable digital solutions for brands across Ahmedabad, Surendranagar, and Bhubaneswar, India.',
+    canonical: `${SITE_URL}/`,
+  },
+  {
+    path: '/works',
+    outputPath: path.join(distDir, 'works', 'index.html'),
+    aliasPath: path.join(distDir, 'works.html'),
+    title: 'Web Design & Development Archive | Vebmore Projects',
+    description:
+      'Explore selected website design, web development, and digital solution projects by Vebmore for clients across Ahmedabad, Surendranagar, and Bhubaneswar, India.',
+    canonical: `${SITE_URL}/works`,
+  },
+]
+
+function findChromePath() {
+  const envBin = process.env.CHROME_BIN || process.env.PUPPETEER_EXECUTABLE_PATH
+  if (envBin && fs.existsSync(envBin)) return envBin
+
+  const candidates = [
+    // Windows
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    path.join(process.env.LOCALAPPDATA || '', 'Google\\Chrome\\Application\\chrome.exe'),
+    // Linux
+    '/usr/bin/google-chrome',
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/chromium',
+    '/usr/bin/chromium-browser',
+    // macOS
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  ]
+
+  for (const c of candidates) {
+    if (c && fs.existsSync(c)) {
+      return c
+    }
+  }
+  return null
+}
+
+const mimeTypes = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+  '.json': 'application/json',
+  '.xml': 'application/xml',
+}
+
+function startServer(port) {
+  return new Promise((resolve, reject) => {
+    const server = http.createServer((req, res) => {
+      let reqPath = req.url.split('?')[0]
+      if (reqPath === '/' || reqPath === '/works' || reqPath === '/work') {
+        reqPath = '/index.html'
+      }
+      const filePath = path.join(distDir, reqPath)
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        const ext = path.extname(filePath).toLowerCase()
+        res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' })
+        fs.createReadStream(filePath).pipe(res)
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+        fs.createReadStream(path.join(distDir, 'index.html')).pipe(res)
+      }
+    })
+
+    server.listen(port, () => resolve(server))
+    server.on('error', reject)
+  })
+}
+
+function dumpDomWithChrome(chromePath, url) {
+  return new Promise((resolve, reject) => {
+    execFile(
+      chromePath,
+      [
+        '--headless=new',
+        '--dump-dom',
+        '--virtual-time-budget=3000',
+        '--disable-gpu',
+        '--no-sandbox',
+        url,
+      ],
+      { maxBuffer: 10 * 1024 * 1024 },
+      (err, stdout, stderr) => {
+        if (err) return reject(err)
+        resolve(stdout)
+      },
+    )
+  })
+}
+
+function injectHeadMeta(html, route) {
+  let modified = html
+
+  // Replace or inject title
+  if (modified.includes('<title>')) {
+    modified = modified.replace(/<title>[\s\S]*?<\/title>/i, `<title>${route.title}</title>`)
+  } else {
+    modified = modified.replace('</head>', `<title>${route.title}</title></head>`)
+  }
+
+  // Replace or inject meta description
+  if (modified.includes('name="description"')) {
+    modified = modified.replace(
+      /<meta\s+name="description"\s+content="[\s\S]*?"\s*\/?>/i,
+      `<meta name="description" content="${route.description}" />`,
+    )
+  }
+
+  // Replace or inject canonical link
+  if (modified.includes('rel="canonical"')) {
+    modified = modified.replace(
+      /<link\s+rel="canonical"\s+href="[\s\S]*?"\s*\/?>/i,
+      `<link rel="canonical" href="${route.canonical}" />`,
+    )
+  }
+
+  // Replace or inject og:title
+  if (modified.includes('property="og:title"')) {
+    modified = modified.replace(
+      /<meta\s+property="og:title"\s+content="[\s\S]*?"\s*\/?>/i,
+      `<meta property="og:title" content="${route.title}" />`,
+    )
+  }
+
+  // Replace or inject og:description
+  if (modified.includes('property="og:description"')) {
+    modified = modified.replace(
+      /<meta\s+property="og:description"\s+content="[\s\S]*?"\s*\/?>/i,
+      `<meta property="og:description" content="${route.description}" />`,
+    )
+  }
+
+  // Replace or inject og:url
+  if (modified.includes('property="og:url"')) {
+    modified = modified.replace(
+      /<meta\s+property="og:url"\s+content="[\s\S]*?"\s*\/?>/i,
+      `<meta property="og:url" content="${route.canonical}" />`,
+    )
+  }
+
+  // Replace or inject twitter:title
+  if (modified.includes('name="twitter:title"')) {
+    modified = modified.replace(
+      /<meta\s+name="twitter:title"\s+content="[\s\S]*?"\s*\/?>/i,
+      `<meta name="twitter:title" content="${route.title}" />`,
+    )
+  }
+
+  // Replace or inject twitter:description
+  if (modified.includes('name="twitter:description"')) {
+    modified = modified.replace(
+      /<meta\s+name="twitter:description"\s+content="[\s\S]*?"\s*\/?>/i,
+      `<meta name="twitter:description" content="${route.description}" />`,
+    )
+  }
+
+  return modified
+}
+
+async function run() {
+  console.log('[prerender] Starting build-time prerendering...')
+  const chromePath = findChromePath()
+
+  if (!chromePath) {
+    console.warn(
+      '[prerender] Chrome executable not found on system. Generating static metadata fallbacks...',
+    )
+    const baseHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8')
+    for (const route of ROUTES) {
+      const pageHtml = injectHeadMeta(baseHtml, route)
+      fs.mkdirSync(path.dirname(route.outputPath), { recursive: true })
+      fs.writeFileSync(route.outputPath, pageHtml, 'utf8')
+      if (route.aliasPath) {
+        fs.writeFileSync(route.aliasPath, pageHtml, 'utf8')
+      }
+      console.log(`[prerender] Generated static route (fallback): ${route.path}`)
+    }
+    return
+  }
+
+  console.log(`[prerender] Using Chrome at: ${chromePath}`)
+  const port = 4188
+  const server = await startServer(port)
+
+  try {
+    for (const route of ROUTES) {
+      console.log(`[prerender] Rendering route: ${route.path}`)
+      const targetUrl = `http://127.0.0.1:${port}${route.path}`
+      let renderedHtml = await dumpDomWithChrome(chromePath, targetUrl)
+
+      // Ensure DOCTYPE is present
+      if (!renderedHtml.startsWith('<!doctype html>') && !renderedHtml.startsWith('<!DOCTYPE html>')) {
+        renderedHtml = `<!doctype html>\n${renderedHtml}`
+      }
+
+      // Synchronize head metadata tags
+      renderedHtml = injectHeadMeta(renderedHtml, route)
+
+      fs.mkdirSync(path.dirname(route.outputPath), { recursive: true })
+      fs.writeFileSync(route.outputPath, renderedHtml, 'utf8')
+      if (route.aliasPath) {
+        fs.writeFileSync(route.aliasPath, renderedHtml, 'utf8')
+      }
+      console.log(
+        `[prerender] Successfully wrote: ${path.relative(distDir, route.outputPath)} (${renderedHtml.length} bytes)`,
+      )
+    }
+  } finally {
+    server.close()
+  }
+
+  console.log('[prerender] Prerendering complete!')
+}
+
+run().catch((err) => {
+  console.error('[prerender] Error during prerendering:', err)
+  process.exit(1)
+})

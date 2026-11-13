@@ -96,7 +96,7 @@ export default function TechStackPanel({ triggerPop }: Props) {
       <div className="ts-inner">
         {/* Labels stay invisible until the sequence has run — while the green
             screen is sliding in, it must read as a completely blank plate. */}
-        <p className={`ts-label ts-fade${popped ? ' is-in' : ''}`}>Tools we fly with</p>
+        <h2 className={`ts-label ts-fade${popped ? ' is-in' : ''}`}>Tools we fly with</h2>
 
         <ul
           id="tech-stack-grid"

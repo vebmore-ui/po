@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, type KeyboardEvent, type TouchEvent } from 'react'
 import { featuredProjects, type Project } from './works/worksData'
-import { navigate } from '../router'
+import { navigate, Link } from '../router'
 import './works.css'
 
 const TITLE_WORDS = ['GROW', 'MORE', 'WITH']
@@ -418,6 +418,8 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
                       className="wk-card-image"
                       src={p.image}
                       alt={`${p.name} — ${p.role} website preview`}
+                      loading="lazy"
+                      decoding="async"
                     />
                   )}
                   <span className="wk-card-index">0{idx + 1}</span>
@@ -465,6 +467,8 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
                       className="wk-plate-image"
                       src={activeProject.image}
                       alt={`${activeProject.name} — ${activeProject.role} interactive project preview`}
+                      loading="lazy"
+                      decoding="async"
                     />
                   )}
                   <span className="wk-plate-index">
@@ -540,15 +544,11 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
             )}
           </div>
 
-          {/* MORE DESIGNS & WORK ↗ Pill Button */}
+          {/* MORE DESIGNS & WORK ↗ Pill Link */}
           <div className="wk-more-wrap">
-            <button
-              type="button"
-              className="wk-more-btn"
-              onClick={() => navigate('/works')}
-            >
-              MORE DESIGNS & WORK ↗
-            </button>
+            <Link to="/works" className="wk-more-btn">
+              MORE DESIGNS &amp; WORK ↗
+            </Link>
           </div>
         </div>
       </div>
