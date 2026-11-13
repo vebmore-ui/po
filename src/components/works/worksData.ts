@@ -1,5 +1,6 @@
 import haulwiseImage from '../../assets/haulwise-cover.png'
 import femiknitImage from '../../assets/femiknit-cover.png'
+import shreeArchitectsImage from '../../assets/shree-architects-cover.jpg'
 
 /**
  * The Works archive.
@@ -106,20 +107,21 @@ export const projects: Project[] = [
       'Experimental interaction lab exploring generative typography and spatial canvas interfaces across touch and pointer environments.',
   },
   {
-    id: 'solstice',
-    slug: 'solstice',
-    name: 'SOLSTICE',
-    year: '2024',
-    role: 'CAMPAIGN SITE',
-    tags: ['MOTION', 'WEBGL', 'ART DIRECTION'],
+    id: 'shree-architects',
+    slug: 'shree-architects',
+    name: 'SHREE ARCHITECTS',
+    year: '2026',
+    role: 'ARCHITECTURE & SPATIAL DESIGN',
+    tags: ['ARCHITECTURE', 'RESIDENTIAL', 'SPATIAL DESIGN'],
     gradient:
-      'radial-gradient(circle at 70% 25%, #ffd36e 0%, #b35c00 35%, #000000 80%)',
-    url: '#', // REPLACE
+      'linear-gradient(135deg, #fbfaf7 0%, #d8cfc4 40%, #2b2825 100%)',
+    image: shreeArchitectsImage,
+    url: 'https://estate-brown-gamma.vercel.app/',
     featured: true,
     description:
-      'Immersive brand launch campaign featuring reactive lighting models, spatial sound design, and fluid scroll orchestration.',
+      'An architectural studio crafting enduring residential spaces to live, gather, and belong. Considered spatial design, natural materiality, and calm editorial presence.',
     blurb:
-      'Immersive brand launch campaign featuring reactive lighting models, spatial sound design, and fluid scroll orchestration.',
+      'An architectural studio crafting enduring residential spaces to live, gather, and belong. Considered spatial design, natural materiality, and calm editorial presence.',
   },
   {
     id: 'vantage',
