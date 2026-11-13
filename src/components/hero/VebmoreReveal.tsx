@@ -217,7 +217,7 @@ export default function VebmoreReveal({
           <span className="reveal-image-more">
             {phase === 1 && (
               <span className="reveal-image">
-                <img src={vebReveal} alt="" />
+                <img src={vebReveal} alt="Vebmore studio brand visual" />
               </span>
             )}
             {['M', 'O', 'R', 'E'].map((ch, i) => (

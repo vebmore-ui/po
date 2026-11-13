@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://your.vebmore-3f4.workers.dev/sitemap.xml

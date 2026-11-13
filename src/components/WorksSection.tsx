@@ -413,7 +413,13 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
                   onTouchStart={() => handleCardTouch(p)}
                   aria-label={`${p.name} — ${p.role}`}
                 >
-                  {p.image && <img className="wk-card-image" src={p.image} alt="" />}
+                  {p.image && (
+                    <img
+                      className="wk-card-image"
+                      src={p.image}
+                      alt={`${p.name} — ${p.role} website preview`}
+                    />
+                  )}
                   <span className="wk-card-index">0{idx + 1}</span>
                   <span className="wk-card-name">{p.name}</span>
                 </a>
@@ -455,7 +461,11 @@ export default function WorksSection({ triggerEntry, slideProgressRef }: Props) 
                   style={{ background: activeProject.gradient }}
                 >
                   {activeProject.image && (
-                    <img className="wk-plate-image" src={activeProject.image} alt="" />
+                    <img
+                      className="wk-plate-image"
+                      src={activeProject.image}
+                      alt={`${activeProject.name} — ${activeProject.role} interactive project preview`}
+                    />
                   )}
                   <span className="wk-plate-index">
                     0{featuredProjects.indexOf(activeProject) + 1} / 05

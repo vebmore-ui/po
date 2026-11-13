@@ -109,7 +109,7 @@ export default function SiteNav({
           key={tone}
           className="nav-logo-image"
           src={tone === 'dark' ? darkLogo : lightLogo}
-          alt="Vebmore"
+          alt="Vebmore — Website Design &amp; Development Studio"
         />
       </div>
 

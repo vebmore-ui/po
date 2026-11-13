@@ -97,10 +97,11 @@ export default function AboutSection({ active }: { active: boolean }) {
           </h2>
 
           <div className={`ab-copy ab-rise${shown(4) ? ' is-in' : ''}`}>
-            <p className="ab-lede">A creative digital studio for the modern web.</p>
+            <p className="ab-lede">Website design, web development &amp; digital solutions.</p>
             <p>
-              Vebmore is a focused digital agency building premium websites with quiet
-              confidence. We combine design sensibility with clean engineering to create
+              Vebmore is a focused digital agency providing modern website design, web development,
+              and affordable digital solutions for brands across Ahmedabad, Surendranagar,
+              and Bhubaneswar, India. We combine design sensibility with clean engineering to create
               digital experiences that feel considered, intentional, and enduring.
             </p>
           </div>

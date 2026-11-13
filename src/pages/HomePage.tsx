@@ -82,6 +82,11 @@ export default function HomePage() {
 
   return (
     <>
+      {/* Primary Accessible H1 for Search Engine & Screen Reader Discovery */}
+      <h1 className="sr-only">
+        Vebmore — Website Design &amp; Web Development Agency in Ahmedabad, Surendranagar &amp; Bhubaneswar, India
+      </h1>
+
       {/* Spacer providing scroll distance for hero exit */}
       <div className="scroll-spacer" style={{ height: Math.round(viewport.heroTrack) }} />
 
