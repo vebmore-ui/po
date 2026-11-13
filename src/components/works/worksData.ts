@@ -116,7 +116,7 @@ export const projects: Project[] = [
     gradient:
       'linear-gradient(135deg, #fbfaf7 0%, #d8cfc4 40%, #2b2825 100%)',
     image: shreeArchitectsImage,
-    url: 'https://estate-brown-gamma.vercel.app/',
+    url: 'https://real-estatesamp.vercel.app',
     featured: true,
     description:
       'An architectural studio crafting enduring residential spaces to live, gather, and belong. Considered spatial design, natural materiality, and calm editorial presence.',
