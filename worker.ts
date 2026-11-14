@@ -54,7 +54,7 @@ export default {
     }
 
     // 4. Dedicated handling for pre-rendered section routes to guarantee static HTML is served directly
-    const KNOWN_PAGE_ROUTES = ['/about', '/services', '/capabilities', '/works', '/work', '/pricing', '/contact']
+    const KNOWN_PAGE_ROUTES = ['/about', '/services', '/capabilities', '/works', '/work', '/pricing', '/contact', '/directory', '/faq']
     const cleanPath = pathname.replace(/\/$/, '')
     if (KNOWN_PAGE_ROUTES.includes(cleanPath)) {
       const targetSubPath = cleanPath === '/work' ? '/works' : cleanPath === '/capabilities' ? '/services' : cleanPath

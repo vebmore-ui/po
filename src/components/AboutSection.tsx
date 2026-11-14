@@ -126,23 +126,11 @@ export default function AboutSection({ active, isStandalone = false }: Props) {
           )}
 
           <div className={`ab-copy ab-rise${shown(4) ? ' is-in' : ''}`}>
-            <p className="ab-lede">Website design, web development &amp; digital solutions.</p>
+            <p className="ab-lede">A creative digital studio for the modern web.</p>
             <p>
-              Vebmore is an independent digital agency providing modern website design, web development,
-              and affordable digital solutions for brands across Ahmedabad, Surendranagar,
-              and Bhubaneswar, India. We combine aesthetic discipline with clean engineering to create
-              digital storefronts and web architectures that feel considered, intentional, and enduring.
-            </p>
-            <p>
-              Our studio approaches every project as a balance of form and utility. From initial interface
-              concepts and responsive layout design to frontend engineering with React, TypeScript, and
-              Vite, we eliminate unnecessary complexity while optimizing load speeds, search engine
-              discoverability, and Core Web Vitals.
-            </p>
-            <p>
-              Whether partnering with emerging founders in Gujarat or growing enterprises across India,
-              our objective remains consistent: crafting accessible, high-performance web presences
-              that elevate brand credibility and drive meaningful digital engagement.
+              Vebmore is a focused digital agency building premium websites with quiet
+              confidence. We combine design sensibility with clean engineering to create
+              digital experiences that feel considered, intentional, and enduring.
             </p>
           </div>
         </div>

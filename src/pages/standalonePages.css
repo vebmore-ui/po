@@ -1,0 +1,307 @@
+/* ==========================================================================
+   STANDALONE PAGES (/directory, /faq)
+   Clean document-flow pages styled in Vebmore's signature dark aesthetic:
+   #000000 surface, JetBrains Mono labels, Bebas Neue / Anton headings,
+   and #13ff00 green accents.
+   ========================================================================== */
+
+.sp-root {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: #000000;
+  color: #ffffff;
+  padding: var(--panel-pad-top, clamp(80px, 12vh, 140px)) clamp(20px, 6vw, 104px) clamp(60px, 10vh, 120px);
+  box-sizing: border-box;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.sp-grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sp-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1360px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(40px, 6vh, 80px);
+}
+
+/* Header */
+.sp-head {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: clamp(24px, 4vh, 48px);
+}
+
+.sp-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0;
+  font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sp-quote {
+  color: #13ff00;
+  font-weight: 700;
+}
+
+.sp-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.sp-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 7vw, 7rem);
+  line-height: 0.88;
+  letter-spacing: 0.02em;
+  margin: 0;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+.sp-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sp-back-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 8px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sp-back-btn:hover {
+  background-color: #13ff00;
+  color: #000000;
+  border-color: #13ff00;
+}
+
+.sp-lede {
+  max-width: 820px;
+  font-size: clamp(0.76rem, 1.05vw, 0.88rem);
+  line-height: 1.7;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+/* Sections & Grids */
+.sp-section {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vh, 32px);
+}
+
+.sp-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
+}
+
+.sp-section-title {
+  font-size: clamp(0.72rem, 1vw, 0.85rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #13ff00;
+  margin: 0;
+}
+
+.sp-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 36px);
+}
+
+.sp-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2.4vw, 28px);
+}
+
+.sp-card {
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.sp-card:hover {
+  border-color: rgba(19, 255, 0, 0.35);
+  transform: translateY(-2px);
+}
+
+.sp-card-index {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #13ff00;
+  letter-spacing: 0.12em;
+}
+
+.sp-card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 2.8vw, 2.4rem);
+  letter-spacing: 0.03em;
+  margin: 0;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.sp-card-category {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.sp-card-desc {
+  font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.sp-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-list-item {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  position: relative;
+  padding-left: 18px;
+}
+
+.sp-list-item::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #13ff00;
+}
+
+/* FAQ Accordion / Item list */
+.sp-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.5vh, 24px);
+}
+
+.sp-faq-card {
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sp-faq-q {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.sp-faq-a {
+  font-size: clamp(0.72rem, 0.98vw, 0.84rem);
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+}
+
+.sp-faq-a strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Footer CTA */
+.sp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: clamp(32px, 6vh, 64px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  flex-wrap: wrap;
+}
+
+.sp-footer-text {
+  font-size: clamp(0.72rem, 1.1vw, 0.88rem);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.sp-footer-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: 1px solid #13ff00;
+  color: #000000;
+  background: #13ff00;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-decoration: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sp-footer-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+@media (max-width: 900px) {
+  .sp-grid-2,
+  .sp-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}

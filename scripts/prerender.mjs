@@ -63,6 +63,24 @@ const ROUTES = [
       'Get in touch with Vebmore for your website design and web development needs. Serving clients across Ahmedabad, Surendranagar, and Bhubaneswar, Gujarat, India.',
     canonical: `${SITE_URL}/contact`,
   },
+  {
+    path: '/directory',
+    outputPath: path.join(distDir, 'directory', 'index.html'),
+    aliasPath: path.join(distDir, 'directory.html'),
+    title: 'Studio Directory & Capabilities | Vebmore India',
+    description:
+      "Explore Vebmore's studio capabilities, web architecture stack, and digital solutions serving brands across Ahmedabad, Surendranagar, and Bhubaneswar, India.",
+    canonical: `${SITE_URL}/directory`,
+  },
+  {
+    path: '/faq',
+    outputPath: path.join(distDir, 'faq', 'index.html'),
+    aliasPath: path.join(distDir, 'faq.html'),
+    title: 'Frequently Asked Questions | Vebmore Web Design Studio',
+    description:
+      "Get clear answers about Vebmore's website design pricing (₹5,999–₹24,499), delivery turnaround, tech stack, and service coverage across Ahmedabad and India.",
+    canonical: `${SITE_URL}/faq`,
+  },
 ]
 
 function findChromePath() {

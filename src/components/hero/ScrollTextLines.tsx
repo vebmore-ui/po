@@ -19,7 +19,15 @@ const LINES = [
 // Line 0 (question) never disappears.
 const DISAPPEAR_ORDER = [4, 3, 2, 1]
 
-export default function ScrollTextLines({ textProgress = 0, animationComplete = false }: { textProgress?: number; animationComplete?: boolean }) {
+export default function ScrollTextLines({
+  textProgress = 0,
+  animationComplete = false,
+  isHeroH1 = true,
+}: {
+  textProgress?: number
+  animationComplete?: boolean
+  isHeroH1?: boolean
+}) {
   const [visibleLines, setVisibleLines] = useState<boolean[]>(Array(LINES.length).fill(false))
   const [questionRevealed, setQuestionRevealed] = useState(false)
   const [lineHeight, setLineHeight] = useState(() => {
@@ -220,6 +228,24 @@ export default function ScrollTextLines({ textProgress = 0, animationComplete = 
                     ))}
                   </div>
                 </div>
+              ) : (index === 2 && isHeroH1) ? (
+                <h1
+                  style={{
+                    display: 'flex',
+                    whiteSpace: 'nowrap',
+                    fontSize: 'clamp(3rem, 10vw, 12rem)',
+                    fontFamily: "'Anton', sans-serif",
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    fontWeight: 400,
+                    margin: 0,
+                    padding: 0,
+                    animation: `${line.direction === 'left' ? 'slideLeft' : 'slideRight'} ${20 + index * 5}s linear infinite`,
+                    willChange: 'transform',
+                  }}
+                >
+                  {items}
+                </h1>
               ) : (
                 <div
                   style={{

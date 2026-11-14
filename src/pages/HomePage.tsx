@@ -3,7 +3,6 @@ import Compass from '../components/hero/Compass'
 import ScrollTextLines from '../components/hero/ScrollTextLines'
 import AboutCapabilitiesStage from '../components/AboutCapabilitiesStage'
 import WorksContactStage from '../components/WorksContactStage'
-import ServicesFaqSection from '../components/faq/ServicesFaqSection'
 import SEO from '../components/SEO'
 import '../components/motion-world/about.css'
 
@@ -81,7 +80,6 @@ export default function HomePage({ currentRoute = '/' }: { currentRoute?: string
 
   const heroDone = heroProgress >= 1
   const aboutActive = heroProgress >= 0.85
-
   const isHomeRoute = currentRoute === '/' || currentRoute === ''
 
   return (
@@ -103,62 +101,11 @@ export default function HomePage({ currentRoute = '/' }: { currentRoute?: string
         }}
       >
         {showCompass && <Compass compassProgress={compassProgress} />}
-        <ScrollTextLines textProgress={textProgress} animationComplete={animationComplete} />
-
-        {/* Visible, real-text H1 describing the studio & locations on homepage */}
-        <div
-          className="hero-studio-header"
-          style={{
-            position: 'absolute',
-            bottom: 'clamp(1rem, 3vh, 2rem)',
-            left: 'clamp(1rem, 3.5vw, 2.5rem)',
-            zIndex: 10,
-            pointerEvents: 'none',
-            maxWidth: 'calc(100vw - 2rem)',
-            opacity: Math.max(0, 1 - heroProgress * 2.5),
-            transition: 'opacity 0.2s linear',
-          }}
-        >
-          {isHomeRoute ? (
-            <h1
-              style={{
-                margin: 0,
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 'clamp(0.65rem, 0.95vw, 0.8rem)',
-                fontWeight: 500,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'rgba(255, 255, 255, 0.65)',
-                lineHeight: 1.5,
-              }}
-            >
-              <span style={{ color: '#ffffff', fontWeight: 700 }}>VEBMORE</span>
-              <span style={{ color: '#13ff00', margin: '0 0.5rem' }}>//</span>
-              <span>Website Design &amp; Web Development Studio</span>
-              <span style={{ color: 'rgba(255, 255, 255, 0.35)', margin: '0 0.5rem' }}>·</span>
-              <span>Ahmedabad, Surendranagar &amp; Bhubaneswar, India</span>
-            </h1>
-          ) : (
-            <p
-              style={{
-                margin: 0,
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 'clamp(0.65rem, 0.95vw, 0.8rem)',
-                fontWeight: 500,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'rgba(255, 255, 255, 0.65)',
-                lineHeight: 1.5,
-              }}
-            >
-              <span style={{ color: '#ffffff', fontWeight: 700 }}>VEBMORE</span>
-              <span style={{ color: '#13ff00', margin: '0 0.5rem' }}>//</span>
-              <span>Website Design &amp; Web Development Studio</span>
-              <span style={{ color: 'rgba(255, 255, 255, 0.35)', margin: '0 0.5rem' }}>·</span>
-              <span>Ahmedabad, Surendranagar &amp; Bhubaneswar, India</span>
-            </p>
-          )}
-        </div>
+        <ScrollTextLines
+          textProgress={textProgress}
+          animationComplete={animationComplete}
+          isHeroH1={isHomeRoute}
+        />
       </div>
 
       {/* About + Capabilities + Tech Stack pinned stage */}
@@ -166,9 +113,6 @@ export default function HomePage({ currentRoute = '/' }: { currentRoute?: string
 
       {/* Works → Contact pinned stage */}
       <WorksContactStage currentRoute={currentRoute} />
-
-      {/* Crawlable plain-text Services & FAQ section */}
-      <ServicesFaqSection />
     </>
   )
 }

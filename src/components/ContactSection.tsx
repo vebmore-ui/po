@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from '../router'
 import ContactButton from './contact/ContactButton'
 import {
   LINKEDIN_URL,
@@ -241,24 +242,6 @@ export default function ContactSection({ triggerEntry, isStandalone = false }: P
             LOOK SHARP AND PERFORM.
           </p>
 
-          <div
-            className={`ct-editorial-desc ct-rise${shown(4) ? ' is-in' : ''}`}
-            style={{
-              fontSize: '0.85rem',
-              lineHeight: 1.6,
-              color: 'rgba(255, 255, 255, 0.65)',
-              margin: '1.25rem 0',
-              maxWidth: '440px',
-            }}
-          >
-            <p style={{ margin: '0 0 0.75rem 0' }}>
-              Whether launching a new brand identity, engineering an interactive showcase, or building a high-speed corporate storefront, Vebmore collaborates closely with businesses across Ahmedabad, Surendranagar, and Bhubaneswar, India.
-            </p>
-            <p style={{ margin: 0 }}>
-              All client inquiries receive a direct review and response within 24 hours. Contact our team below via Gmail, Outlook, phone, or WhatsApp to schedule a discussion.
-            </p>
-          </div>
-
           {/* ── Live studio clock ── */}
           <div className={`ct-clock ct-rise${shown(4) ? ' is-in' : ''}`}>
             <span className="ct-clock-label">LOCAL TIME</span>
@@ -266,9 +249,19 @@ export default function ContactSection({ triggerEntry, isStandalone = false }: P
             <span className="ct-clock-zone">{STUDIO_TIMEZONE_LABEL}</span>
           </div>
 
-          <p className={`ct-copyright ct-rise${shown(9) ? ' is-in' : ''}`}>
-            © 2026 VEBMORE — A CREATIVE DIGITAL STUDIO FOR THE MODERN WEB.
-          </p>
+          <div className={`ct-copyright ct-rise${shown(9) ? ' is-in' : ''}`}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px 16px' }}>
+              <span>© 2026 VEBMORE — A CREATIVE DIGITAL STUDIO FOR THE MODERN WEB.</span>
+              <span style={{ display: 'inline-flex', gap: '14px' }}>
+                <Link to="/directory" style={{ color: 'rgba(255, 255, 255, 0.65)', textDecoration: 'none' }}>
+                  DIRECTORY ↗
+                </Link>
+                <Link to="/faq" style={{ color: 'rgba(255, 255, 255, 0.65)', textDecoration: 'none' }}>
+                  FAQ ↗
+                </Link>
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* ── RIGHT: three action groups ── */}

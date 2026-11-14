@@ -81,4 +81,26 @@ export const PAGES_METADATA: Record<string, PageMetadata> = {
     ogImage: `${SITE_URL}/og-image.png`,
     ogImageAlt: 'Contact Vebmore — Web Design & Development Inquiries',
   },
+  '/directory': {
+    title: 'Studio Directory & Capabilities | Vebmore India',
+    description:
+      'Explore Vebmore\'s studio capabilities, web architecture stack, and digital solutions serving brands across Ahmedabad, Surendranagar, and Bhubaneswar, India.',
+    canonical: `${SITE_URL}/directory`,
+    ogTitle: 'Studio Directory & Capabilities | Vebmore India',
+    ogDescription:
+      'Explore Vebmore\'s studio capabilities, web architecture stack, and digital solutions serving brands across Ahmedabad, Surendranagar, and Bhubaneswar, India.',
+    ogImage: `${SITE_URL}/og-image.png`,
+    ogImageAlt: 'Vebmore Studio Directory — Capabilities & Architecture',
+  },
+  '/faq': {
+    title: 'Frequently Asked Questions | Vebmore Web Design Studio',
+    description:
+      'Get clear answers about Vebmore\'s website design pricing (₹5,999–₹24,499), delivery turnaround, tech stack, and service coverage across Ahmedabad and India.',
+    canonical: `${SITE_URL}/faq`,
+    ogTitle: 'Frequently Asked Questions | Vebmore Web Design Studio',
+    ogDescription:
+      'Get clear answers about Vebmore\'s website design pricing (₹5,999–₹24,499), delivery turnaround, tech stack, and service coverage across Ahmedabad and India.',
+    ogImage: `${SITE_URL}/og-image.png`,
+    ogImageAlt: 'Vebmore FAQ — Web Design Pricing & Process',
+  },
 }

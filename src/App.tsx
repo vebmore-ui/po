@@ -3,6 +3,8 @@ import SiteNav, { type NavItem } from './components/nav/SiteNav'
 import SiteCursor from './components/cursor/SiteCursor'
 import HomePage from './pages/HomePage'
 import WorksPage from './pages/WorksPage'
+import DirectoryPage from './pages/DirectoryPage'
+import FaqPage from './pages/FaqPage'
 import { usePath, navigate } from './router'
 import {
   SECTION_IDS,
@@ -72,6 +74,10 @@ function getAnchorContext(): AnchorContext {
 export default function App() {
   const path = usePath()
   const isWorksPage = path === '/works' || path === '/work'
+  const isDirectoryPage = path === '/directory'
+  const isFaqPage = path === '/faq'
+  const isStandaloneDoc = isWorksPage || isDirectoryPage || isFaqPage
+
   const [activeSection, setActiveSection] = useState<SectionId>('home')
   const [headerTheme, setHeaderTheme] = useState<HeaderTheme>({
     tone: 'light',
@@ -97,7 +103,7 @@ export default function App() {
     (id: string) => {
       const sectionId = id as SectionId
       const targetRoute = SECTION_ROUTES[sectionId] ?? '/'
-      if (isWorksPage) {
+      if (isStandaloneDoc) {
         navigate(targetRoute)
       } else {
         if (sectionId === 'work') {
@@ -108,12 +114,12 @@ export default function App() {
         }
       }
     },
-    [isWorksPage, scrollToSection],
+    [isStandaloneDoc, scrollToSection],
   )
 
   // ── Active section detection for homepage ──
   useEffect(() => {
-    if (isWorksPage) return
+    if (isStandaloneDoc) return
 
     let ticking = false
     const onScroll = () => {
@@ -145,11 +151,11 @@ export default function App() {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
-  }, [isWorksPage])
+  }, [isStandaloneDoc])
 
   // ── Handle incoming path or hash when mounting on homepage ──
   useEffect(() => {
-    if (isWorksPage) return
+    if (isStandaloneDoc) return
 
     const initialSection = sectionIdFromPath(path)
     if (initialSection && initialSection !== 'home') {
@@ -170,7 +176,7 @@ export default function App() {
       scrollToSection(targetSection)
     })
     return () => cancelAnimationFrame(id)
-  }, [isWorksPage, path, scrollToSection])
+  }, [isStandaloneDoc, path, scrollToSection])
 
   const initialActive = isWorksPage ? 'work' : (sectionIdFromPath(path) ?? activeSection)
 
@@ -186,11 +192,19 @@ export default function App() {
         onSelect={handleNavSelect}
         tone={isWorksPage ? 'dark' : headerTheme.tone}
         surface={isWorksPage ? 'paper' : headerTheme.surface}
-        archive={isWorksPage}
+        archive={isStandaloneDoc}
       />
 
       {/* Pages: unmounts / mounts per path */}
-      {isWorksPage ? <WorksPage /> : <HomePage currentRoute={path} />}
+      {isWorksPage ? (
+        <WorksPage />
+      ) : isDirectoryPage ? (
+        <DirectoryPage />
+      ) : isFaqPage ? (
+        <FaqPage />
+      ) : (
+        <HomePage currentRoute={path} />
+      )}
     </>
   )
 }
