@@ -78,12 +78,15 @@ export default function App() {
   const isFaqPage = path === '/faq'
   const isStandaloneDoc = isWorksPage || isDirectoryPage || isFaqPage
 
-  const [activeSection, setActiveSection] = useState<SectionId>('home')
+  const [activeSection, setActiveSection] = useState<SectionId>(() => {
+    return sectionIdFromPath(path) ?? 'home'
+  })
   const [headerTheme, setHeaderTheme] = useState<HeaderTheme>({
     tone: 'light',
     surface: 'ink',
   })
   const rafScrollRef = useRef(0)
+  const isInitialMountRef = useRef(true)
 
   // ── Scroll to a specific section anchor ──
   const scrollToSection = useCallback((id: SectionId) => {
@@ -109,7 +112,8 @@ export default function App() {
         if (sectionId === 'work') {
           navigate('/works')
         } else {
-          navigate(targetRoute)
+          setActiveSection(sectionId)
+          window.history.replaceState(null, '', targetRoute)
           scrollToSection(sectionId)
         }
       }
@@ -158,7 +162,16 @@ export default function App() {
     if (isStandaloneDoc) return
 
     const initialSection = sectionIdFromPath(path)
-    if (initialSection && initialSection !== 'home') {
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false
+      if (initialSection && initialSection !== 'home') {
+        const id = requestAnimationFrame(() => {
+          scrollToSection(initialSection)
+        })
+        return () => cancelAnimationFrame(id)
+      }
+    } else if (initialSection) {
+      setActiveSection(initialSection)
       const id = requestAnimationFrame(() => {
         scrollToSection(initialSection)
       })
@@ -178,7 +191,11 @@ export default function App() {
     return () => cancelAnimationFrame(id)
   }, [isStandaloneDoc, path, scrollToSection])
 
-  const initialActive = isWorksPage ? 'work' : (sectionIdFromPath(path) ?? activeSection)
+  const activeNavId = isWorksPage
+    ? 'work'
+    : isDirectoryPage || isFaqPage
+      ? ''
+      : activeSection
 
   return (
     <>
@@ -188,7 +205,7 @@ export default function App() {
       {/* Primary Site Navigation (persists across pages) */}
       <SiteNav
         items={NAV_ITEMS}
-        activeId={initialActive}
+        activeId={activeNavId}
         onSelect={handleNavSelect}
         tone={isWorksPage ? 'dark' : isDirectoryPage || isFaqPage ? 'light' : headerTheme.tone}
         surface={isWorksPage ? 'paper' : isDirectoryPage || isFaqPage ? 'ink' : headerTheme.surface}

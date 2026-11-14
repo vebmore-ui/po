@@ -83,9 +83,7 @@ export default function DirectoryPage() {
             {SEO_TECH_STACK.map((tech) => (
               <div key={tech.name} className="sp-card">
                 <span className="sp-card-index">// STACK</span>
-                <h3 className="sp-card-title" style={{ fontSize: '1.6rem' }}>
-                  {tech.name}
-                </h3>
+                <h3 className="sp-card-title">{tech.name}</h3>
                 <span className="sp-card-category">{tech.role}</span>
                 <p className="sp-card-desc">{tech.benefit}</p>
               </div>
@@ -104,9 +102,7 @@ export default function DirectoryPage() {
           <div className="sp-grid-3">
             <div className="sp-card">
               <span className="sp-card-index">GUJARAT HUB</span>
-              <h3 className="sp-card-title" style={{ fontSize: '1.8rem' }}>
-                AHMEDABAD
-              </h3>
+              <h3 className="sp-card-title">AHMEDABAD</h3>
               <p className="sp-card-desc">
                 Commercial and creative web development partnerships for emerging brands, design-conscious founders, and modern enterprises in Ahmedabad, Gujarat.
               </p>
@@ -114,9 +110,7 @@ export default function DirectoryPage() {
 
             <div className="sp-card">
               <span className="sp-card-index">GUJARAT STUDIO</span>
-              <h3 className="sp-card-title" style={{ fontSize: '1.8rem' }}>
-                SURENDRANAGAR
-              </h3>
+              <h3 className="sp-card-title">SURENDRANAGAR</h3>
               <p className="sp-card-desc">
                 Regional digital solutions, affordable storefronts, and foundational online presences tailored for growing businesses across Saurashtra and Gujarat.
               </p>
@@ -124,9 +118,7 @@ export default function DirectoryPage() {
 
             <div className="sp-card">
               <span className="sp-card-index">EAST INDIA HUB</span>
-              <h3 className="sp-card-title" style={{ fontSize: '1.8rem' }}>
-                BHUBANESWAR
-              </h3>
+              <h3 className="sp-card-title">BHUBANESWAR</h3>
               <p className="sp-card-desc">
                 Frontend architecture, scalable web applications, and interactive digital experiences for technology ventures and enterprises in Bhubaneswar, Odisha.
               </p>
