@@ -190,9 +190,9 @@ export default function App() {
         items={NAV_ITEMS}
         activeId={initialActive}
         onSelect={handleNavSelect}
-        tone={isWorksPage ? 'dark' : headerTheme.tone}
-        surface={isWorksPage ? 'paper' : headerTheme.surface}
-        archive={isStandaloneDoc}
+        tone={isWorksPage ? 'dark' : isDirectoryPage || isFaqPage ? 'light' : headerTheme.tone}
+        surface={isWorksPage ? 'paper' : isDirectoryPage || isFaqPage ? 'ink' : headerTheme.surface}
+        archive={isWorksPage}
       />
 
       {/* Pages: unmounts / mounts per path */}
